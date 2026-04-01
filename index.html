@@ -2272,7 +2272,7 @@ function onXlFile(event){
 
   var reader=new FileReader();
   reader.onload=function(e){
-    OfflineXLSX.readAsync(e.target.result, function(err, data){
+    readAsync(e.target.result, function(err, data){
       if(err||!data){document.getElementById('xl-msg').textContent='読み込みエラー: '+(err?err.message:'データなし');return;}
       if(data.length<2){document.getElementById('xl-msg').textContent='データが見つかりませんでした';return;}
       xlHeaders=data[0].map(function(h,i){return String(h||'列'+(i+1));});
@@ -2361,7 +2361,7 @@ function generatePDF(){
     cvs.width=A4W*scale;cvs.height=A4H*scale;
     var ctx=cvs.getContext('2d');
     var bgRgb=h2rgb(cfg.cb);
-    ctx.fillStyle='rgb('+bgRgb[0]+','+bgRgb[1]+','+bgRgb[2]+')';
+    ctx.fillStyle='rgb('+bgRgb.r+','+bgRgb.g+','+bgRgb.b+')';
     ctx.fillRect(0,0,cvs.width,cvs.height);
     for(var i=0;i<perPage;i++){
       var item=items[pg*perPage+i]||null;
