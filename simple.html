@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>値段POP作成ツール</title>
 <style>
+/* ============================================================
+   CSS変数（デザイントークン）
+   色・余白・角丸などを一か所で管理する仕組み
+   ここを変えるだけで全体のデザインが変わる
+   ============================================================ */
 :root {
   --color-primary: #52c41a;
   --color-primary-hover: #73d13d;
@@ -38,6 +43,10 @@
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans CJK JP', 'Hiragino Sans', 'Meiryo', sans-serif;
 }
 
+/* ============================================================
+   リセット・ベーススタイル
+   ブラウザ既定のスタイルを統一する
+   ============================================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -48,6 +57,9 @@ body {
   line-height: 1.5714;
 }
 
+/* ============================================================
+   ヘッダー
+   ============================================================ */
 .header {
   background: var(--color-primary);
   color: #fff;
@@ -56,14 +68,79 @@ body {
   font-weight: 600;
   text-align: center;
   box-shadow: var(--shadow-1);
+  /* タブが下に続くので position: sticky にする */
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
+/* ============================================================
+   タブバー
+   ヘッダー直下に固定表示される横並びのタブ
+   ============================================================ */
+.tab-bar {
+  background: var(--color-bg-container);
+  border-bottom: 1px solid var(--color-border-secondary);
+  display: flex;
+  position: sticky;
+  /* ヘッダー高さ（約44px）の直下に固定 */
+  top: 44px;
+  z-index: 99;
+  box-shadow: var(--shadow-1);
+}
+
+/* 各タブボタン */
+.tab-btn {
+  flex: 1;              /* 3つのボタンが均等幅になる */
+  height: 44px;
+  border: none;
+  border-bottom: 2px solid transparent; /* アクティブ時に色が付く */
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+  padding: 0 var(--space-xs);
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--color-primary-hover);
+}
+
+/* アクティブなタブは緑文字 + 下線 */
+.tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* ============================================================
+   コンテナ（各タブのコンテンツを包む）
+   タブ1（POP作成）は max-width 600px
+   タブ2・3（読み物）は max-width 720px
+   ============================================================ */
 .container {
   max-width: 600px;
   margin: 0 auto;
   padding: var(--space-md);
 }
 
+.container.wide {
+  max-width: 720px;
+}
+
+/* ============================================================
+   タブコンテンツの表示/非表示
+   JSで .active クラスを切り替える
+   ============================================================ */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ============================================================
+   セクション（白いカードブロック）
+   ============================================================ */
 .section {
   background: var(--color-bg-container);
   border: 1px solid var(--color-border-secondary);
@@ -73,6 +150,7 @@ body {
   box-shadow: var(--shadow-1);
 }
 
+/* セクション見出し（左に緑の縦棒がつく） */
 .section-title {
   font-size: 13px;
   font-weight: 600;
@@ -93,6 +171,9 @@ body {
   flex-shrink: 0;
 }
 
+/* ============================================================
+   フォーム部品（ラベル・入力欄）
+   ============================================================ */
 label {
   display: block;
   font-size: 13px;
@@ -126,6 +207,7 @@ input:focus {
   box-shadow: 0 0 0 2px rgba(82,196,26,0.1);
 }
 
+/* エラー状態（入力チェック失敗時） */
 input.error {
   border-color: var(--color-error);
   box-shadow: 0 0 0 2px rgba(255,77,79,0.1);
@@ -134,6 +216,9 @@ input.error {
 
 .field { margin-bottom: var(--space-md); }
 
+/* ============================================================
+   税率選択ボタン
+   ============================================================ */
 .tax-buttons {
   display: flex;
   gap: var(--space-xs);
@@ -164,6 +249,9 @@ input.error {
   background: var(--color-primary-bg);
 }
 
+/* ============================================================
+   税込価格表示エリア
+   ============================================================ */
 .price-display {
   background: var(--color-primary-bg);
   border: 1px solid var(--color-primary-border);
@@ -187,6 +275,9 @@ input.error {
   color: var(--color-primary-active);
 }
 
+/* ============================================================
+   追加ボタン
+   ============================================================ */
 .add-btn {
   width: 100%;
   height: 40px;
@@ -214,6 +305,9 @@ input.error {
   box-shadow: var(--shadow-1);
 }
 
+/* ============================================================
+   追加済みリストのアイテム
+   ============================================================ */
 .list-item {
   display: flex;
   align-items: center;
@@ -236,6 +330,7 @@ input.error {
   font-size: 13px;
 }
 
+/* 削除ボタン（×） */
 .delete-btn {
   width: 28px;
   height: 28px;
@@ -258,6 +353,7 @@ input.error {
   background: var(--color-error-bg);
 }
 
+/* リストが空のときのメッセージ */
 .empty-message {
   text-align: center;
   color: var(--color-text-quaternary);
@@ -275,6 +371,9 @@ input.error {
   margin: 0 auto var(--space-sm);
 }
 
+/* ============================================================
+   レイアウト選択ボタン（1面〜16面）
+   ============================================================ */
 .layout-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -305,6 +404,9 @@ input.error {
   background: var(--color-primary-bg);
 }
 
+/* ============================================================
+   A4プレビューエリア
+   ============================================================ */
 .preview-area {
   background: var(--color-bg-layout);
   border: 1px solid var(--color-border);
@@ -316,9 +418,10 @@ input.error {
 .preview-grid {
   display: grid;
   gap: 4px;
-  aspect-ratio: 210 / 297;
+  aspect-ratio: 210 / 297; /* A4縦の比率 */
 }
 
+/* POPカード1枚分 */
 .pop-card {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
@@ -351,6 +454,9 @@ input.error {
   color: var(--color-text-tertiary);
 }
 
+/* ============================================================
+   印刷ボタン
+   ============================================================ */
 .print-btn {
   width: 100%;
   height: 40px;
@@ -385,6 +491,9 @@ input.error {
   transform: none;
 }
 
+/* ============================================================
+   デザイン選択ボタン（シンプル・枠あり・リーフ）
+   ============================================================ */
 .design-buttons {
   display: flex;
   gap: var(--space-xs);
@@ -415,11 +524,69 @@ input.error {
   background: var(--color-primary-bg);
 }
 
+/* ============================================================
+   リアルタイムプレビュー（入力しながら確認できるカード）
+   ============================================================ */
+.live-preview {
+  margin-bottom: var(--space-md);
+}
+
+.live-preview-card {
+  height: 120px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm);
+  background: #fffef8;
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+  text-align: center;
+  transition: background 0.2s;
+}
+
+.live-preview-card .pop-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d5a1e;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  word-break: break-all;
+  transition: color 0.2s;
+}
+
+.live-preview-card .pop-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-price);
+  line-height: 1.1;
+  transition: color 0.2s;
+}
+
+/* プレースホルダー状態（まだ入力していないとき） */
+.live-preview-card .pop-name.placeholder {
+  color: var(--color-text-quaternary);
+}
+
+.live-preview-card .pop-price.placeholder {
+  color: var(--color-text-quaternary);
+}
+
+/* ============================================================
+   印刷専用エリア（通常時は非表示、印刷時のみ表示）
+   ============================================================ */
 #print-area { display: none; }
 
 @media print {
+  /* 印刷時はヘッダー・タブバー・コンテナをすべて隠す */
   body { background: white; padding: 0; margin: 0; }
-  .header, .container { display: none !important; }
+  .header,
+  .tab-bar,
+  .tab-content { display: none !important; }
+
+  /* 印刷エリアだけをグリッドで表示 */
   #print-area {
     display: grid !important;
     width: 100%;
@@ -431,147 +598,957 @@ input.error {
     break-inside: avoid;
   }
 }
+
+/* ============================================================
+   タブ2・タブ3 共通スタイル（設計まとめ・コード解説）
+   ============================================================ */
+
+/* 大見出し */
+.doc-h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-xs);
+}
+
+/* 中見出し */
+.doc-h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primary-active);
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-xs);
+  border-bottom: 2px solid var(--color-primary-border);
+}
+
+/* 本文テキスト */
+.doc-text {
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+  margin-bottom: var(--space-md);
+}
+
+/* ステップフロー図 */
+.flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.flow-step {
+  background: var(--color-primary-bg);
+  border: 1px solid var(--color-primary-border);
+  border-radius: var(--radius);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary-active);
+  text-align: center;
+  flex: 1;
+  min-width: 80px;
+}
+
+/* ステップ間の矢印 */
+.flow-arrow {
+  color: var(--color-text-quaternary);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* 技術特徴カード */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.feature-card {
+  background: var(--color-bg-layout);
+  border-radius: var(--radius);
+  padding: var(--space-sm) var(--space-md);
+  border-left: 3px solid var(--color-primary);
+}
+
+.feature-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-xxs);
+}
+
+.feature-card-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* カラーパレット */
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.palette-item {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--color-border-secondary);
+}
+
+.palette-swatch {
+  height: 48px;
+}
+
+.palette-info {
+  padding: var(--space-xs);
+  background: var(--color-bg-container);
+}
+
+.palette-hex {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  color: var(--color-text);
+}
+
+.palette-name {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+/* フォントサイズ一覧 */
+.font-demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.font-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+
+.font-label {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  font-family: 'Courier New', monospace;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.font-sample {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* スペーシング（余白）一覧 */
+.spacing-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.spacing-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.spacing-label {
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  color: var(--color-text-tertiary);
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.spacing-bar {
+  height: 16px;
+  background: var(--color-primary);
+  border-radius: var(--radius-xs);
+  opacity: 0.7;
+}
+
+.spacing-value {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  width: 32px;
+}
+
+/* ボーダーラジウス一覧 */
+.radius-list {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-md);
+}
+
+.radius-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.radius-box {
+  width: 56px;
+  height: 40px;
+  background: var(--color-primary-bg);
+  border: 2px solid var(--color-primary-border);
+}
+
+.radius-label {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-family: 'Courier New', monospace;
+}
+
+/* ファイル構成ツリー */
+.file-tree {
+  background: #1e1e2e;
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 2;
+  margin-bottom: var(--space-md);
+  overflow-x: auto;
+}
+
+.file-tree-root { color: #cdd6f4; }
+.file-tree-dir  { color: #89b4fa; }
+.file-tree-file { color: #a6e3a1; }
+.file-tree-comment { color: #585b70; }
+
+/* ============================================================
+   タブ3 コード解説スタイル
+   ============================================================ */
+
+/* 解説ブロック（コードの前に置く） */
+.code-explain {
+  background: var(--color-primary-bg);
+  border-left: 3px solid var(--color-primary);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-xs);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.code-explain-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary-active);
+  margin-bottom: var(--space-xxs);
+}
+
+.code-explain-text {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+/* コードブロック本体 */
+.code-block {
+  background: #1e1e2e;
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  margin-bottom: var(--space-lg);
+  overflow-x: auto;
+  color: #cdd6f4;
+  white-space: pre;
+  tab-size: 2;
+}
+
+/* シンタックスハイライト色（JSで span タグを挿入する） */
+.hl-keyword  { color: #c084fc; }  /* var, function, if など → 紫 */
+.hl-string   { color: #a6e3a1; }  /* 文字列 → 緑 */
+.hl-comment  { color: #585b70; }  /* コメント → グレー */
+.hl-property { color: #89b4fa; }  /* プロパティ名 → 青 */
+.hl-number   { color: #fab387; }  /* 数値 → オレンジ */
+
+/* コードのセクション見出し */
+.code-section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+.code-section-badge {
+  display: inline-block;
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.badge-css { background: #4a90d9; color: #fff; }
+.badge-html { background: #e44d26; color: #fff; }
+.badge-js { background: #f7df1e; color: #1a1a1a; }
 </style>
 </head>
 
 <body>
 
+<!-- ヘッダー（全タブ共通） -->
 <div class="header">値段POP作成ツール</div>
 
-<div class="container">
-
-  <div class="section">
-    <div class="section-title">商品を追加</div>
-
-    <div class="field">
-      <label>商品名</label>
-      <input type="text" id="name-input" placeholder="例: ポトス">
-    </div>
-
-    <div class="field">
-      <label>税抜価格（円）</label>
-      <input type="number" id="price-input" placeholder="例: 980">
-    </div>
-
-    <div class="field">
-      <label>税率</label>
-      <div class="tax-buttons">
-        <button class="tax-btn" data-rate="0.08" onclick="selectTax(this)">8%</button>
-        <button class="tax-btn active" data-rate="0.10" onclick="selectTax(this)">10%</button>
-      </div>
-    </div>
-
-    <div class="price-display">
-      <span class="price-label">税込価格</span>
-      <span class="price-value" id="tax-price">¥0</span>
-    </div>
-
-    <button class="add-btn" onclick="addItem()">+ 追加する</button>
-  </div>
-
-  <div class="section">
-    <div class="section-title">追加済みリスト（<span id="item-count">0</span>件）</div>
-    <div id="item-list">
-      <div class="empty-message">商品を追加してください</div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">印刷設定</div>
-
-    <div class="field">
-      <label>レイアウト（A4用紙に何面入れるか）</label>
-      <div class="layout-buttons" id="layout-buttons">
-        <button class="layout-btn" data-cols="1" data-rows="1" onclick="selectLayout(this)">1面</button>
-        <button class="layout-btn" data-cols="1" data-rows="2" onclick="selectLayout(this)">2面</button>
-        <button class="layout-btn active" data-cols="2" data-rows="2" onclick="selectLayout(this)">4面</button>
-        <button class="layout-btn" data-cols="2" data-rows="3" onclick="selectLayout(this)">6面</button>
-        <button class="layout-btn" data-cols="3" data-rows="3" onclick="selectLayout(this)">9面</button>
-        <button class="layout-btn" data-cols="4" data-rows="4" onclick="selectLayout(this)">16面</button>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>デザイン</label>
-      <div class="design-buttons" id="design-buttons">
-        <button class="design-btn active" data-design="simple" onclick="selectDesign(this)">シンプル</button>
-        <button class="design-btn" data-design="frame" onclick="selectDesign(this)">枠あり</button>
-        <button class="design-btn" data-design="leaf" onclick="selectDesign(this)">リーフ</button>
-      </div>
-    </div>
-
-    <div class="preview-area">
-      <div class="preview-grid" id="preview-grid"></div>
-    </div>
-
-    <button class="print-btn" id="print-btn" onclick="printPops()" disabled>
-      印刷する
-    </button>
-  </div>
-
+<!-- タブバー（3つのタブを横並びで表示） -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('tab-create', this)">POP作成</button>
+  <button class="tab-btn" onclick="switchTab('tab-design', this)">設計まとめ</button>
+  <button class="tab-btn" onclick="switchTab('tab-code', this)">解説付きコード</button>
 </div>
 
+
+<!-- ======================================================
+     タブ1: POP作成（メイン機能）
+     ====================================================== -->
+<div id="tab-create" class="tab-content active">
+  <div class="container">
+
+    <!-- 商品追加フォーム -->
+    <div class="section">
+      <div class="section-title">商品を追加</div>
+
+      <div class="field">
+        <label>商品名</label>
+        <input type="text" id="name-input" placeholder="例: ポトス">
+      </div>
+
+      <div class="field">
+        <label>税抜価格（円）</label>
+        <input type="number" id="price-input" placeholder="例: 980">
+      </div>
+
+      <div class="field">
+        <label>税率</label>
+        <div class="tax-buttons">
+          <button class="tax-btn" data-rate="0.08" onclick="selectTax(this)">8%</button>
+          <button class="tax-btn active" data-rate="0.10" onclick="selectTax(this)">10%</button>
+        </div>
+      </div>
+
+      <!-- 税込価格の自動計算結果を表示 -->
+      <div class="price-display">
+        <span class="price-label">税込価格</span>
+        <span class="price-value" id="tax-price">¥0</span>
+      </div>
+
+      <!-- 入力中にリアルタイムでPOPの見た目を確認できる -->
+      <div class="live-preview">
+        <label>プレビュー</label>
+        <div class="live-preview-card" id="live-preview-card">
+          <div class="pop-name placeholder" id="live-name">商品名</div>
+          <div class="pop-price placeholder" id="live-price">¥0<span class="pop-tax">（税込）</span></div>
+        </div>
+      </div>
+
+      <button class="add-btn" onclick="addItem()">+ 追加する</button>
+    </div>
+
+    <!-- 追加済みリスト -->
+    <div class="section">
+      <div class="section-title">追加済みリスト（<span id="item-count">0</span>件）</div>
+      <div id="item-list">
+        <div class="empty-message">商品を追加してください</div>
+      </div>
+    </div>
+
+    <!-- 印刷設定 -->
+    <div class="section">
+      <div class="section-title">印刷設定</div>
+
+      <div class="field">
+        <label>レイアウト（A4用紙に何面入れるか）</label>
+        <div class="layout-buttons" id="layout-buttons">
+          <button class="layout-btn" data-cols="1" data-rows="1" onclick="selectLayout(this)">1面</button>
+          <button class="layout-btn" data-cols="1" data-rows="2" onclick="selectLayout(this)">2面</button>
+          <button class="layout-btn active" data-cols="2" data-rows="2" onclick="selectLayout(this)">4面</button>
+          <button class="layout-btn" data-cols="2" data-rows="3" onclick="selectLayout(this)">6面</button>
+          <button class="layout-btn" data-cols="3" data-rows="3" onclick="selectLayout(this)">9面</button>
+          <button class="layout-btn" data-cols="4" data-rows="4" onclick="selectLayout(this)">16面</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>デザイン</label>
+        <div class="design-buttons" id="design-buttons">
+          <button class="design-btn active" data-design="simple" onclick="selectDesign(this)">シンプル</button>
+          <button class="design-btn" data-design="frame" onclick="selectDesign(this)">枠あり</button>
+          <button class="design-btn" data-design="leaf" onclick="selectDesign(this)">リーフ</button>
+        </div>
+      </div>
+
+      <!-- A4プレビュー（実際の紙の比率で表示） -->
+      <div class="preview-area">
+        <div class="preview-grid" id="preview-grid"></div>
+      </div>
+
+      <button class="print-btn" id="print-btn" onclick="printPops()" disabled>
+        印刷する
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ======================================================
+     タブ2: 設計まとめ
+     ====================================================== -->
+<div id="tab-design" class="tab-content">
+  <div class="container wide">
+
+    <!-- 1. ツール概要 -->
+    <div class="section">
+      <div class="doc-h2">このツールについて</div>
+      <p class="doc-text">
+        値段POP作成ツールは、<strong>園芸店のスタッフが手書きPOPを作る手間を減らす</strong>ために開発した業務ツールです。
+        商品名と税抜価格を入力するだけで、A4用紙に印刷できるきれいな値段POPを自動生成します。
+      </p>
+      <p class="doc-text">
+        主な利用者は店頭スタッフ。スマホ・タブレット・PCのどれでも動き、
+        インターネット接続もサーバーも不要。HTMLファイルをダブルクリックするだけで使えます。
+      </p>
+    </div>
+
+    <!-- 2. 画面の流れ -->
+    <div class="section">
+      <div class="doc-h2">画面の流れ（4ステップ）</div>
+      <p class="doc-text">ユーザーはこの順番で操作します。</p>
+
+      <div class="flow">
+        <div class="flow-step">1. 入力<br><small style="font-weight:400;color:var(--color-text-secondary)">商品名・価格</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">2. 追加<br><small style="font-weight:400;color:var(--color-text-secondary)">リストに蓄積</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">3. 設定<br><small style="font-weight:400;color:var(--color-text-secondary)">面数・デザイン</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">4. 印刷<br><small style="font-weight:400;color:var(--color-text-secondary)">A4に出力</small></div>
+      </div>
+
+      <p class="doc-text">
+        ステップ1〜2は何度でも繰り返せます。複数の商品を追加してから、まとめて1枚の紙に印刷することが可能です。
+        リアルタイムプレビューで、追加前に仕上がりイメージを確認できます。
+      </p>
+    </div>
+
+    <!-- 3. 技術的な特徴 -->
+    <div class="section">
+      <div class="doc-h2">技術的な特徴</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-title">単一HTMLファイル</div>
+          <div class="feature-card-desc">CSS・JavaScript・HTMLがすべて1ファイルに収まっています。サーバー不要、インターネット不要。ダブルクリックで起動します。</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">外部依存なし</div>
+          <div class="feature-card-desc">jQueryもReactも使いません。素のHTML/CSS/JSだけで構成しています。将来にわたって動き続けます。</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">A4印刷最適化</div>
+          <div class="feature-card-desc">@media print で印刷時のみ専用レイアウトを適用。ブラウザの印刷機能をそのまま使えます。</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">レスポンシブ対応</div>
+          <div class="feature-card-desc">スマホ（320px〜）からPCまで対応。スタッフが店頭でスマホを使っても問題なく操作できます。</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">CSS変数設計</div>
+          <div class="feature-card-desc">色・余白・角丸をCSS変数で一元管理。デザイン変更は変数を1か所書き換えるだけで全体に反映されます。</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">GitHub Pages配信</div>
+          <div class="feature-card-desc">GitHubの無料ホスティング機能を使ってURLから誰でもアクセス可能。更新もgit pushで自動反映されます。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. デザインシステム -->
+    <div class="section">
+      <div class="doc-h2">デザインシステム</div>
+      <p class="doc-text">このツールで使用しているデザイントークン（色・文字・余白・角丸）の一覧です。</p>
+
+      <!-- カラーパレット -->
+      <div class="doc-h1" style="font-size:14px;font-weight:700;color:var(--color-text-secondary);margin-bottom:var(--space-sm);margin-top:var(--space-xs);">カラーパレット</div>
+      <div class="palette-grid">
+        <div class="palette-item">
+          <div class="palette-swatch" style="background:#52c41a;"></div>
+          <div class="palette-info">
+            <div class="palette-hex">#52c41a</div>
+            <div class="palette-name">primary（メイン緑）</div>
+          </div>
+        </div>
+        <div class="palette-item">
+          <div class="palette-swatch" style="background:#73d13d;"></div>
+          <div class="palette-info">
+            <div class="palette-hex">#73d13d</div>
+            <div class="palette-name">primary-hover（ホバー）</div>
+          </div>
+        </div>
+        <div class="palette-item">
+          <div class="palette-swatch" style="background:#389e0d;"></div>
+          <div class="palette-info">
+            <div class="palette-hex">#389e0d</div>
+            <div class="palette-name">primary-active（押下）</div>
+          </div>
+        </div>
+        <div class="palette-item">
+          <div class="palette-swatch" style="background:#f6ffed;border-bottom:1px solid #eee;"></div>
+          <div class="palette-info">
+            <div class="palette-hex">#f6ffed</div>
+            <div class="palette-name">primary-bg（薄緑背景）</div>
+          </div>
+        </div>
+        <div class="palette-item">
+          <div class="palette-swatch" style="background:#d48806;"></div>
+          <div class="palette-info">
+            <div class="palette-hex">#d48806</div>
+            <div class="palette-name">price（価格の金色）</div>
+          </div>
+        </div>
+        <div class="palette-item">
+          <div class="palette-swatch" style="background:#ff4d4f;"></div>
+          <div class="palette-info">
+            <div class="palette-hex">#ff4d4f</div>
+            <div class="palette-name">error（エラー赤）</div>
+          </div>
+        </div>
+        <div class="palette-item">
+          <div class="palette-swatch" style="background:rgba(0,0,0,0.88);"></div>
+          <div class="palette-info">
+            <div class="palette-hex">rgba(0,0,0,0.88)</div>
+            <div class="palette-name">text（本文）</div>
+          </div>
+        </div>
+        <div class="palette-item">
+          <div class="palette-swatch" style="background:rgba(0,0,0,0.45);"></div>
+          <div class="palette-info">
+            <div class="palette-hex">rgba(0,0,0,0.45)</div>
+            <div class="palette-name">text-tertiary（薄文字）</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- フォントサイズ -->
+      <div class="doc-h1" style="font-size:14px;font-weight:700;color:var(--color-text-secondary);margin-bottom:var(--space-sm);margin-top:var(--space-md);">フォントサイズ</div>
+      <div class="font-demo">
+        <div class="font-row">
+          <span class="font-label">11px</span>
+          <span class="font-sample" style="font-size:11px;">ラベル・補足テキスト（HEXコード, バッジ）</span>
+        </div>
+        <div class="font-row">
+          <span class="font-label">12px</span>
+          <span class="font-sample" style="font-size:12px;">コード解説の説明文・コードブロック</span>
+        </div>
+        <div class="font-row">
+          <span class="font-label">13px</span>
+          <span class="font-sample" style="font-size:13px;">セクション見出し・ラベル・ボタン</span>
+        </div>
+        <div class="font-row">
+          <span class="font-label">14px（base）</span>
+          <span class="font-sample" style="font-size:14px;">本文テキスト（bodyのデフォルト）</span>
+        </div>
+        <div class="font-row">
+          <span class="font-label">16px</span>
+          <span class="font-sample" style="font-size:16px;">ヘッダータイトル・入力フォーム</span>
+        </div>
+        <div class="font-row">
+          <span class="font-label">20px</span>
+          <span class="font-sample" style="font-size:20px;">ドキュメント大見出し</span>
+        </div>
+        <div class="font-row">
+          <span class="font-label">22px</span>
+          <span class="font-sample" style="font-size:22px;color:var(--color-primary-active);">税込価格表示</span>
+        </div>
+        <div class="font-row">
+          <span class="font-label">28px</span>
+          <span class="font-sample" style="font-size:28px;color:var(--color-price);">プレビュー価格</span>
+        </div>
+      </div>
+
+      <!-- スペーシング -->
+      <div class="doc-h1" style="font-size:14px;font-weight:700;color:var(--color-text-secondary);margin-bottom:var(--space-sm);margin-top:var(--space-md);">スペーシング（余白）</div>
+      <div class="spacing-list">
+        <div class="spacing-row">
+          <span class="spacing-label">--space-xxs</span>
+          <div class="spacing-bar" style="width:4px;"></div>
+          <span class="spacing-value">4px</span>
+        </div>
+        <div class="spacing-row">
+          <span class="spacing-label">--space-xs</span>
+          <div class="spacing-bar" style="width:8px;"></div>
+          <span class="spacing-value">8px</span>
+        </div>
+        <div class="spacing-row">
+          <span class="spacing-label">--space-sm</span>
+          <div class="spacing-bar" style="width:12px;"></div>
+          <span class="spacing-value">12px</span>
+        </div>
+        <div class="spacing-row">
+          <span class="spacing-label">--space-md</span>
+          <div class="spacing-bar" style="width:16px;"></div>
+          <span class="spacing-value">16px</span>
+        </div>
+        <div class="spacing-row">
+          <span class="spacing-label">--space-lg</span>
+          <div class="spacing-bar" style="width:24px;"></div>
+          <span class="spacing-value">24px</span>
+        </div>
+        <div class="spacing-row">
+          <span class="spacing-label">--space-xl</span>
+          <div class="spacing-bar" style="width:32px;"></div>
+          <span class="spacing-value">32px</span>
+        </div>
+      </div>
+
+      <!-- ボーダーラジウス -->
+      <div class="doc-h1" style="font-size:14px;font-weight:700;color:var(--color-text-secondary);margin-bottom:var(--space-sm);margin-top:var(--space-md);">ボーダーラジウス（角丸）</div>
+      <div class="radius-list">
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:2px;"></div>
+          <span class="radius-label">--radius-xs<br>2px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:4px;"></div>
+          <span class="radius-label">--radius-sm<br>4px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:6px;"></div>
+          <span class="radius-label">--radius<br>6px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:8px;"></div>
+          <span class="radius-label">--radius-lg<br>8px</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. ファイル構成 -->
+    <div class="section">
+      <div class="doc-h2">ファイル構成</div>
+      <p class="doc-text">
+        このツールは <strong>simple.html 1ファイルだけ</strong>で構成されています。
+        HTMLファイルの中にCSS・JavaScriptが埋め込まれており、外部ファイルへの依存は一切ありません。
+      </p>
+
+      <div class="file-tree">
+        <span class="file-tree-root">simple.html</span><span class="file-tree-comment">  ← これ1つだけ！</span>
+<span class="file-tree-comment">│</span>
+<span class="file-tree-comment">├─</span> <span class="file-tree-dir">&lt;style&gt;</span><span class="file-tree-comment">  ← CSS部分（見た目のスタイル）</span>
+<span class="file-tree-comment">│    ├─</span> <span class="file-tree-file">:root { --変数 }</span><span class="file-tree-comment">  ← デザイントークン</span>
+<span class="file-tree-comment">│    ├─</span> <span class="file-tree-file">body, header, .tab-bar</span><span class="file-tree-comment">  ← レイアウト</span>
+<span class="file-tree-comment">│    ├─</span> <span class="file-tree-file">フォーム部品</span><span class="file-tree-comment">  ← input, button など</span>
+<span class="file-tree-comment">│    ├─</span> <span class="file-tree-file">.pop-card</span><span class="file-tree-comment">  ← POPカードの見た目</span>
+<span class="file-tree-comment">│    └─</span> <span class="file-tree-file">@media print</span><span class="file-tree-comment">  ← 印刷専用スタイル</span>
+<span class="file-tree-comment">│</span>
+<span class="file-tree-comment">├─</span> <span class="file-tree-dir">&lt;body&gt;</span><span class="file-tree-comment">  ← HTML部分（画面の構造）</span>
+<span class="file-tree-comment">│    ├─</span> <span class="file-tree-file">.header</span><span class="file-tree-comment">  ← タイトルバー</span>
+<span class="file-tree-comment">│    ├─</span> <span class="file-tree-file">.tab-bar</span><span class="file-tree-comment">  ← タブボタン3つ</span>
+<span class="file-tree-comment">│    ├─</span> <span class="file-tree-file">#tab-create</span><span class="file-tree-comment">  ← POP作成タブ</span>
+<span class="file-tree-comment">│    ├─</span> <span class="file-tree-file">#tab-design</span><span class="file-tree-comment">  ← 設計まとめタブ</span>
+<span class="file-tree-comment">│    ├─</span> <span class="file-tree-file">#tab-code</span><span class="file-tree-comment">  ← コード解説タブ</span>
+<span class="file-tree-comment">│    └─</span> <span class="file-tree-file">#print-area</span><span class="file-tree-comment">  ← 印刷専用の非表示エリア</span>
+<span class="file-tree-comment">│</span>
+<span class="file-tree-comment">└─</span> <span class="file-tree-dir">&lt;script&gt;</span><span class="file-tree-comment">  ← JavaScript部分（動きのロジック）</span>
+<span class="file-tree-comment">     ├─</span> <span class="file-tree-file">switchTab()</span><span class="file-tree-comment">  ← タブ切替</span>
+<span class="file-tree-comment">     ├─</span> <span class="file-tree-file">addItem()</span><span class="file-tree-comment">  ← 商品追加</span>
+<span class="file-tree-comment">     ├─</span> <span class="file-tree-file">renderList()</span><span class="file-tree-comment">  ← リスト描画</span>
+<span class="file-tree-comment">     ├─</span> <span class="file-tree-file">renderPreview()</span><span class="file-tree-comment">  ← A4プレビュー描画</span>
+<span class="file-tree-comment">     └─</span> <span class="file-tree-file">printPops()</span><span class="file-tree-comment">  ← 印刷実行</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ======================================================
+     タブ3: 解説付きコード
+     ====================================================== -->
+<div id="tab-code" class="tab-content">
+  <div class="container wide">
+
+    <div class="section">
+      <div class="doc-h2">コードの読み方</div>
+      <p class="doc-text">
+        このページでは、ツールを構成するコードを <strong>CSS → HTML → JavaScript</strong> の順に紹介します。
+        各コードブロックの前に「ここは何をしているか」の解説を入れていますので、
+        プログラミング未経験の方でも雰囲気をつかめるように心がけました。
+      </p>
+      <p class="doc-text">
+        コード中の <span style="color:#585b70;font-family:monospace;">/* こんな書き方 */</span> がコメント（説明文）です。
+        実際の動きには影響せず、読む人のための注釈です。
+      </p>
+    </div>
+
+    <!-- CSS セクション -->
+    <div class="section">
+      <div class="code-section-header">
+        <span class="code-section-badge badge-css">CSS</span>
+        <span style="font-size:15px;font-weight:700;color:var(--color-text);">見た目のスタイル</span>
+      </div>
+
+      <div class="code-explain">
+        <div class="code-explain-title">CSS変数（デザイントークン）とは</div>
+        <div class="code-explain-text">
+          CSSの <code style="background:rgba(0,0,0,0.06);padding:1px 4px;border-radius:3px;">:root { --変数名: 値; }</code> という書き方で、
+          色や余白などをまとめて定義できます。あとで「この緑を少し濃くしたい」となったとき、
+          この1か所を変えるだけで全体が一括更新されます。
+        </div>
+      </div>
+      <div class="code-block" id="code-css-vars"></div>
+
+      <div class="code-explain">
+        <div class="code-explain-title">タブバーのスタイル</div>
+        <div class="code-explain-text">
+          3つのタブボタンを横並びにして均等幅にします。
+          アクティブなタブだけ下線（border-bottom）が緑になります。
+        </div>
+      </div>
+      <div class="code-block" id="code-css-tab"></div>
+
+      <div class="code-explain">
+        <div class="code-explain-title">印刷専用スタイル（@media print）</div>
+        <div class="code-explain-text">
+          <code style="background:rgba(0,0,0,0.06);padding:1px 4px;border-radius:3px;">@media print</code> の中に書いたスタイルは、
+          「印刷するとき（またはPDF出力のとき）だけ」適用されます。
+          タブバーやヘッダーを消して、POPカードだけをA4いっぱいに表示します。
+        </div>
+      </div>
+      <div class="code-block" id="code-css-print"></div>
+    </div>
+
+    <!-- HTML セクション -->
+    <div class="section">
+      <div class="code-section-header">
+        <span class="code-section-badge badge-html">HTML</span>
+        <span style="font-size:15px;font-weight:700;color:var(--color-text);">画面の構造</span>
+      </div>
+
+      <div class="code-explain">
+        <div class="code-explain-title">タブバーのHTML</div>
+        <div class="code-explain-text">
+          ボタンを3つ並べて、クリック時に <code style="background:rgba(0,0,0,0.06);padding:1px 4px;border-radius:3px;">switchTab()</code> 関数を呼び出します。
+          どのタブを表示するか（tab-create / tab-design / tab-code）を引数として渡しています。
+        </div>
+      </div>
+      <div class="code-block" id="code-html-tabbar"></div>
+
+      <div class="code-explain">
+        <div class="code-explain-title">商品追加フォームのHTML</div>
+        <div class="code-explain-text">
+          商品名・価格の入力欄と、税率選択ボタン・追加ボタンで構成されます。
+          <code style="background:rgba(0,0,0,0.06);padding:1px 4px;border-radius:3px;">id="name-input"</code> などのIDを使って、
+          JavaScriptから値を取得・操作します。
+        </div>
+      </div>
+      <div class="code-block" id="code-html-form"></div>
+    </div>
+
+    <!-- JavaScript セクション -->
+    <div class="section">
+      <div class="code-section-header">
+        <span class="code-section-badge badge-js">JS</span>
+        <span style="font-size:15px;font-weight:700;color:var(--color-text);">動きのロジック</span>
+      </div>
+
+      <div class="code-explain">
+        <div class="code-explain-title">タブ切替（switchTab）</div>
+        <div class="code-explain-text">
+          ボタンをクリックすると、全タブを非表示にしてから、クリックされたタブだけを表示します。
+          CSS の <code style="background:rgba(0,0,0,0.06);padding:1px 4px;border-radius:3px;">display: none / block</code> を
+          JavaScriptから切り替えるシンプルな仕組みです。
+        </div>
+      </div>
+      <div class="code-block" id="code-js-tab"></div>
+
+      <div class="code-explain">
+        <div class="code-explain-title">商品追加（addItem）</div>
+        <div class="code-explain-text">
+          入力値を検証して、問題なければ <code style="background:rgba(0,0,0,0.06);padding:1px 4px;border-radius:3px;">items</code> 配列に追加します。
+          バリデーション（入力チェック）に失敗したときは、エラー状態のCSSクラスを付けて赤い枠線を表示します。
+        </div>
+      </div>
+      <div class="code-block" id="code-js-add"></div>
+
+      <div class="code-explain">
+        <div class="code-explain-title">A4プレビュー描画（renderPreview）と印刷（printPops）</div>
+        <div class="code-explain-text">
+          グリッドレイアウト（CSS Grid）を使って、選択した面数（1〜16）に合わせてPOPカードを配置します。
+          印刷ボタンを押すと非表示エリアに同じカードを生成してから
+          <code style="background:rgba(0,0,0,0.06);padding:1px 4px;border-radius:3px;">window.print()</code> を呼び出します。
+        </div>
+      </div>
+      <div class="code-block" id="code-js-render"></div>
+
+      <div class="code-explain">
+        <div class="code-explain-title">リアルタイムプレビュー（updateLivePreview）</div>
+        <div class="code-explain-text">
+          入力欄の <code style="background:rgba(0,0,0,0.06);padding:1px 4px;border-radius:3px;">input</code> イベントを監視して、
+          キーを押すたびにプレビューカードを更新します。まだ何も入力していないときは薄いグレーのプレースホルダー表示にします。
+        </div>
+      </div>
+      <div class="code-block" id="code-js-preview"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 印刷専用エリア（通常は非表示） -->
 <div id="print-area"></div>
 
-<script>
-var items = [];
-var currentTaxRate = 0.10;
-var layoutCols = 2;
-var layoutRows = 2;
-var currentDesign = 'simple';
-var errorTimers = {};
 
+<script>
+/* ============================================================
+   グローバル変数
+   アプリ全体で使うデータをここで管理する
+   ============================================================ */
+var items = [];                 /* 追加済み商品の配列 */
+var currentTaxRate = 0.10;      /* 選択中の税率（初期値: 10%） */
+var layoutCols = 2;             /* グリッドの列数（初期値: 2） */
+var layoutRows = 2;             /* グリッドの行数（初期値: 2） */
+var currentDesign = 'simple';   /* 選択中のデザイン */
+var errorTimers = {};           /* エラー表示タイマー管理用 */
+
+
+/* ============================================================
+   タブ切替
+   クリックされたタブだけを表示し、他を非表示にする
+   ============================================================ */
+function switchTab(tabId, button) {
+  /* すべてのタブコンテンツを非表示にする */
+  document.querySelectorAll('.tab-content').forEach(function(el) {
+    el.classList.remove('active');
+  });
+
+  /* すべてのタブボタンからアクティブクラスを外す */
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+
+  /* クリックされたタブだけを表示する */
+  document.getElementById(tabId).classList.add('active');
+
+  /* クリックされたボタンをアクティブにする */
+  button.classList.add('active');
+
+  /* タブ3（コード解説）に切り替えたタイミングでコードを生成する */
+  if (tabId === 'tab-code') {
+    buildCodeBlocks();
+  }
+}
+
+
+/* ============================================================
+   税率選択
+   ボタンのactiveクラスを切り替えて、税込価格を再計算する
+   ============================================================ */
 function selectTax(button) {
-  document.querySelectorAll('.tax-btn').forEach(function(b) { b.classList.remove('active'); });
+  /* 全ての税率ボタンからactiveを外す */
+  document.querySelectorAll('.tax-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  /* 押されたボタンだけactiveにする */
   button.classList.add('active');
   currentTaxRate = parseFloat(button.dataset.rate);
   updateTaxPrice();
+  updateLivePreview();
 }
 
+
+/* ============================================================
+   税込価格の計算と表示更新
+   入力された税抜価格 × (1 + 税率) を計算して表示する
+   Math.floor は小数点以下を切り捨てる関数
+   ============================================================ */
 function updateTaxPrice() {
   var price = parseInt(document.getElementById('price-input').value) || 0;
   var taxPrice = Math.floor(price * (1 + currentTaxRate));
   document.getElementById('tax-price').textContent = '¥' + taxPrice.toLocaleString();
 }
 
+
+/* ============================================================
+   商品追加
+   入力値を検証してitemsに追加する
+   ============================================================ */
 function addItem() {
   var nameInput = document.getElementById('name-input');
   var priceInput = document.getElementById('price-input');
-  var name = nameInput.value.trim();
+  var name = nameInput.value.trim();   /* trim() は前後の空白を除去する */
   var price = parseInt(priceInput.value) || 0;
 
+  /* 商品名が空の場合はエラー表示して処理を止める */
   if (!name) {
     nameInput.classList.add('error');
     clearTimeout(errorTimers['name']);
-    errorTimers['name'] = setTimeout(function() { nameInput.classList.remove('error'); }, 1500);
-    return;
+    errorTimers['name'] = setTimeout(function() {
+      nameInput.classList.remove('error');
+    }, 1500);
+    return; /* returnでここで処理を終了する */
   }
+
+  /* 価格が0以下の場合もエラー表示して処理を止める */
   if (price <= 0) {
     priceInput.classList.add('error');
     clearTimeout(errorTimers['price']);
-    errorTimers['price'] = setTimeout(function() { priceInput.classList.remove('error'); }, 1500);
+    errorTimers['price'] = setTimeout(function() {
+      priceInput.classList.remove('error');
+    }, 1500);
     return;
   }
 
-  items.push({ name: name, price: price, taxRate: currentTaxRate, taxPrice: Math.floor(price * (1 + currentTaxRate)) });
+  /* 検証を通過したら商品を配列に追加する */
+  items.push({
+    name: name,
+    price: price,
+    taxRate: currentTaxRate,
+    taxPrice: Math.floor(price * (1 + currentTaxRate))
+  });
+
+  /* 入力欄を空にして次の入力を待つ */
   nameInput.value = '';
   priceInput.value = '';
   document.getElementById('tax-price').textContent = '¥0';
   nameInput.focus();
+
+  /* リストとプレビューを再描画する */
   renderList();
   renderPreview();
+  updateLivePreview();
 }
 
+
+/* ============================================================
+   リスト描画
+   items配列の内容をHTML文字列に変換してDOMに反映する
+   ============================================================ */
 function renderList() {
   var listEl = document.getElementById('item-list');
   document.getElementById('item-count').textContent = items.length;
   document.getElementById('print-btn').disabled = items.length === 0;
 
+  /* 商品が0件のときは空メッセージを表示 */
   if (items.length === 0) {
     listEl.innerHTML = '<div class="empty-message">商品を追加してください</div>';
     return;
   }
 
+  /* 各商品をHTML文字列として組み立てる */
   var html = '';
   for (var i = 0; i < items.length; i++) {
     var item = items[i];
@@ -584,32 +1561,56 @@ function renderList() {
   listEl.innerHTML = html;
 }
 
+
+/* ============================================================
+   商品削除
+   indexはitems配列の番号。spliceで1件だけ削除する
+   ============================================================ */
 function removeItem(index) {
   items.splice(index, 1);
   renderList();
   renderPreview();
 }
 
+
+/* ============================================================
+   レイアウト選択（面数の切替）
+   ============================================================ */
 function selectLayout(button) {
-  document.querySelectorAll('.layout-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.layout-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
   button.classList.add('active');
   layoutCols = parseInt(button.dataset.cols);
   layoutRows = parseInt(button.dataset.rows);
   renderPreview();
 }
 
+
+/* ============================================================
+   デザイン選択
+   ============================================================ */
 function selectDesign(button) {
-  document.querySelectorAll('.design-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.design-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
   button.classList.add('active');
   currentDesign = button.dataset.design;
   renderPreview();
+  updateLivePreview();
 }
 
+
+/* ============================================================
+   POPカード1枚分のHTMLを生成する
+   面数に応じたfontSizeを受け取り、デザインを適用する
+   ============================================================ */
 function createPopCardHtml(item, fontSize) {
   var nameSize = fontSize;
-  var priceSize = fontSize * 1.6;
+  var priceSize = fontSize * 1.6;  /* 価格は商品名より1.6倍大きくする */
   var cardStyle = '';
 
+  /* デザインに応じたインラインスタイルを組み立てる */
   if (currentDesign === 'simple') {
     cardStyle = 'background:#fffef8;';
   } else if (currentDesign === 'frame') {
@@ -625,6 +1626,11 @@ function createPopCardHtml(item, fontSize) {
     + '</div>';
 }
 
+
+/* ============================================================
+   面数に応じたフォントサイズを返す
+   面が多いほど1枚あたりが小さくなるので文字も小さくする
+   ============================================================ */
 function getFontSize(totalCells) {
   if (totalCells <= 1) return 22;
   if (totalCells <= 2) return 18;
@@ -634,26 +1640,41 @@ function getFontSize(totalCells) {
   return 7;
 }
 
+
+/* ============================================================
+   A4プレビュー描画
+   CSS Gridで面数分のPOPカードを並べる
+   ============================================================ */
 function renderPreview() {
   var grid = document.getElementById('preview-grid');
   grid.style.gridTemplateColumns = 'repeat(' + layoutCols + ', 1fr)';
   grid.style.gridTemplateRows = 'repeat(' + layoutRows + ', 1fr)';
   var totalCells = layoutCols * layoutRows;
   var fontSize = getFontSize(totalCells);
+
   var html = '';
   for (var i = 0; i < totalCells; i++) {
     if (i < items.length) {
+      /* 登録済み商品があればPOPカードを表示 */
       html += createPopCardHtml(items[i], fontSize);
     } else {
+      /* 商品がなければ「空き」表示 */
       html += '<div class="pop-card" style="border-style:dashed;color:#ccc;font-size:' + fontSize + 'px;">空き</div>';
     }
   }
   grid.innerHTML = html;
 }
 
+
+/* ============================================================
+   印刷実行
+   印刷専用エリアにPOPを生成してからwindow.print()を呼ぶ
+   ============================================================ */
 function printPops() {
   var printArea = document.getElementById('print-area');
   var totalCells = layoutCols * layoutRows;
+
+  /* 面数ごとの印刷用フォントサイズ（プレビューより大きめ） */
   var fontSizeMap = [0, 48, 36, 28, 28, 22, 22, 18, 18, 18, 14, 14, 14, 14, 14, 14, 14];
   var fontSize = fontSizeMap[totalCells] || 14;
 
@@ -670,24 +1691,577 @@ function printPops() {
     }
   }
   printArea.innerHTML = html;
+
+  /* ブラウザの印刷ダイアログを開く */
   window.print();
 }
 
+
+/* ============================================================
+   リアルタイムプレビュー更新
+   入力のたびに呼ばれて、プレビューカードの表示を更新する
+   ============================================================ */
+function updateLivePreview() {
+  var name = document.getElementById('name-input').value.trim();
+  var price = parseInt(document.getElementById('price-input').value) || 0;
+  var taxPrice = Math.floor(price * (1 + currentTaxRate));
+  var card = document.getElementById('live-preview-card');
+  var nameEl = document.getElementById('live-name');
+  var priceEl = document.getElementById('live-price');
+
+  /* 商品名の更新 */
+  if (name) {
+    nameEl.innerHTML = escapeHtml(name);
+    nameEl.classList.remove('placeholder');
+  } else {
+    nameEl.innerHTML = '商品名';
+    nameEl.classList.add('placeholder');
+  }
+
+  /* 価格の更新 */
+  if (price > 0) {
+    priceEl.innerHTML = '¥' + taxPrice.toLocaleString() + '<span class="pop-tax">（税込）</span>';
+    priceEl.classList.remove('placeholder');
+  } else {
+    priceEl.innerHTML = '¥0<span class="pop-tax">（税込）</span>';
+    priceEl.classList.add('placeholder');
+  }
+
+  /* デザインに応じてカードの背景・枠線を変える */
+  if (currentDesign === 'simple') {
+    card.style.background = '#fffef8';
+    card.style.border = '1px solid var(--color-border)';
+  } else if (currentDesign === 'frame') {
+    card.style.background = '#fffef8';
+    card.style.border = '3px solid #2d7a4f';
+  } else if (currentDesign === 'leaf') {
+    card.style.background = 'linear-gradient(135deg, #f0f7f0 0%, #e8f5e0 100%)';
+    card.style.border = '1px solid #b5d6a7';
+  }
+}
+
+
+/* ============================================================
+   XSS対策のHTMLエスケープ
+   ユーザーが入力した文字をそのままHTMLに埋め込むと
+   スクリプトが実行される危険があるため、特殊文字を無害化する
+   ============================================================ */
 function escapeHtml(text) {
   var div = document.createElement('div');
   div.appendChild(document.createTextNode(text));
   return div.innerHTML;
 }
 
-document.getElementById('price-input').addEventListener('input', updateTaxPrice);
+
+/* ============================================================
+   イベントリスナー登録
+   入力欄の変化を監視して各関数を呼び出す
+   ============================================================ */
+
+/* 価格入力時に税込金額とプレビューを更新 */
+document.getElementById('price-input').addEventListener('input', function() {
+  updateTaxPrice();
+  updateLivePreview();
+});
+
+/* 商品名入力時にプレビューを更新 */
+document.getElementById('name-input').addEventListener('input', updateLivePreview);
+
+/* 商品名でEnterを押したら価格入力欄に移動 */
 document.getElementById('name-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') document.getElementById('price-input').focus();
 });
+
+/* 価格でEnterを押したら追加実行 */
 document.getElementById('price-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') addItem();
 });
 
+
+/* ============================================================
+   初期描画
+   ページ読み込み完了時にプレビューを表示する
+   ============================================================ */
 renderPreview();
+updateLivePreview();
+
+
+/* ============================================================
+   タブ3（コード解説）のコードブロックを生成する
+   実際のコードを文字列として取り出し、
+   シンタックスハイライトを付けてDOMに挿入する
+   ============================================================ */
+function buildCodeBlocks() {
+  /* すでに生成済みならスキップ */
+  if (document.getElementById('code-css-vars').innerHTML !== '') return;
+
+  /* --- CSS変数セクション --- */
+  var cssVarsCode = [
+    ':root {',
+    '  /* ブランドカラー（緑系） */',
+    '  --color-primary: #52c41a;',
+    '  --color-primary-hover: #73d13d;',
+    '  --color-primary-active: #389e0d;',
+    '  --color-primary-bg: #f6ffed;',
+    '  --color-primary-border: #b7eb8f;',
+    '',
+    '  /* エラー表示色 */',
+    '  --color-error: #ff4d4f;',
+    '  --color-error-bg: #fff2f0;',
+    '',
+    '  /* 価格表示の金色 */',
+    '  --color-price: #d48806;',
+    '',
+    '  /* テキスト（透明度で濃さを表現） */',
+    '  --color-text: rgba(0,0,0,0.88);',
+    '  --color-text-secondary: rgba(0,0,0,0.65);',
+    '  --color-text-tertiary: rgba(0,0,0,0.45);',
+    '  --color-text-quaternary: rgba(0,0,0,0.25);',
+    '',
+    '  /* 背景色 */',
+    '  --color-bg-container: #ffffff;',
+    '  --color-bg-layout: #f5f5f5;',
+    '',
+    '  /* 枠線の色 */',
+    '  --color-border: #d9d9d9;',
+    '  --color-border-secondary: #f0f0f0;',
+    '',
+    '  /* 余白（4pxを基準に倍数で増やす） */',
+    '  --space-xxs: 4px;',
+    '  --space-xs:  8px;',
+    '  --space-sm: 12px;',
+    '  --space-md: 16px;',
+    '  --space-lg: 24px;',
+    '  --space-xl: 32px;',
+    '',
+    '  /* 角丸 */',
+    '  --radius-xs: 2px;',
+    '  --radius-sm: 4px;',
+    '  --radius:    6px;',
+    '  --radius-lg: 8px;',
+    '}'
+  ].join('\n');
+
+  /* --- タブバーCSSセクション --- */
+  var cssTabCode = [
+    '.tab-bar {',
+    '  background: var(--color-bg-container);',
+    '  border-bottom: 1px solid var(--color-border-secondary);',
+    '  display: flex;       /* 横並び */',
+    '  position: sticky;   /* スクロールしても上に固定 */',
+    '  top: 44px;          /* ヘッダーの下に配置 */',
+    '  z-index: 99;',
+    '}',
+    '',
+    '.tab-btn {',
+    '  flex: 1;            /* 3ボタンが均等幅になる */',
+    '  height: 44px;',
+    '  border: none;',
+    '  border-bottom: 2px solid transparent; /* 非アクティブは透明 */',
+    '  background: transparent;',
+    '  font-size: 13px;',
+    '  font-weight: 600;',
+    '  color: var(--color-text-secondary);',
+    '  cursor: pointer;',
+    '  transition: var(--transition);',
+    '}',
+    '',
+    '/* アクティブなタブだけ緑の下線を表示 */',
+    '.tab-btn.active {',
+    '  color: var(--color-primary);',
+    '  border-bottom-color: var(--color-primary);',
+    '}'
+  ].join('\n');
+
+  /* --- 印刷CSSセクション --- */
+  var cssPrintCode = [
+    '/* 印刷専用エリアは通常非表示 */',
+    '#print-area { display: none; }',
+    '',
+    '@media print {',
+    '  /* 印刷時: ヘッダー・タブ・コンテンツをすべて隠す */',
+    '  body { background: white; padding: 0; margin: 0; }',
+    '  .header,',
+    '  .tab-bar,',
+    '  .tab-content { display: none !important; }',
+    '',
+    '  /* 印刷エリアだけグリッドで表示 */',
+    '  #print-area {',
+    '    display: grid !important;',
+    '    width: 100%;',
+    '    height: 100vh;',
+    '    padding: 5mm;',
+    '  }',
+    '  #print-area .pop-card {',
+    '    border: 1px solid #ccc;',
+    '    break-inside: avoid; /* カードの途中でページ改ページしない */',
+    '  }',
+    '}'
+  ].join('\n');
+
+  /* --- タブバーHTMLセクション --- */
+  var htmlTabbarCode = [
+    '<!-- タブバー: 3つのボタンが均等幅で並ぶ -->',
+    '<div class="tab-bar">',
+    '  <!-- onclick で switchTab(表示するタブID, このボタン自身) を呼ぶ -->',
+    '  <button class="tab-btn active"',
+    '          onclick="switchTab(\'tab-create\', this)">POP作成</button>',
+    '  <button class="tab-btn"',
+    '          onclick="switchTab(\'tab-design\', this)">設計まとめ</button>',
+    '  <button class="tab-btn"',
+    '          onclick="switchTab(\'tab-code\', this)">解説付きコード</button>',
+    '</div>'
+  ].join('\n');
+
+  /* --- フォームHTMLセクション --- */
+  var htmlFormCode = [
+    '<div class="section">',
+    '  <div class="section-title">商品を追加</div>',
+    '',
+    '  <!-- 商品名入力欄 -->',
+    '  <div class="field">',
+    '    <label>商品名</label>',
+    '    <input type="text" id="name-input" placeholder="例: ポトス">',
+    '  </div>',
+    '',
+    '  <!-- 税抜価格入力欄 -->',
+    '  <div class="field">',
+    '    <label>税抜価格（円）</label>',
+    '    <input type="number" id="price-input" placeholder="例: 980">',
+    '  </div>',
+    '',
+    '  <!-- 税率ボタン（8% or 10% を選ぶ） -->',
+    '  <div class="field">',
+    '    <label>税率</label>',
+    '    <div class="tax-buttons">',
+    '      <button class="tax-btn"',
+    '              data-rate="0.08"',
+    '              onclick="selectTax(this)">8%</button>',
+    '      <button class="tax-btn active"',
+    '              data-rate="0.10"',
+    '              onclick="selectTax(this)">10%</button>',
+    '    </div>',
+    '  </div>',
+    '',
+    '  <!-- 税込価格の計算結果（自動更新） -->',
+    '  <div class="price-display">',
+    '    <span class="price-label">税込価格</span>',
+    '    <span class="price-value" id="tax-price">¥0</span>',
+    '  </div>',
+    '',
+    '  <!-- リアルタイムプレビューカード -->',
+    '  <div class="live-preview">',
+    '    <label>プレビュー</label>',
+    '    <div class="live-preview-card" id="live-preview-card">',
+    '      <div class="pop-name placeholder" id="live-name">商品名</div>',
+    '      <div class="pop-price placeholder" id="live-price">',
+    '        ¥0<span class="pop-tax">（税込）</span>',
+    '      </div>',
+    '    </div>',
+    '  </div>',
+    '',
+    '  <button class="add-btn" onclick="addItem()">+ 追加する</button>',
+    '</div>'
+  ].join('\n');
+
+  /* --- switchTab JSセクション --- */
+  var jsTabCode = [
+    'function switchTab(tabId, button) {',
+    '  /* すべてのタブコンテンツを非表示にする */',
+    '  document.querySelectorAll(\'.tab-content\').forEach(function(el) {',
+    '    el.classList.remove(\'active\');',
+    '  });',
+    '',
+    '  /* すべてのタブボタンからアクティブクラスを外す */',
+    '  document.querySelectorAll(\'.tab-btn\').forEach(function(btn) {',
+    '    btn.classList.remove(\'active\');',
+    '  });',
+    '',
+    '  /* クリックされたタブだけを表示する */',
+    '  document.getElementById(tabId).classList.add(\'active\');',
+    '',
+    '  /* クリックされたボタンをアクティブにする */',
+    '  button.classList.add(\'active\');',
+    '}'
+  ].join('\n');
+
+  /* --- addItem JSセクション --- */
+  var jsAddCode = [
+    'function addItem() {',
+    '  var nameInput  = document.getElementById(\'name-input\');',
+    '  var priceInput = document.getElementById(\'price-input\');',
+    '  var name  = nameInput.value.trim();  /* trim()で前後の空白を除去 */',
+    '  var price = parseInt(priceInput.value) || 0;',
+    '',
+    '  /* 商品名が空なら赤い枠線を表示して終了 */',
+    '  if (!name) {',
+    '    nameInput.classList.add(\'error\');',
+    '    clearTimeout(errorTimers[\'name\']);',
+    '    errorTimers[\'name\'] = setTimeout(function() {',
+    '      nameInput.classList.remove(\'error\');',
+    '    }, 1500);  /* 1.5秒後に自動でエラー解除 */',
+    '    return;',
+    '  }',
+    '',
+    '  /* 価格が0以下なら同様にエラー */',
+    '  if (price <= 0) {',
+    '    priceInput.classList.add(\'error\');',
+    '    clearTimeout(errorTimers[\'price\']);',
+    '    errorTimers[\'price\'] = setTimeout(function() {',
+    '      priceInput.classList.remove(\'error\');',
+    '    }, 1500);',
+    '    return;',
+    '  }',
+    '',
+    '  /* 商品をitemsに追加する（税込価格も計算して保存） */',
+    '  items.push({',
+    '    name:     name,',
+    '    price:    price,',
+    '    taxRate:  currentTaxRate,',
+    '    taxPrice: Math.floor(price * (1 + currentTaxRate))',
+    '  });',
+    '',
+    '  /* 入力欄をクリアして次の入力を促す */',
+    '  nameInput.value  = \'\';',
+    '  priceInput.value = \'\';',
+    '  document.getElementById(\'tax-price\').textContent = \'¥0\';',
+    '  nameInput.focus();',
+    '',
+    '  /* 画面を再描画する */',
+    '  renderList();',
+    '  renderPreview();',
+    '  updateLivePreview();',
+    '}'
+  ].join('\n');
+
+  /* --- renderPreview / printPops JSセクション --- */
+  var jsRenderCode = [
+    '/* プレビュー描画: CSS Gridで面数分のカードを並べる */',
+    'function renderPreview() {',
+    '  var grid = document.getElementById(\'preview-grid\');',
+    '',
+    '  /* グリッドの列・行を設定 */',
+    '  grid.style.gridTemplateColumns = \'repeat(\' + layoutCols + \', 1fr)\';',
+    '  grid.style.gridTemplateRows    = \'repeat(\' + layoutRows + \', 1fr)\';',
+    '',
+    '  var totalCells = layoutCols * layoutRows;',
+    '  var fontSize   = getFontSize(totalCells);',
+    '',
+    '  var html = \'\';',
+    '  for (var i = 0; i < totalCells; i++) {',
+    '    if (i < items.length) {',
+    '      html += createPopCardHtml(items[i], fontSize);  /* 商品あり */',
+    '    } else {',
+    '      html += \'<div class="pop-card" style="border-style:dashed;color:#ccc;">空き</div>\';',
+    '    }',
+    '  }',
+    '  grid.innerHTML = html;',
+    '}',
+    '',
+    '/* 印刷実行: 専用エリアにHTMLを生成してからブラウザ印刷を呼ぶ */',
+    'function printPops() {',
+    '  var printArea  = document.getElementById(\'print-area\');',
+    '  var totalCells = layoutCols * layoutRows;',
+    '',
+    '  /* 面数ごとの印刷用フォントサイズ（プレビューより大きめ） */',
+    '  var fontSizeMap = [0,48,36,28,28,22,22,18,18,18,14,14,14,14,14,14,14];',
+    '  var fontSize = fontSizeMap[totalCells] || 14;',
+    '',
+    '  printArea.style.gridTemplateColumns = \'repeat(\' + layoutCols + \', 1fr)\';',
+    '  printArea.style.gridTemplateRows    = \'repeat(\' + layoutRows + \', 1fr)\';',
+    '  printArea.style.gap = \'2mm\';',
+    '',
+    '  var html = \'\';',
+    '  for (var i = 0; i < totalCells; i++) {',
+    '    if (i < items.length) {',
+    '      html += createPopCardHtml(items[i], fontSize);',
+    '    } else {',
+    '      html += \'<div class="pop-card" style="border-style:dashed;color:#ccc;">空き</div>\';',
+    '    }',
+    '  }',
+    '  printArea.innerHTML = html;',
+    '',
+    '  window.print();  /* ブラウザの印刷ダイアログを開く */',
+    '}'
+  ].join('\n');
+
+  /* --- updateLivePreview JSセクション --- */
+  var jsPreviewCode = [
+    'function updateLivePreview() {',
+    '  var name     = document.getElementById(\'name-input\').value.trim();',
+    '  var price    = parseInt(document.getElementById(\'price-input\').value) || 0;',
+    '  var taxPrice = Math.floor(price * (1 + currentTaxRate));',
+    '  var card     = document.getElementById(\'live-preview-card\');',
+    '  var nameEl   = document.getElementById(\'live-name\');',
+    '  var priceEl  = document.getElementById(\'live-price\');',
+    '',
+    '  /* 商品名: 入力があれば反映、なければプレースホルダー */',
+    '  if (name) {',
+    '    nameEl.innerHTML = escapeHtml(name);',
+    '    nameEl.classList.remove(\'placeholder\');',
+    '  } else {',
+    '    nameEl.innerHTML = \'商品名\';',
+    '    nameEl.classList.add(\'placeholder\');',
+    '  }',
+    '',
+    '  /* 価格: 入力があれば税込価格を反映 */',
+    '  if (price > 0) {',
+    '    priceEl.innerHTML = \'¥\' + taxPrice.toLocaleString()',
+    '                      + \'<span class="pop-tax">（税込）</span>\';',
+    '    priceEl.classList.remove(\'placeholder\');',
+    '  } else {',
+    '    priceEl.innerHTML = \'¥0<span class="pop-tax">（税込）</span>\';',
+    '    priceEl.classList.add(\'placeholder\');',
+    '  }',
+    '}',
+    '',
+    '/* 入力欄の変化を監視するイベントリスナー */',
+    'document.getElementById(\'price-input\')',
+    '  .addEventListener(\'input\', function() {',
+    '    updateTaxPrice();',
+    '    updateLivePreview();',
+    '  });',
+    '',
+    'document.getElementById(\'name-input\')',
+    '  .addEventListener(\'input\', updateLivePreview);',
+    '',
+    '/* EnterキーでフォーカスをNameからPriceへ移動 */',
+    'document.getElementById(\'name-input\')',
+    '  .addEventListener(\'keydown\', function(e) {',
+    '    if (e.key === \'Enter\')',
+    '      document.getElementById(\'price-input\').focus();',
+    '  });',
+    '',
+    '/* Enterキーで追加実行 */',
+    'document.getElementById(\'price-input\')',
+    '  .addEventListener(\'keydown\', function(e) {',
+    '    if (e.key === \'Enter\') addItem();',
+    '  });'
+  ].join('\n');
+
+  /* コードにシンタックスハイライトを適用してからDOMに挿入 */
+  document.getElementById('code-css-vars').innerHTML   = highlight(cssVarsCode,   'css');
+  document.getElementById('code-css-tab').innerHTML    = highlight(cssTabCode,    'css');
+  document.getElementById('code-css-print').innerHTML  = highlight(cssPrintCode,  'css');
+  document.getElementById('code-html-tabbar').innerHTML = highlight(htmlTabbarCode, 'html');
+  document.getElementById('code-html-form').innerHTML  = highlight(htmlFormCode,  'html');
+  document.getElementById('code-js-tab').innerHTML     = highlight(jsTabCode,     'js');
+  document.getElementById('code-js-add').innerHTML     = highlight(jsAddCode,     'js');
+  document.getElementById('code-js-render').innerHTML  = highlight(jsRenderCode,  'js');
+  document.getElementById('code-js-preview').innerHTML = highlight(jsPreviewCode, 'js');
+}
+
+
+/* ============================================================
+   簡易シンタックスハイライト
+   正規表現でテキストを解析してspanタグを挿入する
+   CSS・HTML・JSで色付けルールを変える
+   ============================================================ */
+function highlight(code, lang) {
+  /* まずHTMLエスケープして安全な文字列にする */
+  var escaped = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  /*
+   * プレースホルダー方式:
+   * コメント・文字列を先に \x00N\x00 という番号トークンに退避させ、
+   * キーワード/数値の置換が終わってから元のspanに戻す。
+   * これによりコメント内部への二重ハイライトを防ぐ。
+   */
+  var placeholders = [];
+  function stash(spanHtml) {
+    var idx = placeholders.length;
+    placeholders.push(spanHtml);
+    return '\x00' + idx + '\x00';
+  }
+  function restore(s) {
+    return s.replace(/\x00(\d+)\x00/g, function(_, i) {
+      return placeholders[parseInt(i, 10)];
+    });
+  }
+
+  if (lang === 'js') {
+    /* 1. コメントを退避（ブロックコメント → 行コメントの順） */
+    escaped = escaped.replace(/(\/\*[\s\S]*?\*\/|\/\/[^\n]*)/g, function(m) {
+      return stash('<span class="hl-comment">' + m + '</span>');
+    });
+
+    /* 2. 文字列を退避 */
+    escaped = escaped.replace(/('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")/g, function(m) {
+      return stash('<span class="hl-string">' + m + '</span>');
+    });
+
+    /* 3. キーワード */
+    escaped = escaped.replace(
+      /\b(var|function|return|if|else|for|while|break|continue|new|this|true|false|null|undefined|typeof|instanceof|in|of|const|let)\b/g,
+      '<span class="hl-keyword">$1</span>'
+    );
+
+    /* 4. 数値 */
+    escaped = escaped.replace(
+      /\b(\d+)\b/g,
+      '<span class="hl-number">$1</span>'
+    );
+
+    /* 5. 退避したコメント・文字列を元に戻す */
+    escaped = restore(escaped);
+
+  } else if (lang === 'css') {
+    /* 1. コメントを退避 */
+    escaped = escaped.replace(/(\/\*[\s\S]*?\*\/)/g, function(m) {
+      return stash('<span class="hl-comment">' + m + '</span>');
+    });
+
+    /* 2. CSS変数名（--xxx）を退避 */
+    escaped = escaped.replace(/(--[\w-]+)/g, function(m) {
+      return stash('<span class="hl-property">' + m + '</span>');
+    });
+
+    /* 3. HEXカラーコードを退避 */
+    escaped = escaped.replace(/(#[0-9a-fA-F]{3,8})/g, function(m) {
+      return stash('<span class="hl-string">' + m + '</span>');
+    });
+
+    /* 4. 数値+単位 */
+    escaped = escaped.replace(
+      /\b(\d+)(px|em|rem|%|vh|vw|mm)?\b/g,
+      '<span class="hl-number">$1</span>$2'
+    );
+
+    /* 5. 退避トークンを元に戻す */
+    escaped = restore(escaped);
+
+  } else if (lang === 'html') {
+    /* 1. コメントを退避 */
+    escaped = escaped.replace(/(&lt;!--[\s\S]*?--&gt;)/g, function(m) {
+      return stash('<span class="hl-comment">' + m + '</span>');
+    });
+
+    /* 2. タグ名 */
+    escaped = escaped.replace(
+      /(&lt;\/?)([\w-]+)/g,
+      '$1<span class="hl-keyword">$2</span>'
+    );
+
+    /* 3. 属性値を退避 */
+    escaped = escaped.replace(/=("(?:[^"\\]|\\.)*")/g, function(m, val) {
+      return '=' + stash('<span class="hl-string">' + val + '</span>');
+    });
+
+    /* 4. 属性名（属性値を退避した後に処理するので安全） */
+    escaped = escaped.replace(
+      /\s([\w-]+)(=)/g,
+      ' <span class="hl-property">$1</span>$2'
+    );
+
+    /* 5. 退避トークンを元に戻す */
+    escaped = restore(escaped);
+  }
+
+  return escaped;
+}
 </script>
 </body>
 </html>
