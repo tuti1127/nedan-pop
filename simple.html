@@ -1,474 +1,487 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<!-- ページの文字コードをUTF-8に設定（日本語が文字化けしないように） -->
 <meta charset="UTF-8">
-<!-- スマホでの表示を最適化する設定 -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- ブラウザのタブに表示されるタイトル -->
-<title>値段POP作成ツール（シンプル版）</title>
-
+<title>値段POP作成ツール</title>
 <style>
-/* ============================================
-   ここからCSS（見た目のデザイン）を定義します
-   ============================================ */
-
-/* --- 全体のリセット（ブラウザ標準の余白を消す） --- */
-* {
-  box-sizing: border-box;  /* 幅計算にパディングとボーダーを含める */
-  margin: 0;               /* 外側の余白をゼロに */
-  padding: 0;              /* 内側の余白をゼロに */
-}
-
-/* --- 色やサイズの定数を定義（後から一括変更できて便利） --- */
 :root {
-  --green: #1a5c32;       /* メインカラー（緑） */
-  --green-light: #e8f5ed; /* 薄い緑（背景用） */
-  --orange: #b55a18;      /* 価格の色（オレンジ） */
-  --text: #1a1a1a;        /* 通常の文字色 */
-  --gray: #666;           /* 薄い文字色 */
-  --border: #ddd;         /* 線の色 */
-  --bg: #f5f3ee;          /* ページ全体の背景色 */
-  --white: #ffffff;        /* 白 */
-  --radius: 12px;         /* 角丸の大きさ */
+  --color-primary: #52c41a;
+  --color-primary-hover: #73d13d;
+  --color-primary-active: #389e0d;
+  --color-primary-bg: #f6ffed;
+  --color-primary-border: #b7eb8f;
+  --color-error: #ff4d4f;
+  --color-error-bg: #fff2f0;
+  --color-price: #d48806;
+  --color-text: rgba(0,0,0,0.88);
+  --color-text-secondary: rgba(0,0,0,0.65);
+  --color-text-tertiary: rgba(0,0,0,0.45);
+  --color-text-quaternary: rgba(0,0,0,0.25);
+  --color-bg-container: #ffffff;
+  --color-bg-layout: #f5f5f5;
+  --color-border: #d9d9d9;
+  --color-border-secondary: #f0f0f0;
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 8px;
+  --shadow-1: 0 1px 2px 0 rgba(0,0,0,0.03), 0 1px 6px -1px rgba(0,0,0,0.02), 0 2px 4px 0 rgba(0,0,0,0.02);
+  --shadow-2: 0 6px 16px 0 rgba(0,0,0,0.08), 0 3px 6px -4px rgba(0,0,0,0.12), 0 9px 28px 8px rgba(0,0,0,0.05);
+  --transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans CJK JP', 'Hiragino Sans', 'Meiryo', sans-serif;
 }
 
-/* --- ページ全体の基本スタイル --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-  font-family: 'Hiragino Sans', 'Meiryo', sans-serif; /* 日本語フォント */
-  background: var(--bg);   /* 背景色 */
-  color: var(--text);      /* 文字色 */
-  line-height: 1.6;        /* 行間 */
+  font-family: var(--font-family);
+  background: var(--color-bg-layout);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.5714;
 }
 
-/* --- ヘッダー（上部の緑色バー） --- */
 .header {
-  background: var(--green); /* 緑色の背景 */
-  color: white;             /* 白い文字 */
-  padding: 14px 20px;       /* 内側の余白 */
-  font-size: 16px;          /* 文字サイズ */
-  font-weight: bold;        /* 太字 */
-  text-align: center;       /* 中央揃え */
+  background: var(--color-primary);
+  color: #fff;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: var(--shadow-1);
 }
 
-/* --- メインコンテンツの幅を制限して中央に配置 --- */
 .container {
-  max-width: 600px;   /* 最大幅600px */
-  margin: 0 auto;     /* 左右を自動で均等にして中央揃え */
-  padding: 16px;       /* 内側に16pxの余白 */
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--space-md);
 }
 
-/* --- 各セクション（カード風の白い箱） --- */
 .section {
-  background: var(--white);         /* 白い背景 */
-  border: 1px solid var(--border);  /* 薄いグレーの枠線 */
-  border-radius: var(--radius);     /* 角を丸くする */
-  padding: 20px;                    /* 内側の余白 */
-  margin-bottom: 16px;              /* 下に16pxの隙間 */
+  background: var(--color-bg-container);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+  box-shadow: var(--shadow-1);
 }
 
-/* --- セクションの見出し --- */
 .section-title {
-  font-size: 13px;           /* 小さめの文字 */
-  font-weight: bold;         /* 太字 */
-  color: var(--green);       /* 緑色 */
-  margin-bottom: 14px;       /* 下に余白 */
-  letter-spacing: 0.05em;    /* 少し文字間隔を広げる */
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary-active);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
-/* --- ラベル（「商品名」「価格」などの見出し） --- */
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background: var(--color-primary);
+  border-radius: var(--radius-xs);
+  flex-shrink: 0;
+}
+
 label {
-  display: block;           /* ブロック要素にして改行 */
-  font-size: 13px;          /* 文字サイズ */
-  font-weight: bold;        /* 太字 */
-  color: var(--gray);       /* グレーの文字色 */
-  margin-bottom: 6px;       /* 下に余白 */
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xxs);
 }
 
-/* --- テキスト入力欄 --- */
 input[type="text"],
 input[type="number"] {
-  width: 100%;                      /* 横幅いっぱい */
-  height: 48px;                     /* 高さ48px */
-  border: 1.5px solid var(--border); /* 枠線 */
-  border-radius: 8px;               /* 角丸 */
-  padding: 0 14px;                  /* 左右に余白 */
-  font-size: 18px;                  /* 文字サイズ */
-  font-family: inherit;             /* 親要素と同じフォント */
-  outline: none;                    /* フォーカス時の青枠を消す */
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 4px 11px;
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  color: var(--color-text);
+  background: var(--color-bg-container);
+  transition: var(--transition);
 }
 
-/* --- 入力欄がフォーカスされた時（クリックした時）--- */
+input[type="text"]:hover,
+input[type="number"]:hover {
+  border-color: var(--color-primary-hover);
+}
+
 input:focus {
-  border-color: var(--green);                     /* 枠線を緑に */
-  box-shadow: 0 0 0 3px rgba(26, 92, 50, 0.1);   /* 薄い緑の影 */
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(82,196,26,0.1);
 }
 
-/* --- 入力欄の間にスペースを作る --- */
-.field {
-  margin-bottom: 14px; /* 下に14pxの隙間 */
+input.error {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 2px rgba(255,77,79,0.1);
+  background: var(--color-error-bg);
 }
 
-/* --- 税率ボタンを横に並べるエリア --- */
+.field { margin-bottom: var(--space-md); }
+
 .tax-buttons {
-  display: flex;  /* 横並びにする */
-  gap: 8px;       /* ボタン間に8pxの隙間 */
-  margin-bottom: 14px;
-}
-
-/* --- 税率ボタン（8%、10%のボタン） --- */
-.tax-btn {
-  flex: 1;                           /* 均等に幅を分ける */
-  height: 44px;                      /* 高さ */
-  border: 2px solid var(--border);   /* 枠線 */
-  border-radius: 8px;                /* 角丸 */
-  background: var(--white);          /* 白い背景 */
-  font-size: 15px;                   /* 文字サイズ */
-  font-weight: bold;                 /* 太字 */
-  color: var(--gray);                /* グレー文字 */
-  cursor: pointer;                   /* カーソルを指マークに */
-  font-family: inherit;              /* フォント統一 */
-}
-
-/* --- 選択中の税率ボタン --- */
-.tax-btn.active {
-  border-color: var(--green);        /* 緑の枠線 */
-  color: var(--green);               /* 緑の文字 */
-  background: var(--green-light);    /* 薄い緑の背景 */
-}
-
-/* --- 計算結果の表示エリア --- */
-.price-display {
-  background: var(--green-light);   /* 薄い緑の背景 */
-  border-radius: 8px;               /* 角丸 */
-  padding: 12px 16px;               /* 内側の余白 */
-  display: flex;                     /* 横並び */
-  justify-content: space-between;    /* 左右に分散 */
-  align-items: center;               /* 縦方向の中央揃え */
-}
-
-/* --- 「税込価格」のラベル --- */
-.price-label {
-  font-size: 13px;      /* 文字サイズ */
-  color: var(--green);   /* 緑色 */
-  font-weight: bold;     /* 太字 */
-}
-
-/* --- 税込価格の数字 --- */
-.price-value {
-  font-size: 24px;       /* 大きな文字 */
-  font-weight: bold;     /* 太字 */
-  color: var(--green);   /* 緑色 */
-}
-
-/* --- 追加ボタン --- */
-.add-btn {
-  width: 100%;                    /* 横幅いっぱい */
-  height: 50px;                   /* 高さ */
-  background: var(--green);       /* 緑の背景 */
-  color: white;                   /* 白い文字 */
-  border: none;                   /* 枠線なし */
-  border-radius: 8px;             /* 角丸 */
-  font-size: 16px;                /* 文字サイズ */
-  font-weight: bold;              /* 太字 */
-  cursor: pointer;                /* 指マークカーソル */
-  margin-top: 10px;               /* 上に余白 */
-  font-family: inherit;           /* フォント統一 */
-}
-
-/* --- 追加ボタンにマウスを乗せた時 --- */
-.add-btn:hover {
-  opacity: 0.9;  /* 少し薄くなる */
-}
-
-/* --- 追加済みリストの各アイテム --- */
-.list-item {
-  display: flex;                     /* 横並び */
-  align-items: center;               /* 縦中央揃え */
-  justify-content: space-between;    /* 左右に分散 */
-  padding: 10px 0;                   /* 上下に余白 */
-  border-bottom: 1px solid #eee;     /* 下線 */
-}
-
-/* --- リストアイテムの最後は下線なし --- */
-.list-item:last-child {
-  border-bottom: none;
-}
-
-/* --- 商品名の表示 --- */
-.item-name {
-  font-weight: bold;  /* 太字 */
-  font-size: 15px;    /* 文字サイズ */
-}
-
-/* --- 価格の表示 --- */
-.item-price {
-  color: var(--orange);  /* オレンジ色 */
-  font-weight: bold;     /* 太字 */
-  font-size: 15px;       /* 文字サイズ */
-}
-
-/* --- 削除ボタン（×ボタン） --- */
-.delete-btn {
-  width: 30px;                  /* 幅 */
-  height: 30px;                 /* 高さ */
-  border: none;                 /* 枠線なし */
-  background: #fee;             /* 薄い赤の背景 */
-  color: #c00;                  /* 赤い文字 */
-  border-radius: 6px;           /* 角丸 */
-  cursor: pointer;              /* 指マークカーソル */
-  font-size: 16px;              /* 文字サイズ */
-  display: flex;                /* 横並び */
-  align-items: center;          /* 縦中央揃え */
-  justify-content: center;      /* 横中央揃え */
-}
-
-/* --- リストが空の時のメッセージ --- */
-.empty-message {
-  text-align: center;     /* 中央揃え */
-  color: var(--gray);     /* グレー */
-  padding: 24px;          /* 内側余白 */
-  font-size: 14px;        /* 文字サイズ */
-}
-
-/* --- レイアウト選択ボタンを横に並べる --- */
-.layout-buttons {
-  display: flex;   /* 横並び */
-  flex-wrap: wrap;  /* 折り返しを許可 */
-  gap: 6px;         /* ボタン間の隙間 */
-  margin-bottom: 14px;
-}
-
-/* --- レイアウト選択ボタン --- */
-.layout-btn {
-  padding: 8px 14px;                 /* 内側の余白 */
-  border: 2px solid var(--border);   /* 枠線 */
-  border-radius: 8px;                /* 角丸 */
-  background: var(--white);          /* 白い背景 */
-  font-size: 13px;                   /* 文字サイズ */
-  font-weight: bold;                 /* 太字 */
-  color: var(--gray);                /* グレー文字 */
-  cursor: pointer;                   /* 指マークカーソル */
-  font-family: inherit;              /* フォント統一 */
-}
-
-/* --- 選択中のレイアウトボタン --- */
-.layout-btn.active {
-  border-color: var(--green);        /* 緑枠 */
-  color: var(--green);               /* 緑文字 */
-  background: var(--green-light);    /* 薄い緑の背景 */
-}
-
-/* --- プレビューエリア --- */
-.preview-area {
-  background: white;          /* 白い背景 */
-  border: 2px dashed #ccc;   /* 点線の枠 */
-  border-radius: 8px;        /* 角丸 */
-  padding: 12px;              /* 内側余白 */
-  margin-bottom: 14px;       /* 下に余白 */
-}
-
-/* --- プレビュー内のグリッド（POP用紙のレイアウト） --- */
-.preview-grid {
-  display: grid;                     /* グリッドレイアウト */
-  gap: 4px;                          /* カード間の隙間 */
-  aspect-ratio: 210 / 297;           /* A4用紙の縦横比 */
-}
-
-/* --- 各POPカード --- */
-.pop-card {
-  border: 1px solid #ddd;             /* 枠線 */
-  border-radius: 6px;                 /* 角丸 */
-  display: flex;                       /* 中身を縦に並べる */
-  flex-direction: column;              /* 縦方向に配置 */
-  align-items: center;                 /* 横方向の中央揃え */
-  justify-content: center;             /* 縦方向の中央揃え */
-  padding: 8px;                        /* 内側余白 */
-  background: #fffef8;                 /* クリーム色の背景 */
-  overflow: hidden;                    /* はみ出した部分を隠す */
-  text-align: center;                  /* テキスト中央揃え */
-}
-
-/* --- POPカードの商品名 --- */
-.pop-name {
-  font-weight: bold;         /* 太字 */
-  color: #2d5a1e;            /* 濃い緑 */
-  line-height: 1.2;          /* 行間 */
-  margin-bottom: 4px;        /* 下に余白 */
-  word-break: break-all;     /* 長い文字を折り返す */
-}
-
-/* --- POPカードの価格 --- */
-.pop-price {
-  font-weight: bold;         /* 太字 */
-  color: var(--orange);      /* オレンジ */
-  line-height: 1.1;          /* 行間 */
-}
-
-/* --- POPカードの税込表記 --- */
-.pop-tax {
-  font-size: 0.5em;         /* 小さい文字（親の半分） */
-  color: var(--gray);        /* グレー */
-}
-
-/* --- 印刷ボタン --- */
-.print-btn {
-  width: 100%;                     /* 横幅いっぱい */
-  height: 54px;                    /* 高さ */
-  background: var(--green);        /* 緑の背景 */
-  color: white;                    /* 白い文字 */
-  border: none;                    /* 枠線なし */
-  border-radius: 8px;              /* 角丸 */
-  font-size: 16px;                 /* 文字サイズ */
-  font-weight: bold;               /* 太字 */
-  cursor: pointer;                 /* 指マークカーソル */
-  font-family: inherit;            /* フォント統一 */
-  box-shadow: 0 2px 12px rgba(26, 92, 50, 0.25); /* 影 */
-}
-
-/* --- 印刷ボタンにマウスを乗せた時 --- */
-.print-btn:hover {
-  opacity: 0.9;
-}
-
-/* --- 印刷ボタン無効時 --- */
-.print-btn:disabled {
-  background: #aaa;          /* グレーに変更 */
-  box-shadow: none;          /* 影を消す */
-  cursor: not-allowed;       /* 禁止カーソル */
-}
-
-/* --- デザイン選択ボタンを横に並べる --- */
-.design-buttons {
   display: flex;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: var(--space-xs);
 }
 
-/* --- デザイン選択ボタン --- */
-.design-btn {
+.tax-btn {
   flex: 1;
-  height: 44px;
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  background: var(--white);
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--gray);
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg-container);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
   cursor: pointer;
   font-family: inherit;
+  transition: var(--transition);
 }
 
-/* --- 選択中のデザインボタン --- */
+.tax-btn:hover {
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-hover);
+}
+
+.tax-btn.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+
+.price-display {
+  background: var(--color-primary-bg);
+  border: 1px solid var(--color-primary-border);
+  border-radius: var(--radius);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.price-label {
+  font-size: 13px;
+  color: var(--color-primary-active);
+  font-weight: 600;
+}
+
+.price-value {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-primary-active);
+}
+
+.add-btn {
+  width: 100%;
+  height: 40px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+  box-shadow: var(--shadow-1);
+}
+
+.add-btn:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-2);
+}
+
+.add-btn:active {
+  background: var(--color-primary-active);
+  transform: translateY(0);
+  box-shadow: var(--shadow-1);
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+
+.list-item:last-child { border-bottom: none; }
+
+.item-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.item-price {
+  color: var(--color-price);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.delete-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-container);
+  color: var(--color-text-tertiary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.delete-btn:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--color-text-quaternary);
+  padding: var(--space-xl) var(--space-lg);
+  font-size: 14px;
+}
+
+.empty-message::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 40px;
+  border: 2px dashed var(--color-border);
+  border-radius: 50%;
+  margin: 0 auto var(--space-sm);
+}
+
+.layout-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.layout-btn {
+  padding: 5px var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg-container);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.layout-btn:hover {
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-hover);
+}
+
+.layout-btn.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+
+.preview-area {
+  background: var(--color-bg-layout);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.preview-grid {
+  display: grid;
+  gap: 4px;
+  aspect-ratio: 210 / 297;
+}
+
+.pop-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: #fffef8;
+  overflow: hidden;
+  text-align: center;
+}
+
+.pop-name {
+  font-weight: 600;
+  color: #2d5a1e;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  word-break: break-all;
+}
+
+.pop-price {
+  font-weight: 700;
+  color: var(--color-price);
+  line-height: 1.1;
+}
+
+.pop-tax {
+  font-size: 0.5em;
+  color: var(--color-text-tertiary);
+}
+
+.print-btn {
+  width: 100%;
+  height: 40px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(82,196,26,0.25);
+}
+
+.print-btn:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(82,196,26,0.35);
+}
+
+.print-btn:active {
+  background: var(--color-primary-active);
+  transform: translateY(0);
+}
+
+.print-btn:disabled {
+  background: var(--color-border);
+  color: var(--color-text-quaternary);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.design-buttons {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.design-btn {
+  flex: 1;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg-container);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.design-btn:hover {
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-hover);
+}
+
 .design-btn.active {
-  border-color: var(--green);
-  color: var(--green);
-  background: var(--green-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
 }
 
-/* ============================================
-   印刷時のスタイル（画面には影響しない）
-   ============================================ */
+#print-area { display: none; }
+
 @media print {
-  /* 印刷時はヘッダーやフォームなど不要な部分を非表示にする */
   body { background: white; padding: 0; margin: 0; }
   .header, .container { display: none !important; }
-
-  /* 印刷用のグリッドだけ表示する */
   #print-area {
-    display: grid !important;    /* グリッド表示 */
-    width: 100%;                 /* 横幅いっぱい */
-    height: 100vh;               /* 縦いっぱい */
-    padding: 5mm;                /* 余白5mm */
+    display: grid !important;
+    width: 100%;
+    height: 100vh;
+    padding: 5mm;
   }
-
-  /* 印刷用の各POPカード */
   #print-area .pop-card {
-    border: 1px solid #ccc;      /* 枠線 */
-    break-inside: avoid;         /* カードの途中で改ページしない */
+    border: 1px solid #ccc;
+    break-inside: avoid;
   }
-}
-
-/* --- 印刷エリアは画面上では非表示 --- */
-#print-area {
-  display: none;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ============================================
-     ヘッダー（ページ上部の緑色バー）
-     ============================================ -->
 <div class="header">値段POP作成ツール</div>
 
-<!-- ============================================
-     メインコンテンツ（入力フォームとリスト）
-     ============================================ -->
 <div class="container">
 
-  <!-- ────────────────────────────────
-       セクション1: 商品を入力するフォーム
-       ──────────────────────────────── -->
   <div class="section">
     <div class="section-title">商品を追加</div>
 
-    <!-- 商品名の入力欄 -->
     <div class="field">
       <label>商品名</label>
       <input type="text" id="name-input" placeholder="例: ポトス">
     </div>
 
-    <!-- 税抜価格の入力欄 -->
     <div class="field">
       <label>税抜価格（円）</label>
       <input type="number" id="price-input" placeholder="例: 980">
     </div>
 
-    <!-- 税率の選択ボタン -->
     <div class="field">
       <label>税率</label>
       <div class="tax-buttons">
-        <!-- data-rate属性に税率の値を入れている -->
         <button class="tax-btn" data-rate="0.08" onclick="selectTax(this)">8%</button>
         <button class="tax-btn active" data-rate="0.10" onclick="selectTax(this)">10%</button>
       </div>
     </div>
 
-    <!-- 税込価格の自動計算結果 -->
     <div class="price-display">
       <span class="price-label">税込価格</span>
       <span class="price-value" id="tax-price">¥0</span>
     </div>
 
-    <!-- 商品をリストに追加するボタン -->
     <button class="add-btn" onclick="addItem()">+ 追加する</button>
   </div>
 
-  <!-- ────────────────────────────────
-       セクション2: 追加した商品のリスト
-       ──────────────────────────────── -->
   <div class="section">
     <div class="section-title">追加済みリスト（<span id="item-count">0</span>件）</div>
-
-    <!-- ここにJavaScriptで商品リストが表示される -->
     <div id="item-list">
       <div class="empty-message">商品を追加してください</div>
     </div>
   </div>
 
-  <!-- ────────────────────────────────
-       セクション3: 印刷の設定とプレビュー
-       ──────────────────────────────── -->
   <div class="section">
     <div class="section-title">印刷設定</div>
 
-    <!-- レイアウト選択（1枚のA4に何面入れるか） -->
     <div class="field">
       <label>レイアウト（A4用紙に何面入れるか）</label>
       <div class="layout-buttons" id="layout-buttons">
-        <!-- data-cols=列数, data-rows=行数 -->
         <button class="layout-btn" data-cols="1" data-rows="1" onclick="selectLayout(this)">1面</button>
         <button class="layout-btn" data-cols="1" data-rows="2" onclick="selectLayout(this)">2面</button>
         <button class="layout-btn active" data-cols="2" data-rows="2" onclick="selectLayout(this)">4面</button>
@@ -478,7 +491,6 @@ input:focus {
       </div>
     </div>
 
-    <!-- デザイン選択 -->
     <div class="field">
       <label>デザイン</label>
       <div class="design-buttons" id="design-buttons">
@@ -488,350 +500,167 @@ input:focus {
       </div>
     </div>
 
-    <!-- プレビュー表示エリア -->
     <div class="preview-area">
-      <div class="preview-grid" id="preview-grid">
-        <!-- JavaScriptでPOPカードが挿入される -->
-      </div>
+      <div class="preview-grid" id="preview-grid"></div>
     </div>
 
-    <!-- 印刷ボタン -->
     <button class="print-btn" id="print-btn" onclick="printPops()" disabled>
       印刷する
     </button>
   </div>
 
-</div><!-- /.container -->
+</div>
 
-<!-- ============================================
-     印刷専用エリア（画面上は非表示）
-     ============================================ -->
 <div id="print-area"></div>
 
-
-<!-- ============================================
-     JavaScript（プログラムの本体）
-     ============================================ -->
 <script>
-/* ============================================
-   ■ データの保管場所（変数）
-   ============================================ */
-
-// 追加した商品を入れておく配列（リスト）
-// 例: [{name:"ポトス", price:980, taxRate:0.10, taxPrice:1078}, ...]
 var items = [];
-
-// 現在選択中の税率（初期値は10%＝0.10）
 var currentTaxRate = 0.10;
-
-// レイアウト設定（初期値は2列×2行＝4面）
-var layoutCols = 2;  // 列数（横に何枚並べるか）
-var layoutRows = 2;  // 行数（縦に何枚並べるか）
-
-// 現在選択中のデザイン（初期値は「シンプル」）
+var layoutCols = 2;
+var layoutRows = 2;
 var currentDesign = 'simple';
+var errorTimers = {};
 
-
-/* ============================================
-   ■ 税率ボタンが押された時の処理
-   ============================================ */
 function selectTax(button) {
-  // 全ての税率ボタンから「active」クラスを外す（選択解除）
-  var allButtons = document.querySelectorAll('.tax-btn');
-  for (var i = 0; i < allButtons.length; i++) {
-    allButtons[i].classList.remove('active');
-  }
-
-  // 押されたボタンに「active」クラスを付ける（選択状態にする）
+  document.querySelectorAll('.tax-btn').forEach(function(b) { b.classList.remove('active'); });
   button.classList.add('active');
-
-  // ボタンのdata-rate属性から税率を取得して保存
-  // 例: data-rate="0.10" → currentTaxRate = 0.10
   currentTaxRate = parseFloat(button.dataset.rate);
-
-  // 税込価格を再計算して表示を更新
   updateTaxPrice();
 }
 
-
-/* ============================================
-   ■ 税込価格を計算して画面に表示する
-   ============================================ */
 function updateTaxPrice() {
-  // 入力欄から税抜価格を取得
-  var priceInput = document.getElementById('price-input');
-  var price = parseInt(priceInput.value) || 0;
-  // parseInt() → 文字列を整数に変換
-  // || 0 → 空欄やエラーの場合は0にする
-
-  // 税込価格を計算（小数点以下を切り捨て）
+  var price = parseInt(document.getElementById('price-input').value) || 0;
   var taxPrice = Math.floor(price * (1 + currentTaxRate));
-  // 例: 980 × (1 + 0.10) = 980 × 1.10 = 1078
-
-  // 画面に表示（¥マーク + カンマ区切り）
   document.getElementById('tax-price').textContent = '¥' + taxPrice.toLocaleString();
-  // toLocaleString() → 1078 を "1,078" のようにカンマ区切りにする
 }
 
-
-/* ============================================
-   ■ 「追加する」ボタンが押された時の処理
-   ============================================ */
 function addItem() {
-  // 入力欄の値を取得
   var nameInput = document.getElementById('name-input');
   var priceInput = document.getElementById('price-input');
-
-  // 商品名を取得（前後の空白を削除）
   var name = nameInput.value.trim();
-
-  // 税抜価格を取得
   var price = parseInt(priceInput.value) || 0;
 
-  // --- バリデーション（入力チェック）---
-  // 商品名が空なら警告して終了
   if (!name) {
-    nameInput.style.borderColor = '#c00';         // 入力欄を赤くする
-    setTimeout(function() {                        // 1.5秒後に戻す
-      nameInput.style.borderColor = '';
-    }, 1500);
-    return; // ここで処理を中断
+    nameInput.classList.add('error');
+    clearTimeout(errorTimers['name']);
+    errorTimers['name'] = setTimeout(function() { nameInput.classList.remove('error'); }, 1500);
+    return;
   }
-
-  // 価格が0以下なら警告して終了
   if (price <= 0) {
-    priceInput.style.borderColor = '#c00';
-    setTimeout(function() {
-      priceInput.style.borderColor = '';
-    }, 1500);
+    priceInput.classList.add('error');
+    clearTimeout(errorTimers['price']);
+    errorTimers['price'] = setTimeout(function() { priceInput.classList.remove('error'); }, 1500);
     return;
   }
 
-  // --- 商品データを作成してリストに追加 ---
-  var taxPrice = Math.floor(price * (1 + currentTaxRate));
-
-  items.push({
-    name: name,                // 商品名
-    price: price,              // 税抜価格
-    taxRate: currentTaxRate,   // 税率
-    taxPrice: taxPrice         // 税込価格
-  });
-  // push() → 配列の末尾に要素を追加する
-
-  // --- 入力欄をクリアして次の入力に備える ---
+  items.push({ name: name, price: price, taxRate: currentTaxRate, taxPrice: Math.floor(price * (1 + currentTaxRate)) });
   nameInput.value = '';
   priceInput.value = '';
   document.getElementById('tax-price').textContent = '¥0';
-
-  // 商品名の入力欄にフォーカスを戻す（すぐ次を入力できるように）
   nameInput.focus();
-
-  // 画面の表示を更新
-  renderList();    // 商品リストを再描画
-  renderPreview(); // プレビューを再描画
-}
-
-
-/* ============================================
-   ■ 商品リストを画面に表示する
-   ============================================ */
-function renderList() {
-  var listEl = document.getElementById('item-list');
-  var countEl = document.getElementById('item-count');
-  var printBtn = document.getElementById('print-btn');
-
-  // 件数を更新
-  countEl.textContent = items.length;
-
-  // 印刷ボタンの有効/無効を切り替え
-  // 商品が0件なら無効（disabled）にする
-  printBtn.disabled = items.length === 0;
-
-  // リストが空の場合のメッセージ
-  if (items.length === 0) {
-    listEl.innerHTML = '<div class="empty-message">商品を追加してください</div>';
-    return; // ここで終了
-  }
-
-  // --- 商品リストのHTMLを組み立てる ---
-  var html = '';
-  for (var i = 0; i < items.length; i++) {
-    var item = items[i];
-    // 各商品の行を作る
-    html += '<div class="list-item">';
-    html += '  <div>';
-    html += '    <div class="item-name">' + escapeHtml(item.name) + '</div>';
-    html += '    <div class="item-price">¥' + item.taxPrice.toLocaleString() + '（税込）</div>';
-    html += '  </div>';
-    // 削除ボタン（クリックでremoveItem関数を呼ぶ）
-    html += '  <button class="delete-btn" onclick="removeItem(' + i + ')">✕</button>';
-    html += '</div>';
-  }
-
-  // 組み立てたHTMLを画面に反映
-  listEl.innerHTML = html;
-}
-
-
-/* ============================================
-   ■ 商品をリストから削除する
-   ============================================ */
-function removeItem(index) {
-  // 指定した位置の商品を1つ削除
-  items.splice(index, 1);
-  // splice(位置, 削除する数) → 配列から要素を削除
-
-  // 画面を更新
   renderList();
   renderPreview();
 }
 
+function renderList() {
+  var listEl = document.getElementById('item-list');
+  document.getElementById('item-count').textContent = items.length;
+  document.getElementById('print-btn').disabled = items.length === 0;
 
-/* ============================================
-   ■ レイアウトボタンが押された時の処理
-   ============================================ */
-function selectLayout(button) {
-  // 全てのレイアウトボタンから「active」を外す
-  var allButtons = document.querySelectorAll('.layout-btn');
-  for (var i = 0; i < allButtons.length; i++) {
-    allButtons[i].classList.remove('active');
+  if (items.length === 0) {
+    listEl.innerHTML = '<div class="empty-message">商品を追加してください</div>';
+    return;
   }
 
-  // 押されたボタンを選択状態にする
-  button.classList.add('active');
+  var html = '';
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    html += '<div class="list-item">';
+    html += '<div><div class="item-name">' + escapeHtml(item.name) + '</div>';
+    html += '<div class="item-price">¥' + item.taxPrice.toLocaleString() + '（税込）</div></div>';
+    html += '<button class="delete-btn" onclick="removeItem(' + i + ')">✕</button>';
+    html += '</div>';
+  }
+  listEl.innerHTML = html;
+}
 
-  // ボタンから列数と行数を取得
+function removeItem(index) {
+  items.splice(index, 1);
+  renderList();
+  renderPreview();
+}
+
+function selectLayout(button) {
+  document.querySelectorAll('.layout-btn').forEach(function(b) { b.classList.remove('active'); });
+  button.classList.add('active');
   layoutCols = parseInt(button.dataset.cols);
   layoutRows = parseInt(button.dataset.rows);
-
-  // プレビューを再描画
   renderPreview();
 }
 
-
-/* ============================================
-   ■ デザインボタンが押された時の処理
-   ============================================ */
 function selectDesign(button) {
-  // 全てのデザインボタンから「active」を外す
-  var allButtons = document.querySelectorAll('.design-btn');
-  for (var i = 0; i < allButtons.length; i++) {
-    allButtons[i].classList.remove('active');
-  }
-
-  // 押されたボタンを選択状態にする
+  document.querySelectorAll('.design-btn').forEach(function(b) { b.classList.remove('active'); });
   button.classList.add('active');
-
-  // デザイン名を保存
   currentDesign = button.dataset.design;
-
-  // プレビューを再描画
   renderPreview();
 }
 
-
-/* ============================================
-   ■ POPカード1枚分のHTMLを生成する
-   ============================================ */
 function createPopCardHtml(item, fontSize) {
-  // フォントサイズの基準値（レイアウトに応じて変わる）
-  var nameSize = fontSize;       // 商品名のフォントサイズ
-  var priceSize = fontSize * 1.6; // 価格は商品名の1.6倍
-
-  // デザインごとのスタイルを設定
-  var cardStyle = '';   // カード自体の追加スタイル
-  var nameExtra = '';   // 商品名の追加スタイル
-  var priceExtra = '';  // 価格の追加スタイル
+  var nameSize = fontSize;
+  var priceSize = fontSize * 1.6;
+  var cardStyle = '';
 
   if (currentDesign === 'simple') {
-    // シンプル: 白背景、控えめなスタイル
     cardStyle = 'background:#fffef8;';
-
   } else if (currentDesign === 'frame') {
-    // 枠あり: 緑色の太い枠線付き
     cardStyle = 'background:#fffef8; border:3px solid #2d7a4f;';
-
   } else if (currentDesign === 'leaf') {
-    // リーフ: 薄い緑背景で自然な雰囲気
     cardStyle = 'background:linear-gradient(135deg, #f0f7f0 0%, #e8f5e0 100%); border:1px solid #b5d6a7;';
   }
 
-  // HTMLを組み立てて返す
-  var html = '';
-  html += '<div class="pop-card" style="' + cardStyle + '">';
-  html += '  <div class="pop-name" style="font-size:' + nameSize + 'px;' + nameExtra + '">';
-  html +=      escapeHtml(item.name);
-  html += '  </div>';
-  html += '  <div class="pop-price" style="font-size:' + priceSize + 'px;' + priceExtra + '">';
-  html +=      '¥' + item.taxPrice.toLocaleString();
-  html += '    <span class="pop-tax">（税込）</span>';
-  html += '  </div>';
-  html += '</div>';
-
-  return html;
+  return '<div class="pop-card" style="' + cardStyle + '">'
+    + '<div class="pop-name" style="font-size:' + nameSize + 'px;">' + escapeHtml(item.name) + '</div>'
+    + '<div class="pop-price" style="font-size:' + priceSize + 'px;">¥' + item.taxPrice.toLocaleString()
+    + '<span class="pop-tax">（税込）</span></div>'
+    + '</div>';
 }
 
+function getFontSize(totalCells) {
+  if (totalCells <= 1) return 22;
+  if (totalCells <= 2) return 18;
+  if (totalCells <= 4) return 14;
+  if (totalCells <= 6) return 11;
+  if (totalCells <= 9) return 9;
+  return 7;
+}
 
-/* ============================================
-   ■ プレビューを描画する
-   ============================================ */
 function renderPreview() {
   var grid = document.getElementById('preview-grid');
-
-  // グリッドの列数と行数をCSSに設定
-  // 例: 2列 → "1fr 1fr"（均等に2分割）
   grid.style.gridTemplateColumns = 'repeat(' + layoutCols + ', 1fr)';
   grid.style.gridTemplateRows = 'repeat(' + layoutRows + ', 1fr)';
-
-  // 面数に応じてフォントサイズを調整
   var totalCells = layoutCols * layoutRows;
-  var fontSize;
-  if (totalCells <= 1)  fontSize = 22;  // 1面: 大きな文字
-  else if (totalCells <= 2)  fontSize = 18;
-  else if (totalCells <= 4)  fontSize = 14;
-  else if (totalCells <= 6)  fontSize = 11;
-  else if (totalCells <= 9)  fontSize = 9;
-  else fontSize = 7;                     // 16面: 小さな文字
-
-  // --- グリッドの中身を組み立てる ---
+  var fontSize = getFontSize(totalCells);
   var html = '';
   for (var i = 0; i < totalCells; i++) {
     if (i < items.length) {
-      // 商品データがある場合 → POPカードを表示
       html += createPopCardHtml(items[i], fontSize);
     } else {
-      // 商品データがない場合 → 空のカードを表示
       html += '<div class="pop-card" style="border-style:dashed;color:#ccc;font-size:' + fontSize + 'px;">空き</div>';
     }
   }
-
   grid.innerHTML = html;
 }
 
-
-/* ============================================
-   ■ 印刷する
-   ============================================ */
 function printPops() {
-  // 印刷用エリアにPOPカードを配置
   var printArea = document.getElementById('print-area');
   var totalCells = layoutCols * layoutRows;
+  var fontSizeMap = [0, 48, 36, 28, 28, 22, 22, 18, 18, 18, 14, 14, 14, 14, 14, 14, 14];
+  var fontSize = fontSizeMap[totalCells] || 14;
 
-  // 印刷用のフォントサイズ（プレビューより大きめ）
-  var fontSize;
-  if (totalCells <= 1)  fontSize = 48;
-  else if (totalCells <= 2)  fontSize = 36;
-  else if (totalCells <= 4)  fontSize = 28;
-  else if (totalCells <= 6)  fontSize = 22;
-  else if (totalCells <= 9)  fontSize = 18;
-  else fontSize = 14;
-
-  // グリッドを設定
   printArea.style.gridTemplateColumns = 'repeat(' + layoutCols + ', 1fr)';
   printArea.style.gridTemplateRows = 'repeat(' + layoutRows + ', 1fr)';
   printArea.style.gap = '2mm';
 
-  // POPカードのHTMLを組み立て
   var html = '';
   for (var i = 0; i < totalCells; i++) {
     if (i < items.length) {
@@ -841,55 +670,24 @@ function printPops() {
     }
   }
   printArea.innerHTML = html;
-
-  // ブラウザの印刷ダイアログを開く
   window.print();
 }
 
-
-/* ============================================
-   ■ HTMLの特殊文字をエスケープする（セキュリティ対策）
-
-   ユーザーが入力した文字をそのまま画面に出すと、
-   <script>などの危険なコードが実行される恐れがある。
-   この関数で < > " & などの文字を安全な形に変換する。
-   ============================================ */
 function escapeHtml(text) {
-  var div = document.createElement('div');     // 一時的な要素を作る
-  div.appendChild(document.createTextNode(text)); // テキストとして追加（自動エスケープ）
-  return div.innerHTML;                         // エスケープ済みHTMLを返す
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(text));
+  return div.innerHTML;
 }
 
-
-/* ============================================
-   ■ 価格入力時にリアルタイムで税込価格を更新する
-   ============================================ */
-// 価格入力欄に「入力された時」のイベントを登録
 document.getElementById('price-input').addEventListener('input', updateTaxPrice);
-// addEventListener('input', 関数) → 入力が変わるたびに関数を実行
-
-// Enterキーで追加できるようにする
 document.getElementById('name-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    // 商品名でEnterを押したら、価格入力欄にフォーカスを移す
-    document.getElementById('price-input').focus();
-  }
+  if (e.key === 'Enter') document.getElementById('price-input').focus();
 });
-
 document.getElementById('price-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    // 価格入力欄でEnterを押したら、商品を追加する
-    addItem();
-  }
+  if (e.key === 'Enter') addItem();
 });
 
-
-/* ============================================
-   ■ 初期表示の設定
-   ============================================ */
-// ページ読み込み時にプレビューを表示
 renderPreview();
-
 </script>
 </body>
 </html>
