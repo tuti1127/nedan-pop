@@ -1171,7 +1171,6 @@ button:focus,input:focus,select:focus{outline:none;}
   <button class="tnb active" onclick="switchTab('input',this)">入力・生成</button>
   <button class="tnb" onclick="switchTab('template',this)">テンプレート</button>
   <button class="tnb" onclick="switchTab('settings',this)">設定</button>
-  <button class="tnb" onclick="switchTab('square',this)">Square変換</button>
 </nav>
 
 
@@ -1189,10 +1188,6 @@ button:focus,input:focus,select:focus{outline:none;}
     <span class="bnb-i"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2"/></svg></span>
     <span class="bnb-l">設定</span>
   </button>
-  <button class="bnb" id="bnav-square" onclick="switchTab('square',this)">
-    <span class="bnb-i"><svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="20" x2="18" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="20" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="20" x2="6" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-    <span class="bnb-l">Square</span>
-  </button>
 </nav>
 
 <main class="main">
@@ -1203,20 +1198,80 @@ button:focus,input:focus,select:focus{outline:none;}
 
     <div class="ip-col">
 
-      <!-- Excel 一括挿入 2ボタン -->
-      <div class="xl-btns">
-        <button class="xl-card" onclick="onXlToyoake()">
-          <span class="xl-card-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/></svg></span>
-          <span class="xl-card-main">豊明花き専用</span>
-          <span class="xl-card-sub">専用フォーマットで<br>自動読み込み</span>
-        </button>
-        <button class="xl-card" onclick="document.getElementById('xl-file').click()">
+      <!-- Excel 一括挿入 -->
+
+      <!-- 豊明花き 一括読み込み -->
+      <div class="toyoake-section">
+        <div class="xl-btns">
+          <button class="xl-card" onclick="onXlToyoake()" style="grid-column:1/-1;">
+            <span class="xl-card-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/></svg></span>
+            <span class="xl-card-main">豊明花き CSV 一括読み込み</span>
+            <span class="xl-card-sub">POP作成 + Square Excelを同時生成</span>
+          </button>
+          <input type="file" id="xl-toyoake-file" accept=".csv,.CSV" style="display:none" onchange="onXlToyoakeFile(event)">
+        </div>
+
+        <!-- 読み込み結果（初期非表示） -->
+        <div id="toyoake-result" style="display:none;">
+          <div class="card" style="margin-top:10px;">
+            <div class="card-hdr">読み込み結果</div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;">
+                <span><strong id="toyoake-count">0</strong> 件のPOPを追加</span>
+                <span>売立日: <strong id="toyoake-date">—</strong></span>
+              </div>
+              <!-- Square Excel ダウンロード -->
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <button id="toyoake-sq-dl" class="m-btn m-btn-p" onclick="downloadSquareExcel()" style="height:40px;display:flex;align-items:center;gap:6px;">
+                  <svg viewBox="0 0 24 24" fill="none" width="16" height="16" style="stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Square Excel ダウンロード
+                </button>
+                <span id="toyoake-sq-status" style="font-size:12px;color:var(--ink3);"></span>
+              </div>
+              <!-- Square設定（折りたたみ） -->
+              <details style="font-size:13px;">
+                <summary style="cursor:pointer;color:var(--ink2);font-weight:600;">Square変換の設定</summary>
+                <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div class="sq-field">
+                    <label style="font-size:12px;">店舗名</label>
+                    <input type="text" id="sq-storeName" value="北山ナーセリー" placeholder="北山ナーセリー" style="height:36px;font-size:13px;border:1px solid var(--border);border-radius:8px;padding:0 10px;">
+                  </div>
+                  <div class="sq-field">
+                    <label style="font-size:12px;">消費税</label>
+                    <select id="sq-taxValue" style="height:36px;font-size:13px;border:1px solid var(--border);border-radius:8px;padding:0 10px;">
+                      <option value="Y" selected>適用する</option>
+                      <option value="N">適用しない</option>
+                    </select>
+                  </div>
+                  <div class="sq-field">
+                    <label style="font-size:12px;">価格設定</label>
+                    <select id="sq-priceMode" style="height:36px;font-size:13px;border:1px solid var(--border);border-radius:8px;padding:0 10px;">
+                      <option value="case" selected>ケース単価そのまま</option>
+                      <option value="per_unit">÷入数（1本単価）</option>
+                    </select>
+                  </div>
+                  <div class="sq-field">
+                    <label style="font-size:12px;">商品タイプ</label>
+                    <select id="sq-productType" style="height:36px;font-size:13px;border:1px solid var(--border);border-radius:8px;padding:0 10px;">
+                      <option value="有形商品" selected>有形商品</option>
+                      <option value="その他">その他</option>
+                    </select>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 任意Excelファイル（既存機能維持） -->
+      <div class="xl-btns" style="margin-top:8px;">
+        <button class="xl-card" onclick="document.getElementById('xl-file').click()" style="grid-column:1/-1;">
           <span class="xl-card-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M9 21V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
           <span class="xl-card-main">任意のExcelファイル</span>
-          <span class="xl-card-sub">.xlsx / .xls / .csv<br>列を手動で指定</span>
+          <span class="xl-card-sub">.xlsx / .xls / .csv — 列を手動で指定</span>
         </button>
         <input type="file" id="xl-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="onXlFile(event)">
-        <input type="file" id="xl-toyoake-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="onXlToyoakeFile(event)">
       </div>
 
       <!-- 手入力フォーム -->
@@ -1398,130 +1453,6 @@ button:focus,input:focus,select:focus{outline:none;}
       <div class="tax-hint">税抜入力モード時、自動で税込価格を計算して表示します。</div>
     </div>
   </div>
-</div>
-
-<!-- ─── SQUARE変換 ──────────────────────────── -->
-<div class="panel" id="panel-square">
-<div class="sq-tool" style="max-width:820px;margin:0 auto;padding:20px 14px 40px;">
-
-  <div class="sq-header">
-    <div class="sq-logo-mark" style="background:var(--accent);display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;margin-bottom:1rem;">
-      <svg viewBox="0 0 24 24" fill="none" width="28" height="28"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="3" stroke="#fff" stroke-width="2"/></svg>
-    </div>
-    <h2 class="sq-h1">豊明花き<span class="sq-arrow-badge">→</span>Square<span class="sq-version-badge">v2</span></h2>
-    <p class="sq-subtitle">入荷明細CSV（Shift-JIS）をSquareインポート用Excelに自動変換</p>
-  </div>
-
-  <!-- 対策内容カード -->
-  <div class="sq-card">
-    <div class="sq-card-label">面談資料で確認した修正・対策内容</div>
-    <div class="sq-notice-grid">
-      <div class="sq-notice sq-fixed">
-        <div class="sq-notice-title">✅ SKU重複を自動解決</div>
-        <div class="sq-notice-body">荷受番号は約3ヶ月で循環する連番。<strong>「売立日＋荷受番号」</strong>を組み合わせてSKUを生成。同日同番号が複数ある場合は連番サフィックス（-2,-3…）を自動付与。</div>
-      </div>
-      <div class="sq-notice sq-fixed">
-        <div class="sq-notice-title">✅ 鉢単価を÷100補正</div>
-        <div class="sq-notice-body">豊明データの鉢単価は<strong>100倍の整数で格納</strong>（例：50000→¥500）。÷100して正しい円単位でSquareの原価に登録。</div>
-      </div>
-      <div class="sq-notice sq-fixed">
-        <div class="sq-notice-title">✅ 品名コード（6桁）を使用</div>
-        <div class="sq-notice-body">旧5桁のJFコードでなく<strong>品名コード（9列目・正規6桁）</strong>を参照ハンドルに使用。同一品種の入荷をSquareで正しくグループ化できる。</div>
-      </div>
-      <div class="sq-notice sq-warn">
-        <div class="sq-notice-title">⚠️ カテゴリ名称は変動する</div>
-        <div class="sq-notice-body">JFコード分類は学術的変更で更新される場合があります。定期的に最新データで再インポートすることを推奨。</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 設定 -->
-  <div class="sq-card">
-    <div class="sq-card-label">設定</div>
-    <div class="sq-settings-grid">
-      <div class="sq-field">
-        <label>Square 店舗名（ロケーション名）</label>
-        <input type="text" id="sq-storeName" value="北山ナーセリー" placeholder="例: 北山ナーセリー">
-        <small>Squareの在庫管理ロケーション名に合わせてください</small>
-      </div>
-      <div class="sq-field">
-        <label>消費税（内税10%）</label>
-        <select id="sq-taxValue">
-          <option value="Y" selected>Y — 適用する</option>
-          <option value="N">N — 適用しない</option>
-        </select>
-      </div>
-      <div class="sq-field">
-        <label>販売価格の設定方法</label>
-        <select id="sq-priceMode">
-          <option value="case" selected>ケース単価をそのまま（セット価格）</option>
-          <option value="per_unit">ケース単価 ÷ 入数（1本あたり単価）</option>
-        </select>
-        <small>セット販売→ケース単価、バラ販売→÷入数</small>
-      </div>
-      <div class="sq-field">
-        <label>商品タイプ</label>
-        <select id="sq-productType">
-          <option value="有形商品" selected>有形商品</option>
-          <option value="その他">その他</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- ファイル選択 -->
-  <div class="sq-card" style="padding:1.5rem 2rem">
-    <div class="sq-card-label">Step 1 — ファイル選択</div>
-    <div id="sq-dropZone" onclick="document.getElementById('sq-fileInput').click()">
-      <input type="file" id="sq-fileInput" accept=".csv,.CSV">
-      <span class="sq-upload-icon" style="display:flex;justify-content:center;margin-bottom:.75rem;"><svg viewBox="0 0 24 24" fill="none" width="40" height="40"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--accent)"/></svg></span>
-      <div class="sq-upload-primary">豊明花きの入荷明細CSVをドロップ</div>
-      <div class="sq-upload-secondary">またはクリックしてファイルを選択（Shift-JIS / カンマ区切りCSV）</div>
-      <div class="sq-file-name-display">✓ <span id="sq-fileNameText"></span></div>
-    </div>
-  </div>
-
-  <!-- データ確認 -->
-  <div class="sq-card" id="sq-previewSection">
-    <div class="sq-card-label">Step 2 — データ確認・バリデーション</div>
-    <div class="sq-preview-meta">
-      <div class="sq-meta-chip"><span class="sq-meta-label">レコード数</span><span class="sq-meta-value" id="sq-metaRows">—</span></div>
-      <div class="sq-meta-chip"><span class="sq-meta-label">仕入日</span><span class="sq-meta-value" id="sq-metaDate">—</span></div>
-      <div class="sq-meta-chip"><span class="sq-meta-label">合計金額</span><span class="sq-meta-value" id="sq-metaTotal">—</span></div>
-      <div class="sq-meta-chip"><span class="sq-meta-label">荷受番号重複</span><span class="sq-meta-value" id="sq-metaDupes">—</span></div>
-    </div>
-    <div id="sq-validationBox"></div>
-    <div style="font-size:0.74rem;font-weight:600;color:#8a9e97;margin-top:1.2rem;margin-bottom:0.5rem;letter-spacing:0.05em;">SQUARE登録プレビュー（先頭5件）</div>
-    <div class="sq-preview-table-wrap">
-      <table class="sq-preview-table">
-        <thead id="sq-previewHead"></thead>
-        <tbody id="sq-previewBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- マッピング -->
-  <div class="sq-card" id="sq-mappingSection">
-    <div class="sq-card-label">列マッピング詳細</div>
-    <div class="sq-mapping-grid" id="sq-mappingGrid"></div>
-  </div>
-
-  <!-- ダウンロード -->
-  <button id="sq-convertBtn" disabled>
-    <svg viewBox="0 0 24 24" fill="none" width="18" height="18" style="display:inline;vertical-align:middle;margin-right:6px;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Squareインポート用 Excel をダウンロード
-  </button>
-  <div id="sq-statusMsg">
-    <span id="sq-statusIcon" style="font-size:1rem;flex-shrink:0;margin-top:0.05rem"></span>
-    <span class="sq-status-text" id="sq-statusText"></span>
-  </div>
-
-  <div class="sq-footer">
-    豊明花き入荷明細 → Square 商品マスタ 変換ツール v2｜面談資料（2026/03/20）対応版<br>
-    すべての処理はブラウザ内で完結します。データはサーバーに送信されません。
-  </div>
-
-</div>
 </div>
 
 </main>
@@ -1779,11 +1710,11 @@ function switchTab(name,btn){
   }
   if(btn)btn.classList.add('active');
   // bnav同期
-  var bmap={input:'bnav-input',template:'bnav-template',settings:'bnav-settings',square:'bnav-square'};
+  var bmap={input:'bnav-input',template:'bnav-template',settings:'bnav-settings'};
   var bb=document.getElementById(bmap[name]);
   if(bb)bb.classList.add('active');
   // topnav同期
-  var order=['input','template','settings','square'];
+  var order=['input','template','settings'];
   var idx=order.indexOf(name);
   var tnbs=document.querySelectorAll('.tnb');
   if(tnbs[idx])tnbs[idx].classList.add('active');
@@ -3324,26 +3255,28 @@ function toggleTaxPopover(){
   }
 }
 
-// 豊明花き専用Excel読み込み
+// 豊明花き CSV 一括読み込み（POP追加 + Square変換用データ保持）
+var toyoakeParsedCSV = null;
+
 function onXlToyoake(){
   document.getElementById('xl-toyoake-file').click();
 }
 function onXlToyoakeFile(event){
   var file=event.target.files[0];if(!file)return;
   event.target.value='';
-  // 豊明花きCSVはShift-JIS（CP932）エンコード
   var reader=new FileReader();
   reader.onload=function(e){
     try{
       var text=new TextDecoder('shift-jis').decode(e.target.result);
       var rows=parseCSV(text);
       if(!rows||rows.length<2){toast('データがありません');return;}
-      // ヘッダー行からカラムインデックスを特定
       var hdr=rows[0].map(function(h){return String(h).trim();});
       var nameIdx=hdr.indexOf('品名');
       var priceIdx=hdr.indexOf('ケース単価');
-      if(nameIdx<0) nameIdx=9;   // fallback: 豊明CSVの品名は列9
-      if(priceIdx<0) priceIdx=18; // fallback: ケース単価は列18
+      if(nameIdx<0) nameIdx=9;
+      if(priceIdx<0) priceIdx=18;
+
+      // 1) POP用アイテム追加
       var added=0;
       for(var i=1;i<rows.length;i++){
         var row=rows[i];
@@ -3352,11 +3285,56 @@ function onXlToyoakeFile(event){
         if(name&&price){items.push({id:Date.now()+Math.random(),name:name,price:price,extras:{}});added++;}
       }
       renderList();updateBadge();redrawPrev();
-      toast('豊明花き: '+added+'件を追加しました');
+
+      // 2) Square変換用に生CSVデータを保持（sqParseCSV互換形式）
+      var sqRows=[];
+      for(var i=1;i<rows.length;i++){
+        var vals=rows[i];
+        if(vals.length<5)continue;
+        var obj={};
+        hdr.forEach(function(h,idx){obj[h]=(vals[idx]||'').toString().trim();});
+        sqRows.push(obj);
+      }
+      toyoakeParsedCSV={headers:hdr,rows:sqRows};
+
+      // 3) 結果表示
+      var resultEl=document.getElementById('toyoake-result');
+      if(resultEl)resultEl.style.display='block';
+      var countEl=document.getElementById('toyoake-count');
+      if(countEl)countEl.textContent=added;
+      var dateEl=document.getElementById('toyoake-date');
+      if(dateEl&&sqRows.length>0){
+        var d=sqRows[0]['売立日']||'';
+        dateEl.textContent=d.length===8?d.slice(0,4)+'/'+d.slice(4,6)+'/'+d.slice(6,8):d;
+      }
+      var statusEl=document.getElementById('toyoake-sq-status');
+      if(statusEl)statusEl.textContent='Square Excel準備完了（'+sqRows.length+'件）';
+
+      toast('豊明花き: '+added+'件を追加 + Square Excel準備完了');
     }catch(err){toast('読み込み失敗: '+err.message);}
   };
   reader.onerror=function(){toast('ファイル読み込みに失敗しました');};
   reader.readAsArrayBuffer(file);
+}
+
+function downloadSquareExcel(){
+  if(!toyoakeParsedCSV||!toyoakeParsedCSV.rows.length){
+    toast('先に豊明CSVを読み込んでください');return;
+  }
+  if(typeof XLSX==='undefined'){toast('XLSXライブラリが読み込まれていません');return;}
+  var store=(document.getElementById('sq-storeName')||{value:'北山ナーセリー'}).value.trim()||'北山ナーセリー';
+  var tax=(document.getElementById('sq-taxValue')||{value:'Y'}).value;
+  var pmode=(document.getElementById('sq-priceMode')||{value:'case'}).value;
+  var ptype=(document.getElementById('sq-productType')||{value:'有形商品'}).value;
+  try{
+    var wb=window.sqBuildXLSX(toyoakeParsedCSV.rows,store,tax,pmode,ptype);
+    var date=(toyoakeParsedCSV.rows[0]?(toyoakeParsedCSV.rows[0]['売立日']||''):'').slice(0,8)||new Date().toISOString().slice(0,10).replace(/-/g,'');
+    var fn='square_import_'+date+'.xlsx';
+    XLSX.writeFile(wb,fn);
+    var statusEl=document.getElementById('toyoake-sq-status');
+    if(statusEl){statusEl.textContent=fn+' をダウンロードしました';statusEl.style.color='var(--accent)';}
+    toast(fn+' をダウンロードしました');
+  }catch(e){toast('Excel生成失敗: '+e.message);}
 }
 window.addEventListener('DOMContentLoaded',function(){
   buildGrid();updateOrientInfo();
@@ -3706,6 +3684,10 @@ function toggleTheme(){
     if (pmEl2)   pmEl2.addEventListener('change', sqSaveSettings);
     if (ptEl)    ptEl.addEventListener('change', sqSaveSettings);
   });
+
+  // 入力タブから呼び出せるように公開
+  window.sqBuildXLSX = sqBuildXLSX;
+  window.sqValidate = sqValidate;
 })();
 </script>
 </body>
