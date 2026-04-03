@@ -939,14 +939,14 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
 /* tax-popover anchor */
 .price-row-wrap{position:relative;z-index:10;}
 
-/* ════ テンプレートパネル 新デザイン ════ */
+/* ════ テンプレートパネル グリッドエディタ ════ */
 .tmpl-layout{
   display:flex;flex-direction:column;gap:14px;
 }
 @media(min-width:680px){
   .tmpl-layout{
     display:grid;
-    grid-template-columns:minmax(180px,46%) 1fr;
+    grid-template-columns:minmax(200px,48%) 1fr;
     gap:14px;align-items:start;
   }
 }
@@ -961,7 +961,7 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
   .tmpl-left-col::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:3px;}
 }
 
-/* Canvas エリア */
+/* グリッドエディタ Canvas エリア */
 .tmpl-cvs-wrap{
   background:var(--surface);
   border:1px solid var(--outline-var);
@@ -986,7 +986,59 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
 }
 .cvs-reset-btn:hover{border-color:var(--primary);color:var(--primary);}
 .cvs-reset-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;}
-#pop-canvas{width:100%;display:block;cursor:grab;touch-action:none;}
+#pop-canvas{width:100%;display:block;cursor:crosshair;touch-action:none;}
+
+/* 要素配置ボタンバー */
+.el-place-bar{
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding:10px 13px;
+  border-bottom:1px solid var(--outline-var);
+  background:var(--surface-var);
+}
+.el-place-btn{
+  height:32px;padding:0 10px;
+  border:1.5px solid var(--outline-var);
+  border-radius:var(--radius-sm);
+  background:var(--surface);font-family:inherit;font-size:11px;font-weight:700;
+  color:var(--on-surface-var);cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+  min-height:32px;
+}
+.el-place-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-cnt);}
+.el-place-btn:active{transform:scale(.96);}
+.el-place-btn.active-type{border-color:var(--primary);background:var(--primary);color:var(--on-primary);}
+.el-place-info{
+  padding:7px 13px;font-size:11px;color:var(--on-surface-dim);
+  background:var(--surface-cnt);border-bottom:1px solid var(--outline-var);
+  min-height:28px;display:flex;align-items:center;gap:6px;
+}
+.el-place-info span{color:var(--primary);font-weight:700;}
+
+/* 選択中要素のプロパティパネル */
+.sel-el-panel{
+  padding:10px 13px;
+  border-top:1px solid var(--outline-var);
+  background:var(--primary-cnt);
+  display:none;flex-direction:column;gap:8px;
+}
+[data-theme="dark"] .sel-el-panel{background:var(--surface-cnt);}
+.sel-el-panel.show{display:flex;}
+.sel-el-hdr{
+  font-size:9px;font-weight:700;color:var(--on-surface-dim);
+  letter-spacing:.07em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sel-el-del{
+  height:26px;padding:0 8px;
+  border:1.5px solid var(--outline-var);
+  border-radius:var(--radius-sm);
+  background:var(--surface);font-family:inherit;font-size:10px;font-weight:700;
+  color:var(--error);cursor:pointer;
+  display:flex;align-items:center;gap:3px;
+  transition:all .18s;min-height:26px;
+}
+.sel-el-del:hover{border-color:var(--error);background:var(--error-cnt);}
 
 /* テンプレート管理 */
 .tmpl-mgr{
@@ -1717,16 +1769,73 @@ button:focus,input:focus,select:focus{outline:none;}
 <div class="panel" id="panel-template">
   <div class="tmpl-layout">
 
-    <!-- 左列：Canvas + テンプレート管理 -->
+    <!-- 左列：グリッドエディタ Canvas + テンプレート管理 -->
     <div class="tmpl-left-col">
 
-      <!-- 編集プレビュー -->
+      <!-- グリッドエディタ -->
       <div class="tmpl-cvs-wrap">
         <div class="cvs-lbl-bar">
-          編集プレビュー（ドラッグで移動）
+          グリッドエディタ（12×10）
           <button class="cvs-reset-btn" onclick="resetEl()"><svg viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 1 0 .49-4.98" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 初期値</button>
         </div>
+        <!-- 要素配置ボタンバー -->
+        <div class="el-place-bar">
+          <button class="el-place-btn" id="place-btn-name" onclick="setPlaceType('name')">品名</button>
+          <button class="el-place-btn" id="place-btn-price" onclick="setPlaceType('price')">価格</button>
+          <button class="el-place-btn" id="place-btn-tax" onclick="setPlaceType('tax')">税込</button>
+          <button class="el-place-btn" id="place-btn-custom" onclick="setPlaceType('custom')">テキスト+</button>
+          <button class="el-place-btn" onclick="clearGridSel()" style="margin-left:auto;color:var(--on-surface-dim);">選択解除</button>
+        </div>
+        <!-- 操作説明 -->
+        <div class="el-place-info" id="grid-info">
+          セルをドラッグして範囲選択 → ボタンで要素を配置
+        </div>
+        <!-- グリッドCanvas -->
         <canvas id="pop-canvas"></canvas>
+        <!-- 選択中要素プロパティ -->
+        <div class="sel-el-panel" id="sel-el-panel">
+          <div class="sel-el-hdr">
+            <span id="sel-el-label">選択中の要素</span>
+            <button class="sel-el-del" onclick="deleteSelEl()">
+              <svg viewBox="0 0 24 24" fill="none" width="12" height="12"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              削除
+            </button>
+          </div>
+          <!-- フォントサイズ -->
+          <div class="iprop-row">
+            <span class="iprop-lbl">サイズ</span>
+            <div class="fsz-ctrl">
+              <button class="fsz-btn" onclick="selElNudge('fontSize',-1)">−</button>
+              <input class="fsz-val" type="number" id="sel-el-fs" min="6" max="120" value="14" oninput="selElSetFs(this.value)">
+              <button class="fsz-btn" onclick="selElNudge('fontSize',1)">＋</button>
+            </div>
+            <span style="font-size:9px;color:var(--on-surface-dim);margin-left:6px;">px / auto</span>
+            <button class="fsz-btn" id="sel-el-auto-btn" onclick="selElToggleAuto()" style="margin-left:4px;font-size:10px;padding:0 6px;width:auto;">auto</button>
+          </div>
+          <!-- 文字色 -->
+          <div class="iprop-row">
+            <span class="iprop-lbl">色</span>
+            <input type="color" class="clr-btn" id="sel-el-color" value="#1a1a1a" onchange="selElSet('color',this.value)">
+          </div>
+          <!-- スタイル・揃え -->
+          <div class="iprop-row">
+            <span class="iprop-lbl">スタイル</span>
+            <div class="style-btns">
+              <button class="s-btn" id="sel-el-bold" onclick="selElToggleBold()">B</button>
+              <button class="s-btn" id="sel-el-left"   onclick="selElSet('align','left')">←</button>
+              <button class="s-btn" id="sel-el-center" onclick="selElSet('align','center')">中</button>
+              <button class="s-btn" id="sel-el-right"  onclick="selElSet('align','right')">→</button>
+              <button class="s-btn" id="sel-el-vtop"   onclick="selElSet('valign','top')">上</button>
+              <button class="s-btn" id="sel-el-vmid"   onclick="selElSet('valign','middle')">中</button>
+              <button class="s-btn" id="sel-el-vbot"   onclick="selElSet('valign','bottom')">下</button>
+            </div>
+          </div>
+          <!-- カスタムテキスト入力 -->
+          <div class="iprop-row" id="sel-el-text-row" style="display:none;">
+            <span class="iprop-lbl">テキスト</span>
+            <input class="prop-inp" type="text" id="sel-el-text" placeholder="テキストを入力" oninput="selElSet('text',this.value)" style="flex:1;height:34px;margin-left:6px;">
+          </div>
+        </div>
       </div>
 
       <!-- テンプレート管理 -->
@@ -1742,14 +1851,13 @@ button:focus,input:focus,select:focus{outline:none;}
 
     </div>
 
-    <!-- 右列：項目 + 背景 -->
+    <!-- 右列：背景設定 -->
     <div class="tmpl-right-col">
 
-      <!-- 項目リスト -->
+      <!-- 配置済み要素リスト -->
       <div class="items-section">
         <div class="items-hdr">
-          <span>項目</span>
-          <button class="items-add-btn" onclick="addEl()"><svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg> テキスト追加</button>
+          <span>配置済み要素</span>
         </div>
         <div id="ellist"></div>
       </div>
@@ -1762,9 +1870,9 @@ button:focus,input:focus,select:focus{outline:none;}
           <div class="clr-row"><span class="clr-lbl">枠・アクセント色</span><input type="color" id="caccent" value="#2d7a4f" onchange="markEdited();redrawAll()"></div>
           <div class="clr-row"><span class="clr-lbl">背景色</span><input type="color" id="cbg" value="#fffef8" onchange="markEdited();redrawAll()"></div>
           <select class="dstyle-sel" id="dstyle" onchange="markEdited();redrawAll();rebuildInpFields();">
-            <option value="custom">🖼 カスタム背景（外部ソフト）</option>
-            <option value="natural" selected>🌿 シンプルポップ</option>
-            <option value="ikea">🟡 IKEAスタイル</option>
+            <option value="custom">カスタム背景（外部ソフト）</option>
+            <option value="natural" selected>シンプルポップ</option>
+            <option value="ikea">IKEAスタイル</option>
           </select>
           <div class="bg-btns">
             <button class="bg-btn" onclick="document.getElementById('bg-img-file').click()">
@@ -1873,9 +1981,17 @@ var lineImg = new Image(); lineImg.src = LINE_B64;
 // ━━ STATE ━━
 var items=[], selEl=null, dragging=null, EL_BOXES=[];
 var gridCols=2, gridRows=2;
+var logoImg=null;       // ロゴ画像（将来使用）
+var selTmplId=null;     // 現在選択中のテンプレートID
 var TAX_RATE=10;
 var PRICE_MODE='excl'; // 'excl'=税抜入力 'incl'=税込入力
 var xlRows=[], xlHeaders=[];
+
+// ━━ グリッドエディタ STATE ━━
+var GRID_COLS=12, GRID_ROWS=10; // グリッド分割数
+var gridSelStart=null, gridSelEnd=null, gridDragging=false; // セル選択
+var selGridEl=null;   // 選択中のグリッド要素ID
+var placeType=null;   // 配置モード: 'name'|'price'|'tax'|'custom'|null
 
 // ━━ PRESETS ━━
 var PRESETS=[
@@ -1890,11 +2006,14 @@ var PRESETS=[
 ];
 function curPreset(){return PRESETS.find(function(p){return p.c===gridCols&&p.r===gridRows;})||PRESETS[2];}
 
-// ━━ DEFAULT ELEMENTS ━━
+// ━━ DEFAULT ELEMENTS (グリッド座標ベース) ━━
 var DEF_ELS=[
-  {id:'name', label:'植物名',   inputField:true,  optional:false, type:'text',  color:'#1a1a1a',x:.50,y:.62,size:22,align:'center',bold:true},
-  {id:'price',label:'本体価格', inputField:false, optional:false, type:'price', color:'#cc1100',x:.56,y:.76,size:28,align:'center',bold:true},
-  {id:'tax',  label:'税込価格', inputField:false, optional:false, type:'tax',   color:'#333333',x:.56,y:.87,size:14,align:'center',bold:true},
+  {id:'name', label:'植物名',   inputField:true,  optional:false, type:'text',
+   col:1, row:2, colSpan:10, rowSpan:2, color:'#2d5a1e', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+  {id:'price',label:'税込価格', inputField:false, optional:false, type:'price',
+   col:2, row:5, colSpan:8,  rowSpan:3, color:'#b45309', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+  {id:'tax',  label:'税込文字', inputField:false, optional:false, type:'tax',
+   col:3, row:8, colSpan:6,  rowSpan:1, color:'#9ca3af', bold:false, align:'center', valign:'middle', fontSize:'auto'},
 ];
 var ELS=DEF_ELS.map(function(e){return Object.assign({},e);});
 
@@ -2073,7 +2192,7 @@ function switchTab(name,btn){
   if(name==='template'){
     var cfg=gst();
     savedSnapshot={els:JSON.parse(JSON.stringify(ELS)),ca:cfg.ca,cb:cfg.cb,st:cfg.st};
-    setTimeout(function(){redrawEd();},60);
+    setTimeout(function(){initEdCvs();buildElList();},60);
     renderTmplList();
   }
   if(name==='input'){
@@ -2458,18 +2577,50 @@ function fitFs(ctx, text, fontStyle, startFs, maxW, maxH, minFs) {
   return {fs: Math.max(minFs, fs), lines: wrapWords(ctx, text, maxW)};
 }
 
-function drawPop(ctx, cx, cy, cw, ch, sample, cfg) {
-  var ca=cfg.ca, cb=cfg.cb, st=cfg.st, sn=cfg.sn;
-  var LINE_GAP = 1.28;
+// ━━ グリッド座標からピクセル座標に変換 ━━
+function gridToPixel(cx, cy, cw, ch, el){
+  var cellW = cw / GRID_COLS;
+  var cellH = ch / GRID_ROWS;
+  var col   = (typeof el.col !== 'undefined') ? el.col : 0;
+  var row   = (typeof el.row !== 'undefined') ? el.row : 0;
+  var colSpan = el.colSpan || 1;
+  var rowSpan = el.rowSpan || 1;
+  return {
+    x: cx + col * cellW,
+    y: cy + row * cellH,
+    w: colSpan * cellW,
+    h: rowSpan * cellH,
+    cellW: cellW,
+    cellH: cellH
+  };
+}
 
-  // Background
+// ━━ ELSのフォールバック（旧x,y,size座標→グリッド変換） ━━
+function normalizeEl(el){
+  // すでにグリッド座標があればそのまま
+  if(typeof el.col !== 'undefined') return el;
+  // 旧x,y,size座標をグリッドに変換
+  var col = Math.round((el.x||0.5) * GRID_COLS - 5);
+  var row = Math.round((el.y||0.5) * GRID_ROWS - 1);
+  col = Math.max(0, Math.min(GRID_COLS-2, col));
+  row = Math.max(0, Math.min(GRID_ROWS-2, row));
+  return Object.assign({}, el, {
+    col: col, row: row, colSpan: 10, rowSpan: 2,
+    fontSize: el.size || 16,
+    valign: 'middle'
+  });
+}
+
+function drawPop(ctx, cx, cy, cw, ch, sample, cfg) {
+  var ca=cfg.ca, cb=cfg.cb, st=cfg.st;
+
+  // 背景描画
   if(st==='custom' && customBgImg && customBgImg.complete && customBgImg.naturalWidth>0){
     ctx.save(); rrect(ctx,cx,cy,cw,ch,cw*.02); ctx.clip();
     ctx.drawImage(customBgImg,cx,cy,cw,ch); ctx.restore();
   } else {
     ctx.fillStyle=cb; rrect(ctx,cx,cy,cw,ch,cw*.04); ctx.fill();
   }
-  // Frame
   drawFrame(ctx, cx, cy, cw, ch, ca, st);
 
   if(!sample) {
@@ -2478,221 +2629,89 @@ function drawPop(ctx, cx, cy, cw, ch, sample, cfg) {
     ctx.fillText('空き', cx+cw/2, cy+ch/2); return;
   }
 
-  var pad   = cw * .06;
-  var aW    = cw - pad*2;
-  var aH    = ch - pad*2;
-  var topD  = (st==='natural') ? ch*.12 : (st==='minimal' ? ch*.03 : 0);
-
-  // Content area after top decoration
-  var contentY = cy + pad + topD;
-  var contentH = ch - pad - topD - pad*.5;
-
-  var SCALE = cw / 105;
-  var nameEl  = ELS.find(function(e){return e.id==='name';});
-  var priceEl = ELS.find(function(e){return e.id==='price';});
-  var taxEl   = ELS.find(function(e){return e.id==='tax';});
-  var shopEl  = ELS.find(function(e){return e.id==='shop';});
-
   // 価格計算
   var prices = sample.price ? calcPrices(sample.price) : {base:0, incl:0};
-  var isExcl = PRICE_MODE==='excl';
 
-  // ── IKEAスタイル専用レイアウト ──
-  if(st==='ikea'){
-    var SC = cw/105;
-    var pad2 = cw*0.05;
-    var aW2  = cw - pad2*2;
+  // グリッド座標ベースで各要素を描画
+  var cellW = cw / GRID_COLS;
+  var cellH = ch / GRID_ROWS;
 
-    // 黄色ヘッダー帯（上30%）
-    var hdrH = ch * 0.32;
-    ctx.fillStyle = '#FFDA1A';
-    ctx.fillRect(cx, cy, cw, hdrH);
+  ELS.forEach(function(elRaw){
+    var el = normalizeEl(elRaw);
+    if(typeof el.col === 'undefined') return;
 
-    // ヘッダー帯と本体の境界線
-    ctx.fillStyle = '#111';
-    ctx.fillRect(cx, cy+hdrH, cw, cw*0.013);
+    var ex = cx + el.col * cellW;
+    var ey = cy + el.row * cellH;
+    var ew = el.colSpan * cellW;
+    var eh = el.rowSpan * cellH;
 
-    // 植物名（黄帯内・黒・大）
-    var nameText2 = sample.name||'';
-    if(nameText2){
-      var nFs2 = 20*SC;
-      var nFit2 = fitFs(ctx,nameText2,'700 __FS__px sans-serif',nFs2,aW2*0.92,hdrH*0.72,7);
-      ctx.font='700 '+nFit2.fs+'px sans-serif';
-      ctx.fillStyle='#111'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      var nBH=nFit2.lines.length*nFit2.fs*1.25;
-      var nSY=cy+(hdrH-nBH)*0.5;
-      nFit2.lines.forEach(function(ln,li){
-        ctx.fillText(ln,cx+cw/2,nSY+nFit2.fs*1.25*(li+0.5));
-      });
-    }
-
-    // 価格エリア（下70%・白背景）
-    var priceAreaY2 = cy + hdrH + cw*0.013;
-    var priceAreaH2 = ch - hdrH - cw*0.013;
-
-    var prices2 = sample.price ? calcPrices(sample.price) : {base:0,incl:0};
-    var isExcl2 = PRICE_MODE==='excl';
-    var mainPrice = isExcl2 ? prices2.base : prices2.incl;
-    var subPrice  = isExcl2 ? prices2.incl : null;
-
-    if(mainPrice){
-      // 価格ラベル（小・左寄り）
-      var lblFs = 7*SC;
-      ctx.font='500 '+lblFs+'px sans-serif';
-      ctx.fillStyle='#555'; ctx.textAlign='left'; ctx.textBaseline='top';
-      ctx.fillText(isExcl2?'税抜価格':'税込価格', cx+pad2, priceAreaY2+priceAreaH2*0.08);
-
-      // 価格数字（極大・左寄り・黒）
-      var pTxt = mainPrice.toLocaleString();
-      var pFs  = 34*SC;
-      ctx.font='900 '+pFs+'px sans-serif';
-      while(ctx.measureText(pTxt+'円').width>aW2*0.82&&pFs>10){pFs*=0.91;ctx.font='900 '+pFs+'px sans-serif';}
-      ctx.fillStyle='#111'; ctx.textAlign='left'; ctx.textBaseline='middle';
-      ctx.fillText(pTxt, cx+pad2, priceAreaY2+priceAreaH2*(subPrice?0.42:0.50));
-      // 「円」を小さく右に
-      ctx.font='700 '+(pFs*0.38)+'px sans-serif'; ctx.textBaseline='middle';
-      var pw=ctx.measureText(pTxt).width;
-      ctx.font='900 '+pFs+'px sans-serif'; // 測定用に戻す
-      pw=ctx.measureText(pTxt).width;
-      ctx.font='700 '+(pFs*0.38)+'px sans-serif';
-      ctx.fillText('円', cx+pad2+pw+2, priceAreaY2+priceAreaH2*(subPrice?0.42:0.50));
-
-      if(subPrice&&isExcl2){
-        // 税込区切り線
-        ctx.strokeStyle='rgba(0,0,0,.12)'; ctx.lineWidth=0.7;
-        ctx.beginPath();
-        ctx.moveTo(cx+pad2,priceAreaY2+priceAreaH2*0.66);
-        ctx.lineTo(cx+cw-pad2,priceAreaY2+priceAreaH2*0.66);
-        ctx.stroke();
-        // 税込ラベル
-        ctx.font='500 '+lblFs+'px sans-serif';
-        ctx.fillStyle='#888'; ctx.textAlign='left'; ctx.textBaseline='top';
-        ctx.fillText('税込価格', cx+pad2, priceAreaY2+priceAreaH2*0.69);
-        // 税込価格（中）
-        var iTxt=subPrice.toLocaleString()+'円';
-        var iFs=pFs*0.55;
-        ctx.font='700 '+iFs+'px sans-serif';
-        ctx.fillStyle='#444'; ctx.textBaseline='middle';
-        ctx.fillText(iTxt,cx+pad2,priceAreaY2+priceAreaH2*0.86);
+    // テキスト内容を決定
+    var text = '';
+    if(el.type === 'text' || el.id === 'name'){
+      text = sample ? (sample.name || '') : (el.label || '');
+    } else if(el.type === 'price'){
+      if(sample && sample.price){
+        text = '¥' + prices.incl.toLocaleString();
+      } else {
+        text = '¥0';
       }
+    } else if(el.type === 'tax'){
+      if(sample && sample.price){
+        text = '税込 ¥' + prices.incl.toLocaleString();
+      } else {
+        text = '税込 ¥0';
+      }
+    } else if(el.type === 'custom'){
+      text = el.text || el.label || '';
     }
-    return;
-  }
 
-  // ── 通常レイアウト（natural）──
-  // Zone split: top 48% = name, bottom 52% = price zone
-  var nameZoneH  = contentH * 0.48;
-  var priceZoneH = contentH * 0.52;
+    if(!text) return;
 
-  // NAME zone: fit name text
-  var nameText = sample.name || '';
-  var nameFit = {fs:8, lines:[nameText]};
-  if(nameText){
-    var nameBaseFs = (nameEl?nameEl.size:20)*SCALE;
-    nameFit = fitFs(ctx, nameText,
-      (nameEl&&nameEl.bold?'700':'400')+' __FS__px "Noto Sans JP",sans-serif',
-      nameBaseFs, aW*.92, nameZoneH, 8);
-  }
+    // フォントサイズ（autoはセル高さに合わせる）
+    var fs;
+    if(el.fontSize === 'auto' || !el.fontSize){
+      fs = Math.floor(eh * 0.55);
+      // テキストが幅に収まるよう調整
+      var fontStyle = (el.bold ? '700' : '400') + ' __FS__px sans-serif';
+      var fit = fitFs(ctx, text, fontStyle, fs, ew * 0.92, eh * 0.88, 6);
+      fs = fit.fs;
+      // テキスト描画（複数行対応）
+      ctx.fillStyle = el.color || '#000';
+      ctx.font = (el.bold ? '700 ' : '400 ') + fs + 'px sans-serif';
+      ctx.textAlign = el.align || 'center';
+      var tx = el.align === 'left' ? ex + 4 : el.align === 'right' ? ex + ew - 4 : ex + ew/2;
+      var totalH = fit.lines.length * fs * 1.25;
+      var ty;
+      if(el.valign === 'top')         ty = ey + 4;
+      else if(el.valign === 'bottom') ty = ey + eh - totalH - 2;
+      else                            ty = ey + (eh - totalH) / 2;
+      ctx.textBaseline = 'top';
+      fit.lines.forEach(function(ln, li){
+        ctx.fillText(ln, tx, ty + li * fs * 1.25);
+      });
+      return;
+    } else {
+      fs = Number(el.fontSize) || 14;
+    }
 
-  // PRICE zone texts（税率計算済み）
-  var displayPrice = prices.incl;
-  var priceText = displayPrice ? '¥ '+displayPrice.toLocaleString() : '';
-  var taxText   = '（税込）';
-  var shopText  = sn || '';
+    // 固定サイズ描画
+    ctx.fillStyle = el.color || '#000';
+    ctx.font = (el.bold ? '700 ' : '400 ') + fs + 'px sans-serif';
+    ctx.textAlign = el.align || 'center';
+    var tx2 = el.align === 'left' ? ex + 4 : el.align === 'right' ? ex + ew - 4 : ex + ew/2;
+    var ty2;
+    if(el.valign === 'top')         { ctx.textBaseline='top';    ty2 = ey + 2; }
+    else if(el.valign === 'bottom') { ctx.textBaseline='bottom'; ty2 = ey + eh - 2; }
+    else                            { ctx.textBaseline='middle'; ty2 = ey + eh/2; }
+    ctx.fillText(text, tx2, ty2);
+  });
 
-  // Price font: start from el.size, but clamp so it's no more than 2× name fs
-  var priceBaseFs = (priceEl ? priceEl.size : 26) * SCALE;
-  var priceMaxFs  = nameFit.fs * 2.0;
-  var priceStartFs = Math.min(priceBaseFs, priceMaxFs);
-
-  // Allocate heights within price zone
-  var taxFs   = (taxEl  ? taxEl.size  :  9) * SCALE;
-  var shopFs  = (shopEl ? shopEl.size :  8) * SCALE;
-  var taxH    = taxText  ? taxFs  * LINE_GAP : 0;
-  var shopH   = shopText ? shopFs * LINE_GAP : 0;
-  var priceZoneForPrice = priceZoneH - taxH - shopH - (taxH||shopH ? cw*.012 : 0);
-
-  var priceFit = {fs: 8, lines: [priceText]};
-  if(priceText) {
-    priceFit = fitFs(ctx, priceText,
-      (priceEl&&priceEl.bold?'700':'400')+' __FS__px "Noto Sans JP",sans-serif',
-      priceStartFs, aW * .92, Math.max(priceZoneForPrice, priceZoneH * 0.55), 8);
-  }
-
-  // ── Draw name zone (vertically centred within its zone) ──
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  if(nameText) {
-    ctx.font = (nameEl&&nameEl.bold?'700':'400')+' '+nameFit.fs+'px "Noto Sans JP",sans-serif';
-    ctx.fillStyle = nameEl ? nameEl.color : '#2d5a1e';
-    var nameBlockH = nameFit.lines.length * nameFit.fs * LINE_GAP;
-    var nameStartY = contentY + (nameZoneH - nameBlockH) / 2;
-    nameFit.lines.forEach(function(ln, li) {
-      ctx.fillText(ln, cx+cw/2, nameStartY + nameFit.fs*LINE_GAP*(li+0.5));
-    });
-  }
-
-  // ── Divider line between zones ──
-  var divY = contentY + nameZoneH;
-  ctx.strokeStyle = h2rgba(ca, 0.20);
-  ctx.lineWidth = 0.6;
-  ctx.setLineDash && ctx.setLineDash([]);
-  ctx.beginPath();
-  ctx.moveTo(cx + pad*1.2, divY);
-  ctx.lineTo(cx + cw - pad*1.2, divY);
-  ctx.stroke();
-
-  // ── Draw price zone ──
-  var priceZoneTop = divY;
-  var priceBlockH  = priceFit.lines.length * priceFit.fs * LINE_GAP;
-  var taxLineH     = taxH + (taxText && priceText ? cw*.008 : 0);
-  var shopLineH    = shopH + (shopText ? cw*.006 : 0);
-  var totalPriceContent = priceBlockH + taxLineH + shopLineH;
-  var priceStartY  = priceZoneTop + (priceZoneH - totalPriceContent) / 2;
-
-  if(priceText) {
-    ctx.font = (priceEl&&priceEl.bold?'700':'400')+' '+priceFit.fs+'px "Noto Sans JP",sans-serif';
-    ctx.fillStyle = priceEl ? priceEl.color : '#b45309';
-    priceFit.lines.forEach(function(ln, li) {
-      ctx.fillText(ln, cx+cw/2, priceStartY + priceFit.fs*LINE_GAP*(li+0.5));
-    });
-    priceStartY += priceBlockH + cw*.008;
-  }
-  if(taxText) {
-    ctx.font = (taxEl&&taxEl.bold?'700':'400')+' '+taxFs+'px "Noto Sans JP",sans-serif';
-    ctx.fillStyle = taxEl ? taxEl.color : '#9ca3af';
-    ctx.fillText(taxText, cx+cw/2, priceStartY + taxFs*0.6);
-    priceStartY += taxLineH;
-  }
-  if(shopText) {
-    ctx.font = (shopEl&&shopEl.bold?'700':'400')+' '+shopFs+'px "Noto Sans JP",sans-serif';
-    ctx.fillStyle = shopEl ? shopEl.color : '#6b7280';
-    ctx.fillText(shopText, cx+cw/2, priceStartY + shopFs*0.6);
-  }
-
-  // ── カスタム要素（固定4要素以外）を描画 ──
-  var FIXED_IDS={name:1,price:1,tax:1,shop:1};
-  var customEls=ELS.filter(function(e){return !FIXED_IDS[e.id];});
-  if(customEls.length){
-    var aWc=cw-pad*2,aHc=ch-pad*2;
-    customEls.forEach(function(cel){
-      var ex2=cx+pad+cel.x*aWc, ey2=cy+pad+cel.y*aHc;
-      var cfs=cel.size*SCALE;
-      ctx.font=(cel.bold?'700':'400')+' '+cfs+'px "Noto Sans JP",sans-serif';
-      ctx.fillStyle=cel.color||'#333';
-      ctx.textAlign=cel.align||'center';
-      ctx.textBaseline='middle';
-      ctx.fillText(cel.text||cel.label,ex2,ey2);
-    });
-  }
-
-  // ── Logo: bottom-right corner ──
+  // ロゴ（底右）
   if(logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
-    var logoSize = cw * 0.18; // 18% of pop width
+    var logoSize = cw * 0.18;
     var margin   = cw * 0.03;
-    var lx = cx + cw - margin - logoSize;
-    var ly = cy + ch - margin - logoSize;
     ctx.save();
-    ctx.drawImage(logoImg, lx, ly, logoSize, logoSize);
+    ctx.drawImage(logoImg, cx+cw-margin-logoSize, cy+ch-margin-logoSize, logoSize, logoSize);
     ctx.restore();
   }
 }
@@ -2721,8 +2740,8 @@ function redrawPrev(){
   drawPop(ctx,0,0,W,H,sample,gst());
 }
 
-// ━━ EDITOR CANVAS ━━
-var _resizeHandle=null;
+// ━━ グリッドエディタ Canvas ━━
+var _edCvsInited=false;
 function initEdCvs(){
   var c=document.getElementById('pop-canvas');if(!c)return;
   var sz=function(){
@@ -2731,377 +2750,493 @@ function initEdCvs(){
   };
   sz();
   window.addEventListener('resize',function(){if(document.getElementById('panel-template').classList.contains('on'))sz();});
-  c.addEventListener('mousedown',edDn);c.addEventListener('mousemove',edMv);c.addEventListener('mouseup',edUp);c.addEventListener('mouseleave',edUp);
-  c.addEventListener('touchstart',function(e){e.preventDefault();edDn(e.touches[0]);},{passive:false});
-  c.addEventListener('touchmove', function(e){e.preventDefault();edMv(e.touches[0]);},{passive:false});
-  c.addEventListener('touchend',  function(e){e.preventDefault();edUp();},{passive:false});
+  if(!_edCvsInited){
+    _edCvsInited=true;
+    c.addEventListener('mousedown',edDn);
+    c.addEventListener('mousemove',edMv);
+    c.addEventListener('mouseup',edUp);
+    c.addEventListener('mouseleave',edUp);
+    c.addEventListener('touchstart',function(e){e.preventDefault();edDn(e.touches[0]);},{passive:false});
+    c.addEventListener('touchmove', function(e){e.preventDefault();edMv(e.touches[0]);},{passive:false});
+    c.addEventListener('touchend',  function(e){e.preventDefault();edUp();},{passive:false});
+  }
 }
-function epos(cx,cy){var c=document.getElementById('pop-canvas'),r=c.getBoundingClientRect();return{x:(cx-r.left)*(c.width/c.clientWidth),y:(cy-r.top)*(c.height/c.clientHeight)};}
+
+// Canvasの論理座標を返す
+function epos(clientX,clientY){
+  var c=document.getElementById('pop-canvas'),r=c.getBoundingClientRect();
+  return{x:(clientX-r.left)*(c.width/c.clientWidth),y:(clientY-r.top)*(c.height/c.clientHeight)};
+}
+
+// 論理座標 → グリッドセル座標
+function posToCell(px,py){
+  var c=document.getElementById('pop-canvas');
+  var W=c.width,H=c.height;
+  var col=Math.floor(px/W*GRID_COLS);
+  var row=Math.floor(py/H*GRID_ROWS);
+  col=Math.max(0,Math.min(GRID_COLS-1,col));
+  row=Math.max(0,Math.min(GRID_ROWS-1,row));
+  return{col:col,row:row};
+}
+
+// クリック座標にある配置済み要素を探す
+function findElAtCell(col,row){
+  for(var i=0;i<ELS.length;i++){
+    var el=normalizeEl(ELS[i]);
+    if(col>=el.col && col<el.col+el.colSpan && row>=el.row && row<el.row+el.rowSpan){
+      return ELS[i].id;
+    }
+  }
+  return null;
+}
+
+// 選択セル範囲の正規化（start/end順不同に対応）
+function normSel(){
+  if(!gridSelStart||!gridSelEnd)return null;
+  return{
+    c1:Math.min(gridSelStart.col,gridSelEnd.col),
+    r1:Math.min(gridSelStart.row,gridSelEnd.row),
+    c2:Math.max(gridSelStart.col,gridSelEnd.col),
+    r2:Math.max(gridSelStart.row,gridSelEnd.row)
+  };
+}
+
 function edDn(e){
-  var c=document.getElementById('pop-canvas'),p=epos(e.clientX,e.clientY);
-  var W=c.width,H=c.height,pd=W*.07,aW=W-pd*2,aH=H-pd*2;
-  _resizeHandle=null;
-  if(!EL_BOXES.length)redrawEd();
+  var p=epos(e.clientX,e.clientY);
+  var cell=posToCell(p.x,p.y);
 
-  // 選択中の項目がある場合のみドラッグ開始
-  if(!selEl){
-    toast('右の「項目」リストから移動したい項目を選択してください');
-    return;
+  // 既存要素クリック → その要素を選択（プロパティ編集モード）
+  var hitId=findElAtCell(cell.col,cell.row);
+  if(hitId){
+    selGridEl=hitId;
+    gridSelStart=null;gridSelEnd=null;gridDragging=false;
+    showSelElPanel();
+    redrawEd();return;
   }
-  var el=gEl(selEl);
-  if(!el){return;}
-  if(el.locked){toast('ロックを解除してください');return;}
 
-  var selBox=EL_BOXES.find(function(b){return b.id===selEl;});
-  if(selBox&&p.x>=selBox.bx-14&&p.x<=selBox.bx+selBox.bw+14&&p.y>=selBox.by-14&&p.y<=selBox.by+selBox.bh+14){
-    dragging={id:selEl,ox:p.x-selBox.ex,oy:p.y-selBox.ey};
-    c.style.cursor='grabbing';
-    redrawEd();
-  }
+  // 配置モードまたは範囲選択
+  gridDragging=true;
+  gridSelStart=cell;
+  gridSelEnd=cell;
+  selGridEl=null;
+  updateSelElPanel(null);
+  redrawEd();
 }
+
 function edMv(e){
-  var c=document.getElementById('pop-canvas'),p=epos(e.clientX,e.clientY);
-  var W=c.width,H=c.height,pd=W*.07,aW=W-pd*2,aH=H-pd*2;
+  if(!gridDragging)return;
+  var p=epos(e.clientX,e.clientY);
+  var cell=posToCell(p.x,p.y);
+  gridSelEnd=cell;
+  redrawEd();
+  updateGridInfo();
+}
 
-  // ドラッグ中
-  if(dragging&&selEl){
-    var el=gEl(dragging.id);if(!el||el.locked){dragging=null;return;}
-    markEdited();
-    el.x=Math.max(0,Math.min(1,(p.x-dragging.ox-pd)/aW));
-    el.y=Math.max(0,Math.min(1,(p.y-dragging.oy-pd)/aH));
-    updateQP(el);redrawEd();
-    c.style.cursor='grabbing';
-    return;
-  }
-
-  // ホバー：選択中ボックス上かどうかでカーソル変更
-  if(!selEl){c.style.cursor='default';return;}
-  var selBox=EL_BOXES.find(function(b){return b.id===selEl;});
-  if(selBox&&p.x>=selBox.bx-14&&p.x<=selBox.bx+selBox.bw+14&&p.y>=selBox.by-14&&p.y<=selBox.by+selBox.bh+14){
-    c.style.cursor='grab';
-  } else {
-    c.style.cursor='default';
+function edUp(){
+  if(gridDragging){
+    gridDragging=false;
+    updateGridInfo();
+    // 配置モードが有効なら自動配置
+    if(placeType){
+      placeElAtSel();
+    }
   }
 }
-function edUp(){dragging=null;_resizeHandle=null;}
 
+// 選択範囲に要素を配置
+function placeElAtSel(){
+  var sel=normSel();if(!sel)return;
+  // placeTypeに対応するIDを決定
+  var typeMap={name:'name',price:'price',tax:'tax'};
+  var id,label,type;
+  if(typeMap[placeType]){
+    id=placeType;label={name:'植物名',price:'税込価格',tax:'税込文字'}[placeType];type=placeType==='name'?'text':placeType;
+  } else {
+    id='custom_'+Date.now();label='テキスト';type='custom';
+  }
+
+  // 既存の同IDを削除（name/price/taxは1つのみ）
+  if(typeMap[placeType]){
+    ELS=ELS.filter(function(e){return e.id!==id;});
+  }
+
+  // デフォルトカラー
+  var defColors={name:'#2d5a1e',price:'#b45309',tax:'#9ca3af',custom:'#333333'};
+
+  ELS.push({
+    id:id, label:label, type:type,
+    col:sel.c1, row:sel.r1,
+    colSpan:sel.c2-sel.c1+1, rowSpan:sel.r2-sel.r1+1,
+    color:defColors[placeType]||'#333333',
+    bold:placeType!=='tax', align:'center', valign:'middle',
+    fontSize:'auto',
+    inputField:(placeType==='name'), optional:false,
+    text:(type==='custom'?'テキスト':'')
+  });
+
+  markEdited();
+  selGridEl=id;
+  gridSelStart=null;gridSelEnd=null;
+  showSelElPanel();
+  buildElList();
+  redrawEd();
+  rebuildInpFields();
+  toast(label+'を配置しました');
+}
+
+function clearGridSel(){
+  gridSelStart=null;gridSelEnd=null;gridDragging=false;
+  selGridEl=null;
+  setPlaceType(null);
+  updateSelElPanel(null);
+  redrawEd();
+}
+
+function setPlaceType(t){
+  placeType=(placeType===t)?null:t; // 同じボタンで解除
+  ['name','price','tax','custom'].forEach(function(k){
+    var b=document.getElementById('place-btn-'+k);
+    if(b)b.classList.toggle('active-type',placeType===k);
+  });
+  updateGridInfo();
+}
+
+function updateGridInfo(){
+  var info=document.getElementById('grid-info');if(!info)return;
+  var sel=normSel();
+  if(placeType){
+    var labels={name:'品名',price:'価格',tax:'税込',custom:'テキスト'};
+    if(sel){
+      info.innerHTML='<span>'+(sel.c2-sel.c1+1)+'×'+(sel.r2-sel.r1+1)+'列</span>の範囲選択中 → 「'+labels[placeType]+'」を配置';
+    } else {
+      info.innerHTML='セルをドラッグで範囲選択 → <span>'+labels[placeType]+'</span>を配置します';
+    }
+  } else {
+    if(sel){
+      info.innerHTML='<span>'+(sel.c2-sel.c1+1)+'×'+(sel.r2-sel.r1+1)+'列</span>選択中 — 上のボタンで要素を配置';
+    } else {
+      info.textContent='セルをドラッグして範囲選択 → ボタンで要素を配置';
+    }
+  }
+}
+
+// 選択要素プロパティパネルを表示
+function showSelElPanel(){
+  var el=gEl(selGridEl);if(!el)return;
+  updateSelElPanel(el);
+}
+
+function updateSelElPanel(el){
+  var panel=document.getElementById('sel-el-panel');if(!panel)return;
+  if(!el){panel.classList.remove('show');return;}
+  panel.classList.add('show');
+  var lbl=document.getElementById('sel-el-label');
+  if(lbl)lbl.textContent=(el.label||'要素')+'のプロパティ';
+  var fsEl=document.getElementById('sel-el-fs');
+  if(fsEl){
+    fsEl.value=(el.fontSize==='auto'||!el.fontSize)?'':Number(el.fontSize)||14;
+    fsEl.disabled=(el.fontSize==='auto');
+  }
+  var autoBtn=document.getElementById('sel-el-auto-btn');
+  if(autoBtn)autoBtn.classList.toggle('on',el.fontSize==='auto'||!el.fontSize);
+  var clrEl=document.getElementById('sel-el-color');
+  if(clrEl)clrEl.value=el.color||'#1a1a1a';
+  // スタイルボタン
+  var boldBtn=document.getElementById('sel-el-bold');
+  if(boldBtn)boldBtn.classList.toggle('on',!!el.bold);
+  ['left','center','right'].forEach(function(a){
+    var b=document.getElementById('sel-el-'+a);
+    if(b)b.classList.toggle('on',el.align===a);
+  });
+  ['vtop','vmid','vbot'].forEach(function(a,i){
+    var vMap=['top','middle','bottom'];
+    var b=document.getElementById('sel-el-'+a);
+    if(b)b.classList.toggle('on',el.valign===vMap[i]);
+  });
+  // カスタムテキスト行
+  var textRow=document.getElementById('sel-el-text-row');
+  var textInp=document.getElementById('sel-el-text');
+  if(textRow){textRow.style.display=el.type==='custom'?'flex':'none';}
+  if(textInp&&el.type==='custom')textInp.value=el.text||'';
+}
+
+// 選択要素のプロパティ変更
+function selElSet(prop,val){
+  if(!selGridEl)return;
+  var el=gEl(selGridEl);if(!el)return;
+  el[prop]=val;
+  markEdited();
+  updateSelElPanel(el);
+  redrawEd();
+}
+function selElSetFs(v){
+  if(!selGridEl)return;
+  var el=gEl(selGridEl);if(!el)return;
+  var n=parseInt(v)||0;
+  el.fontSize=(n>0)?n:'auto';
+  markEdited();redrawEd();
+}
+function selElNudge(prop,delta){
+  if(!selGridEl)return;
+  var el=gEl(selGridEl);if(!el)return;
+  if(prop==='fontSize'){
+    var cur=el.fontSize==='auto'?Math.floor(14):Number(el.fontSize)||14;
+    el.fontSize=Math.max(6,Math.min(120,cur+delta));
+  }
+  markEdited();
+  var fsEl=document.getElementById('sel-el-fs');
+  if(fsEl)fsEl.value=el.fontSize==='auto'?'':el.fontSize;
+  redrawEd();
+}
+function selElToggleAuto(){
+  if(!selGridEl)return;
+  var el=gEl(selGridEl);if(!el)return;
+  el.fontSize=(el.fontSize==='auto'||!el.fontSize)?14:'auto';
+  markEdited();updateSelElPanel(el);redrawEd();
+}
+function selElToggleBold(){
+  if(!selGridEl)return;
+  var el=gEl(selGridEl);if(!el)return;
+  el.bold=!el.bold;
+  markEdited();updateSelElPanel(el);redrawEd();
+}
+function deleteSelEl(){
+  if(!selGridEl)return;
+  var el=gEl(selGridEl);if(!el)return;
+  var lbl=el.label;
+  ELS=ELS.filter(function(e){return e.id!==selGridEl;});
+  selGridEl=null;
+  updateSelElPanel(null);
+  markEdited();buildElList();redrawEd();rebuildInpFields();
+  toast(lbl+'を削除しました');
+}
+
+// ━━ エディタCanvas描画 ━━
 function redrawEd(){
   var c=document.getElementById('pop-canvas');if(!c||!c.width)return;
   var ctx=c.getContext('2d'),W=c.width,H=c.height;
   ctx.clearRect(0,0,W,H);
+
   var sample=items[0]||{name:'コルクチューブ SS',price:5000};
   var cfg=gst();
-  // 背景
-  ctx.fillStyle=cfg.cb;rrect(ctx,0,0,W,H,W*.04);ctx.fill();
-  drawFrame(ctx,0,0,W,H,cfg.ca,cfg.st);
-var pd=W*.07,aW=W-pd*2,aH=H-pd*2;
-  EL_BOXES=[];
-  var EL_COLORS={name:'#e67e22',price:'#2980b9',tax:'#8e44ad',shop:'#27ae60'};
-  var texts={
-    name:sample.name||'植物名',
-    price:'¥ '+(sample.price||0).toLocaleString(),
-    tax:'（税込）'
-  };
-  ELS.forEach(function(el){if(!texts[el.id])texts[el.id]=el.text||el.label;});
-  var sorted=[].concat(ELS).sort(function(a,b){return(a.zIndex||0)-(b.zIndex||0);});
-  var SCALE=W/105;
-  sorted.forEach(function(el){
-    if(el.locked&&el.id!=='name'&&el.id!=='price'&&el.id!=='tax')return;
-    var isSel=selEl===el.id;
-    var dotColor=EL_COLORS[el.id]||el.color||'#888';
-    var ex=pd+el.x*aW,ey=pd+el.y*aH;
-    var text=texts[el.id]||el.text||'';
-    if(!text)return;
-    ctx.save();
-    ctx.globalAlpha=el.opacity||1;
-    var fs=(el.size||12)*SCALE;
-    ctx.font=(el.bold?'700':'400')+' '+fs+'px sans-serif';
-    var tw=ctx.measureText(text).width;
-    var bw=tw+14,bh=fs*1.5;
-    var bx=el.align==='center'?ex-tw/2-7:el.align==='right'?ex-tw-7:ex-7;
-    var by=ey-fs*.95;
-    EL_BOXES.push({id:el.id,bx:bx,by:by,bw:bw,bh:bh,ex:ex,ey:ey});
-    ctx.globalAlpha=1;
-    if(isSel){
-      ctx.fillStyle='rgba('+parseInt(dotColor.slice(1,3),16)+','+parseInt(dotColor.slice(3,5),16)+','+parseInt(dotColor.slice(5,7),16)+',.13)';
-      rrect(ctx,bx,by,bw,bh,5);ctx.fill();
-      ctx.strokeStyle=dotColor;ctx.lineWidth=2;rrect(ctx,bx,by,bw,bh,5);ctx.stroke();
-    } else {
-      ctx.strokeStyle=dotColor;ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
-      rrect(ctx,bx,by,bw,bh,5);ctx.stroke();ctx.setLineDash([]);
-    }
-    ctx.font='10px sans-serif';ctx.fillStyle=dotColor;ctx.globalAlpha=.75;
-    ctx.textAlign='left';ctx.textBaseline='top';
-    ctx.fillText(el.label,bx+4,by+2);
-    ctx.restore();
-  });
-  // カーソル：項目未選択はデフォルト、選択中はgrab
-  if(!selEl){
-    c.style.cursor='default';
-  } else if(dragging){
-    c.style.cursor='grabbing';
+
+  // POP背景（drawPopと同じ）
+  if(cfg.st==='custom' && customBgImg && customBgImg.complete && customBgImg.naturalWidth>0){
+    ctx.save(); rrect(ctx,0,0,W,H,W*.02); ctx.clip();
+    ctx.drawImage(customBgImg,0,0,W,H); ctx.restore();
   } else {
-    // マウス位置が選択中ボックス上かどうかはmousemoveで更新するのでここはgrab固定
-    c.style.cursor='grab';
+    ctx.fillStyle=cfg.cb; rrect(ctx,0,0,W,H,W*.04); ctx.fill();
+  }
+  drawFrame(ctx,0,0,W,H,cfg.ca,cfg.st);
+
+  var cellW=W/GRID_COLS, cellH=H/GRID_ROWS;
+
+  // ── グリッド線（薄いドット） ──
+  ctx.save();
+  ctx.strokeStyle='rgba(0,0,0,0.08)';
+  ctx.lineWidth=1;
+  if(ctx.setLineDash)ctx.setLineDash([2,2]);
+  for(var ci=1;ci<GRID_COLS;ci++){
+    ctx.beginPath();ctx.moveTo(ci*cellW,0);ctx.lineTo(ci*cellW,H);ctx.stroke();
+  }
+  for(var ri=1;ri<GRID_ROWS;ri++){
+    ctx.beginPath();ctx.moveTo(0,ri*cellH);ctx.lineTo(W,ri*cellH);ctx.stroke();
+  }
+  if(ctx.setLineDash)ctx.setLineDash([]);
+  ctx.restore();
+
+  // ── 配置済み要素を描画 ──
+  var prices=sample.price?calcPrices(sample.price):{base:0,incl:0};
+  var EL_COLORS={name:'rgba(46,125,50,0.18)',price:'rgba(180,83,9,0.18)',tax:'rgba(156,163,175,0.18)',custom:'rgba(100,100,200,0.18)'};
+  var EL_BORDERS={name:'#2d5a1e',price:'#b45309',tax:'#9ca3af',custom:'#4444cc'};
+
+  ELS.forEach(function(elRaw){
+    var el=normalizeEl(elRaw);
+    var ex=el.col*cellW, ey=el.row*cellH;
+    var ew=el.colSpan*cellW, eh=el.rowSpan*cellH;
+    var isSel=selGridEl===el.id;
+
+    // セル背景
+    ctx.fillStyle=EL_COLORS[el.type]||EL_COLORS[el.id]||'rgba(100,100,100,0.1)';
+    ctx.fillRect(ex+1,ey+1,ew-2,eh-2);
+
+    // セル枠
+    ctx.strokeStyle=isSel
+      ? (EL_BORDERS[el.type]||EL_BORDERS[el.id]||'#888')
+      : (EL_BORDERS[el.type]||EL_BORDERS[el.id]||'#888');
+    ctx.lineWidth=isSel?2.5:1.5;
+    ctx.strokeRect(ex+1,ey+1,ew-2,eh-2);
+
+    // ラベル（上部）
+    var labelColor=EL_BORDERS[el.type]||EL_BORDERS[el.id]||'#888';
+    ctx.font='bold 10px sans-serif';
+    ctx.fillStyle=labelColor;
+    ctx.textAlign='left';
+    ctx.textBaseline='top';
+    ctx.fillText(el.label,ex+4,ey+3);
+
+    // テキストプレビュー
+    var previewText='';
+    if(el.type==='text'||el.id==='name') previewText=sample.name||'植物名';
+    else if(el.type==='price') previewText='¥'+prices.incl.toLocaleString();
+    else if(el.type==='tax')   previewText='税込 ¥'+prices.incl.toLocaleString();
+    else if(el.type==='custom') previewText=el.text||el.label||'テキスト';
+
+    if(previewText){
+      var fs;
+      if(el.fontSize==='auto'||!el.fontSize){
+        fs=Math.floor(eh*0.42);
+      } else {
+        fs=Number(el.fontSize)||12;
+      }
+      fs=Math.max(8,Math.min(fs,eh*0.6));
+      ctx.font=(el.bold?'700 ':'400 ')+fs+'px sans-serif';
+      // 幅に収まるよう縮小
+      while(ctx.measureText(previewText).width>ew*0.85&&fs>7){fs--;ctx.font=(el.bold?'700 ':'400 ')+fs+'px sans-serif';}
+      ctx.fillStyle=el.color||'#333';
+      ctx.textAlign=el.align||'center';
+      ctx.textBaseline='middle';
+      var tx=el.align==='left'?ex+6:el.align==='right'?ex+ew-6:ex+ew/2;
+      ctx.fillText(previewText,tx,ey+eh*0.6);
+    }
+
+    // 選択時：外枠ハイライト
+    if(isSel){
+      ctx.save();
+      ctx.strokeStyle=labelColor;
+      ctx.lineWidth=3;
+      ctx.shadowColor=labelColor;
+      ctx.shadowBlur=6;
+      ctx.strokeRect(ex+1,ey+1,ew-2,eh-2);
+      ctx.restore();
+    }
+  });
+
+  // ── ドラッグ選択範囲ハイライト ──
+  var sel=normSel();
+  if(sel){
+    var sx=sel.c1*cellW, sy=sel.r1*cellH;
+    var sw=(sel.c2-sel.c1+1)*cellW, sh=(sel.r2-sel.r1+1)*cellH;
+    var pc=document.documentElement.style.getPropertyValue('--primary')||'#2e7d32';
+    ctx.fillStyle='rgba(46,125,50,0.22)';
+    ctx.fillRect(sx,sy,sw,sh);
+    ctx.strokeStyle='#2e7d32';
+    ctx.lineWidth=2;
+    ctx.strokeRect(sx,sy,sw,sh);
   }
 }
 
-function resetEl(){ELS=DEF_ELS.map(function(e){return Object.assign({},e);});selEl=null;buildElList();redrawEd();}
+function resetEl(){
+  ELS=DEF_ELS.map(function(e){return Object.assign({},e);});
+  selGridEl=null;gridSelStart=null;gridSelEnd=null;
+  updateSelElPanel(null);
+  buildElList();redrawEd();
+}
 function resetToSaved(){
   if(!savedSnapshot)return;
   ELS=JSON.parse(JSON.stringify(savedSnapshot.els));
   var ca=document.getElementById('caccent'),cb=document.getElementById('cbg'),ds=document.getElementById('dstyle');
   if(ca)ca.value=savedSnapshot.ca;if(cb)cb.value=savedSnapshot.cb;if(ds)ds.value=savedSnapshot.st;
-  selEl=null;buildElList();redrawEd();toast('編集前に戻しました');
+  selGridEl=null;gridSelStart=null;gridSelEnd=null;
+  updateSelElPanel(null);buildElList();redrawEd();toast('編集前に戻しました');
 }
 function redrawAll(){redrawPrev();if(document.getElementById('panel-template').classList.contains('on'))redrawEd();}
 
 // ━━ ELEMENT MANAGEMENT ━━
 function gEl(id){return ELS.find(function(e){return e.id===id;});}
 function addEl(){
-  var newId='custom_'+Date.now();
-  ELS.push({id:newId,label:'テキスト',text:'テキスト',type:'text',
-    color:'#333333',x:.5,y:.5,size:12,align:'center',bold:false,
-    opacity:1,zIndex:ELS.length,inputField:true,optional:true});
-  markEdited();selEl=newId;buildElList();redrawEd();rebuildInpFields();toast('テキスト要素を追加しました');
+  // グリッドエディタでは「テキスト+」ボタンから使う
+  setPlaceType('custom');
+  toast('セルをドラッグして範囲を選択してください');
 }
 function delEl(id){
   markEdited();ELS=ELS.filter(function(e){return e.id!==id;});
-  if(selEl===id)selEl=null;
+  if(selGridEl===id){selGridEl=null;updateSelElPanel(null);}
   buildElList();redrawEd();rebuildInpFields();
 }
-function addImage(event){
-  var file=event.target.files[0];if(!file)return;event.target.value='';
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var img=new Image();
-    img.onload=function(){
-      var newId='img_'+Date.now();
-      ELS.push({id:newId,label:'画像',type:'image',x:.5,y:.5,size:30,
-        imgData:ev.target.result,imgEl:img,keepAspect:true,opacity:1,zIndex:ELS.length});
-      selEl=newId;buildElList();redrawEd();
-    };
-    img.src=ev.target.result;
-  };
-  reader.onerror = function(){ alert('画像の読み込みに失敗しました。'); };
-  reader.readAsDataURL(file);
-}
-function duplicateEl(){
-  if(!selEl)return;var e=gEl(selEl);if(!e)return;
-  var copy=JSON.parse(JSON.stringify(e));
-  copy.id='copy_'+Date.now();copy.x=Math.min(1,(copy.x||.5)+.03);copy.y=Math.min(1,(copy.y||.5)+.03);
-  copy.zIndex=(copy.zIndex||0)+1;copy.label=copy.label+'（コピー）';
-  ELS.push(copy);selEl=copy.id;buildElList();redrawEd();rebuildInpFields();
-}
-function changeZ(delta){
-  if(!selEl)return;var e=gEl(selEl);if(!e)return;
-  if(delta===999)e.zIndex=ELS.length+1;else if(delta===-999)e.zIndex=-1;else e.zIndex=(e.zIndex||0)+delta;
-  buildElList();redrawEd();
-}
-function toggleLock(id){
-  var e=gEl(id);if(!e)return;e.locked=!e.locked;buildElList();toast(e.locked?'ロック':'ロック解除');
-}
 
-// ━━ ELEMENT PROPERTY SETTERS ━━
-function sSz(id,v){var e=gEl(id);if(e){e.size=+v;redrawEd();}}
-function sClr(id,v){var e=gEl(id);if(e){e.color=v;redrawEd();}}
-function sAln(id,a){var e=gEl(id);if(e){e.align=a;redrawEd();buildPropsPanel(e);}}
-function sText(id,v){var e=gEl(id);if(e){e.text=v;redrawEd();}}
-function toggleBold(id){var e=gEl(id);if(e){e.bold=!e.bold;redrawEd();buildPropsPanel(e);}}
-function nudge(id,prop,delta){
-  var e=gEl(id);if(!e)return;
-  if(prop==='size')e.size=Math.max(6,Math.min(120,(e.size||12)+delta));
-  redrawEd();if(selEl)buildPropsPanel(e);
-}
-function sShapeFill(id,v){var e=gEl(id);if(e){e.fillColor=v;redrawEd();}}
-function sShapeStroke(id,v){var e=gEl(id);if(e){e.strokeColor=v;redrawEd();}}
-function sShapeStrokeW(id,v){var e=gEl(id);if(e){e.strokeWidth=+v;redrawEd();}}
-function sShapeRx(id,v){var e=gEl(id);if(e){e.rx=+v;redrawEd();}}
-function sKeepAspect(id,v){var e=gEl(id);if(e){e.keepAspect=v;}}
-function replaceImage(id,event){
-  var file=event.target.files[0];if(!file)return;
-  var e=gEl(id);if(!e)return;
-  var reader=new FileReader();
-  reader.onload=function(ev){var img=new Image();img.onload=function(){e.imgData=ev.target.result;e.imgEl=img;redrawEd();};img.src=ev.target.result;};
-  reader.onerror = function(){ alert('画像の読み込みに失敗しました。'); };
-  reader.readAsDataURL(file);
-}
-function qpSet(prop,val){
-  if(!selEl)return;var e=gEl(selEl);if(!e)return;
-  e[prop]=isNaN(+val)?val:+val;redrawEd();
-}
-function qpSetLock(checked){if(!selEl)return;var e=gEl(selEl);if(!e)return;e.locked=checked;buildElList();}
-function updateQP(el){
-  var qp=document.getElementById('quick-props');if(!qp)return;
-  qp.style.display='flex';
-  var xe=document.getElementById('qp-x'),ye=document.getElementById('qp-y');
-  if(xe)xe.value=Math.round((el.x||0)*100);
-  if(ye)ye.value=Math.round((el.y||0)*100);
-}
-function snapX(id,pos){var e=gEl(id);if(!e)return;if(pos==='left'){e.x=0.08;e.align='left';}else if(pos==='center'){e.x=0.50;e.align='center';}else{e.x=0.92;e.align='right';}buildElList();redrawEd();}
-function snapY(id,pos){var e=gEl(id);if(!e)return;if(pos==='top')e.y=0.12;else if(pos==='mid')e.y=0.50;else e.y=0.88;buildElList();redrawEd();}
-function groupEls(){toast('グループ化は準備中です');}
-function ungroupEls(){toast('グループ解除は準備中です');}
-
-// ━━ ELEMENT LIST (DOM操作) ━━
+// ━━ ELEMENT LIST (配置済み要素一覧) ━━
 function buildElList(){
   var wrap=document.getElementById('ellist');if(!wrap)return;
   wrap.innerHTML='';
-  var EL_COLORS={name:'#e67e22',price:'#2980b9',tax:'#8e44ad',shop:'#27ae60'};
-  var FIXED={name:1,price:1,tax:1,shop:1};
-  [].concat(ELS).sort(function(a,b){return(b.zIndex||0)-(a.zIndex||0);}).forEach(function(el){
+  var EL_COLORS={name:'#e67e22',price:'#2980b9',tax:'#8e44ad',custom:'#4444cc'};
+  var FIXED={name:1,price:1,tax:1};
+
+  if(!ELS.length){
+    var empty=document.createElement('div');
+    empty.style.cssText='font-size:12px;color:var(--on-surface-dim);padding:12px 13px;';
+    empty.textContent='要素がまだありません。グリッドで範囲選択して配置してください。';
+    wrap.appendChild(empty);return;
+  }
+
+  ELS.forEach(function(el){
     var isFixed=!!FIXED[el.id];
-    var dotColor=EL_COLORS[el.id]||el.color||'#888';
-    var isOpen=selEl===el.id;
+    var elN=normalizeEl(el);
+    var dotColor=EL_COLORS[el.type]||EL_COLORS[el.id]||el.color||'#888';
+    var isSel=selGridEl===el.id;
 
     var row=document.createElement('div');
-    row.className='item-row'+(isOpen?' open':'');
+    row.className='item-row'+(isSel?' open':'');
 
-    // ── メイン行 ──
     var main=document.createElement('div');main.className='item-row-main';
 
     var dot=document.createElement('div');
-    dot.className='item-dot';
-    dot.style.background=dotColor+(el.locked?'66':'');
+    dot.className='item-dot';dot.style.background=dotColor;
     main.appendChild(dot);
 
     var nm=document.createElement('div');nm.className='item-nm';
-    nm.textContent=(el.locked?'🔒 ':'')+el.label;
+    // グリッド座標も表示
+    nm.textContent=el.label+' ('+elN.col+','+elN.row+')';
     main.appendChild(nm);
 
     var acts=document.createElement('div');acts.className='item-acts';
-    var lockBtn=document.createElement('button');
-    lockBtn.className='item-act';
-    lockBtn.textContent=el.locked?'🔒':'🔓';
-    lockBtn.title=el.locked?'ロック解除':'ロック';
-    lockBtn.addEventListener('click',function(e){e.stopPropagation();toggleLock(el.id);});
-    acts.appendChild(lockBtn);
-    if(!isFixed){
-      var delBtn=document.createElement('button');delBtn.className='item-act';delBtn.textContent='✕';
+    if(!isFixed||el.type==='custom'){
+      var delBtn=document.createElement('button');delBtn.className='item-act';
+      delBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" width="14" height="14"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       delBtn.addEventListener('click',function(e){e.stopPropagation();delEl(el.id);});
       acts.appendChild(delBtn);
     }
     main.appendChild(acts);
 
     main.addEventListener('click',function(){
-      if(el.locked){toast('ロックを解除してください');return;}
-      var wasOpen=selEl===el.id;
-      selEl=wasOpen?null:el.id;
+      var wasOpen=selGridEl===el.id;
+      selGridEl=wasOpen?null:el.id;
+      if(selGridEl)showSelElPanel();
+      else updateSelElPanel(null);
       buildElList();redrawEd();
     });
     row.appendChild(main);
-
-    // ── インラインプロパティ（開いた時のみ表示） ──
-    if(el.type==='text'||!el.type){
-      var props=document.createElement('div');props.className='item-props';
-
-      // 行1：フォントサイズ + 文字色
-      var r1=document.createElement('div');r1.className='iprop-row';
-      var szLbl=document.createElement('span');szLbl.className='iprop-lbl';szLbl.textContent='サイズ';r1.appendChild(szLbl);
-      var fsz=document.createElement('div');fsz.className='fsz-ctrl';
-      var bm=document.createElement('button');bm.className='fsz-btn';bm.textContent='−';
-      bm.addEventListener('click',function(){nudge(el.id,'size',-1);refreshItemProps(el.id);});
-      var fv=document.createElement('input');fv.className='fsz-val';fv.type='number';fv.min=6;fv.max=120;fv.value=el.size||12;
-      fv.addEventListener('input',function(){sSz(el.id,this.value);});
-      fv.id='fsz-val-'+el.id;
-      var bp=document.createElement('button');bp.className='fsz-btn';bp.textContent='＋';
-      bp.addEventListener('click',function(){nudge(el.id,'size',1);refreshItemProps(el.id);});
-      fsz.appendChild(bm);fsz.appendChild(fv);fsz.appendChild(bp);
-      r1.appendChild(fsz);
-      var clrLabel=document.createElement('span');clrLabel.style.cssText='font-size:9px;font-weight:700;color:var(--ink3);margin-left:6px;';clrLabel.textContent='色';
-      r1.appendChild(clrLabel);
-      var clrInp=document.createElement('input');clrInp.type='color';clrInp.className='clr-btn';
-      clrInp.value=el.color||'#111111';
-      clrInp.addEventListener('change',function(){sClr(el.id,this.value);});
-      r1.appendChild(clrInp);
-      props.appendChild(r1);
-
-      // 行2：スタイル（太字）＋ 横揃え
-      var r2=document.createElement('div');r2.className='iprop-row';var stLbl=document.createElement('span');stLbl.className='iprop-lbl';stLbl.textContent='スタイル';r2.appendChild(stLbl);
-      var sb=document.createElement('div');sb.className='style-btns';
-      function mkBtn(lbl,cls,active,cb){
-        var b=document.createElement('button');b.className='s-btn'+(active?' on':'');b.textContent=lbl;
-        b.addEventListener('click',function(){cb();});return b;
-      }
-      sb.appendChild(mkBtn('B',null,el.bold,function(){toggleBold(el.id);buildElList();}));
-      sb.appendChild(mkBtn('←',null,el.align==='left',function(){sAln(el.id,'left');buildElList();}));
-      sb.appendChild(mkBtn('中',null,el.align==='center',function(){sAln(el.id,'center');buildElList();}));
-      sb.appendChild(mkBtn('→',null,el.align==='right',function(){sAln(el.id,'right');buildElList();}));
-      r2.appendChild(sb);props.appendChild(r2);
-
-      row.appendChild(props);
-    }
-
     wrap.appendChild(row);
   });
 }
 
-function refreshItemProps(id){
-  var fv=document.getElementById('fsz-val-'+id);
-  var el=gEl(id);if(!el||!fv)return;
-  fv.value=el.size||12;
-}
-
-// ━━ PROPS PANEL (DOM操作) ━━
-function buildPropsPanel(el){
-  var sec=document.getElementById('el-props-section');
-  var titleEl=document.getElementById('el-props-title');
-  var body=document.getElementById('el-props-body');
-  if(!sec||!body)return;
-  sec.style.display='block';
-  if(titleEl)titleEl.textContent=(el.label||'要素')+'のプロパティ';
-  body.innerHTML='';
-  var FIXED={name:1,price:1,tax:1,shop:1};
-  var isFixed=!!FIXED[el.id];
-  var type=el.type||'text';
-  function row(lbl){var d=document.createElement('div');d.className='prop-row';var l=document.createElement('div');l.className='prop-lbl';l.textContent=lbl;d.appendChild(l);return d;}
-  function ph(){var d=document.createElement('div');d.className='prop-h';return d;}
-  function pbtn(txt,cls){var b=document.createElement('button');b.className='prop-btn'+(cls?' '+cls:'');b.textContent=txt;return b;}
-  function cinp(val,cb){var i=document.createElement('input');i.type='color';i.value=val||'#000';i.style.cssText='width:100%;height:36px;border:1.5px solid var(--ln);border-radius:var(--r3);padding:3px;-webkit-appearance:none;';i.addEventListener('change',function(){cb(this.value);});return i;}
-  function rinp(mn,mx,val,cb){var i=document.createElement('input');i.type='range';i.min=mn;i.max=mx;i.value=val;i.addEventListener('input',function(){cb(this.value);});return i;}
-  function unit(t){var s=document.createElement('span');s.className='qp-u';s.textContent=t;return s;}
-
-  if(type==='text'){
-    if(!isFixed){
-      var r1=row('テキスト');var ti=document.createElement('input');ti.className='prop-inp';ti.type='text';ti.value=el.text||el.label||'';ti.addEventListener('input',function(){sText(el.id,this.value);});r1.appendChild(ti);body.appendChild(r1);
-      // 入力フォームに表示チェック
-      var r1b=row('入力フォームに表示');
-      var lck=document.createElement('label');lck.style.cssText='display:flex;align-items:center;gap:8px;font-size:13px;';
-      var ckb=document.createElement('input');ckb.type='checkbox';ckb.style.cssText='width:18px;height:18px;accent-color:var(--gr);';ckb.checked=!!el.inputField;
-      ckb.addEventListener('change',function(){el.inputField=this.checked;rebuildInpFields();});
-      lck.appendChild(ckb);lck.appendChild(document.createTextNode('入力タブに表示する'));r1b.appendChild(lck);body.appendChild(r1b);
-      // 任意チェック
-      var r1c=row('必須/任意');
-      var lck2=document.createElement('label');lck2.style.cssText='display:flex;align-items:center;gap:8px;font-size:13px;';
-      var ckb2=document.createElement('input');ckb2.type='checkbox';ckb2.style.cssText='width:18px;height:18px;accent-color:var(--gr);';ckb2.checked=!!el.optional;
-      ckb2.addEventListener('change',function(){el.optional=this.checked;rebuildInpFields();});
-      lck2.appendChild(ckb2);lck2.appendChild(document.createTextNode('任意入力（チェックボックス付き）'));r1c.appendChild(lck2);body.appendChild(r1c);
-    }
-    var r2=row('フォントサイズ');var h2=ph();
-    var bm=pbtn('−');bm.style.cssText='flex:none;width:36px;';bm.addEventListener('click',function(){nudge(el.id,'size',-1);});
-    var si=document.createElement('input');si.className='prop-inp';si.type='number';si.min=6;si.max=120;si.value=el.size||12;si.style.cssText='text-align:center;flex:1;';si.addEventListener('input',function(){sSz(el.id,this.value);});
-    var bp=pbtn('＋');bp.style.cssText='flex:none;width:36px;';bp.addEventListener('click',function(){nudge(el.id,'size',1);});
-    h2.appendChild(bm);h2.appendChild(si);h2.appendChild(bp);r2.appendChild(h2);body.appendChild(r2);
-    var r3=row('文字色');r3.appendChild(cinp(el.color||'#333',function(v){sClr(el.id,v);}));body.appendChild(r3);
-    var r4=row('スタイル・揃え');var br=document.createElement('div');br.className='prop-btn-row';
-    var bb=pbtn('B 太字',el.bold?'on':'');bb.addEventListener('click',function(){toggleBold(el.id);});
-    var bl=pbtn('◁左',el.align==='left'?'on':'');bl.addEventListener('click',function(){sAln(el.id,'left');});
-    var bc=pbtn('中央',el.align==='center'?'on':'');bc.addEventListener('click',function(){sAln(el.id,'center');});
-    var brg=pbtn('右▷',el.align==='right'?'on':'');brg.addEventListener('click',function(){sAln(el.id,'right');});
-    br.appendChild(bb);br.appendChild(bl);br.appendChild(bc);br.appendChild(brg);r4.appendChild(br);body.appendChild(r4);
+// 後方互換（旧コードが参照するかもしれないスタブ）
+function refreshItemProps(){}
+function buildPropsPanel(){}
+function sSz(id,v){var e=gEl(id);if(e){e.fontSize=+v||'auto';redrawEd();}}
+function sClr(id,v){var e=gEl(id);if(e){e.color=v;redrawEd();}}
+function sAln(id,a){var e=gEl(id);if(e){e.align=a;redrawEd();}}
+function sText(id,v){var e=gEl(id);if(e){e.text=v;redrawEd();}}
+function toggleBold(id){var e=gEl(id);if(e){e.bold=!e.bold;redrawEd();}}
+function nudge(id,prop,delta){
+  var e=gEl(id);if(!e)return;
+  if(prop==='size'||prop==='fontSize'){
+    var cur=e.fontSize==='auto'?14:Number(e.fontSize)||14;
+    e.fontSize=Math.max(6,Math.min(120,cur+delta));
   }
-  // 共通：透明度
-  var rop=row('透明度');var hop=ph();
-  var opU=unit(Math.round((el.opacity||1)*100)+'%');
-  var opR=rinp(0,100,Math.round((el.opacity||1)*100),function(v){qpSet('opacity',v/100);opU.textContent=v+'%';});
-  hop.appendChild(opR);hop.appendChild(opU);rop.appendChild(hop);body.appendChild(rop);
-  // 操作
-  var rops=row('');var brow=document.createElement('div');brow.className='prop-btn-row';
-  var bdup=pbtn('⧉ 複製');bdup.style.flex='1';bdup.addEventListener('click',function(){duplicateEl();});
-  var btop=pbtn('⤒ 最前面');btop.style.flex='1';btop.addEventListener('click',function(){changeZ(999);});
-  var bbot=pbtn('⤓ 最背面');bbot.style.flex='1';bbot.addEventListener('click',function(){changeZ(-999);});
-  brow.appendChild(bdup);brow.appendChild(btop);brow.appendChild(bbot);rops.appendChild(brow);body.appendChild(rops);
+  redrawEd();
 }
+// 削除された旧関数スタブ
+function duplicateEl(){}
+function changeZ(){}
+function toggleLock(){}
+function qpSet(){}
+function qpSetLock(){}
+function updateQP(){}
+function snapX(){}
+function snapY(){}
+function groupEls(){toast('グループ化は準備中です');}
+function ungroupEls(){toast('グループ解除は準備中です');}
 
 // ━━ TEMPLATES ━━
 function loadT(){try{return JSON.parse(localStorage.getItem('popT'))||[];}catch(ex){return[];}}
@@ -3156,7 +3291,8 @@ function loadTmpl(id){
     if(hint)hint.style.display='none';
     if(ubtn)ubtn.textContent='📁 画像ファイルを選択';
   }
-  selTmplId=tmpl.id;_isEdited=false;selEl=null;buildElList();redrawEd();rebuildInpFields();renderTmplList();toast(tmpl.name+'を適用しました');
+  selTmplId=tmpl.id;_isEdited=false;selEl=null;selGridEl=null;gridSelStart=null;gridSelEnd=null;
+  updateSelElPanel(null);buildElList();redrawEd();rebuildInpFields();renderTmplList();toast(tmpl.name+'を適用しました');
 }
 function delTmpl(id){saveT(loadT().filter(function(t){return t.id!==id;}));renderTmplList();}
 function renderTmplList(){
@@ -3215,28 +3351,34 @@ function initPresetTemplates(){
   // 旧preset_stampが残っていれば削除
   arr=arr.filter(function(t){return t.id!=='preset_stamp';});
 
-  // ① シンプルポップ
+  // ① シンプルポップ（グリッド座標ベース・12×10）
   if(!hasStd){
     arr.unshift({
       id:'preset_std',name:'シンプルポップ',author:'プリセット',date:'初期設定',
       ca:'#2d7a4f',cb:'#fffef8',st:'natural',
       els:[
-        {id:'name', label:'植物名',  inputField:true, optional:false,type:'text', color:'#2d5a1e',x:.50,y:.30,size:20,align:'center',bold:true},
-        {id:'price',label:'税込価格',inputField:false,optional:false,type:'price',color:'#b45309',x:.50,y:.60,size:26,align:'center',bold:true},
-        {id:'tax',  label:'税込文字',inputField:false,optional:false,type:'tax',  color:'#9ca3af',x:.50,y:.74,size:10,align:'center',bold:false},
+        {id:'name', label:'植物名',  inputField:true, optional:false,type:'text',
+         col:1, row:2, colSpan:10, rowSpan:2, color:'#2d5a1e', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+        {id:'price',label:'税込価格',inputField:false,optional:false,type:'price',
+         col:2, row:5, colSpan:8,  rowSpan:3, color:'#b45309', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+        {id:'tax',  label:'税込文字',inputField:false,optional:false,type:'tax',
+         col:3, row:8, colSpan:6,  rowSpan:1, color:'#9ca3af', bold:false, align:'center', valign:'middle', fontSize:'auto'},
       ]
     });
   }
 
-  // ② IKEAスタイル
+  // ② IKEAスタイル（グリッド座標ベース・12×10）
   if(!hasIkea){
     arr.unshift({
       id:'preset_ikea',name:'IKEAスタイル',author:'プリセット',date:'初期設定',
       ca:'#111111',cb:'#ffffff',st:'ikea',
       els:[
-        {id:'name', label:'植物名',  inputField:true, optional:false,type:'text', color:'#111111',x:.50,y:.16,size:18,align:'center',bold:true},
-        {id:'price',label:'税込価格',inputField:false,optional:false,type:'price',color:'#111111',x:.50,y:.60,size:32,align:'center',bold:true},
-        {id:'tax',  label:'税込文字',inputField:false,optional:false,type:'tax',  color:'#444444',x:.50,y:.82,size:10,align:'center',bold:false},
+        {id:'name', label:'植物名',  inputField:true, optional:false,type:'text',
+         col:1, row:0, colSpan:10, rowSpan:2, color:'#111111', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+        {id:'price',label:'税込価格',inputField:false,optional:false,type:'price',
+         col:1, row:3, colSpan:10, rowSpan:4, color:'#111111', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+        {id:'tax',  label:'税込文字',inputField:false,optional:false,type:'tax',
+         col:2, row:7, colSpan:8,  rowSpan:2, color:'#444444', bold:false, align:'center', valign:'middle', fontSize:'auto'},
       ]
     });
   }
@@ -3826,7 +3968,7 @@ function downloadSquareExcel(){
 }
 window.addEventListener('DOMContentLoaded',function(){
   buildGrid();updateOrientInfo();
-  initPrevCvs();initEdCvs();
+  initPrevCvs();
   rebuildInpFields();
   buildElList();
   renderTmplList();
