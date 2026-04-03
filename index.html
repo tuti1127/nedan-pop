@@ -1873,13 +1873,41 @@ function renderList(){
   grid.innerHTML='';
   var p=curPreset();
   var ar=p.cw/p.ch;
-  var iw=Math.round(Math.min(160,grid.parentElement.clientWidth/2-10)*2);
+  var pw=grid.parentElement?grid.parentElement.clientWidth:0;
+  if(pw<50)pw=300;
+  var iw=Math.round(Math.min(160,pw/2-10)*2);
+  if(iw<60)iw=200;
   var ih=Math.round(iw/ar);
+  if(ih<30)ih=Math.round(iw*0.7);
+  var cfg=gst();
+  var observer=null;
+  if(window.IntersectionObserver){
+    observer=new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var cvs=entry.target;
+          if(!cvs._drawn){
+            cvs._drawn=true;
+            var ctx=cvs.getContext('2d');
+            var itm=cvs._item;
+            drawPop(ctx,0,0,cvs.width,cvs.height,itm,cfg);
+          }
+          observer.unobserve(cvs);
+        }
+      });
+    },{rootMargin:'200px'});
+  }
   items.forEach(function(item,idx){
     var wrap=document.createElement('div');wrap.className='pop-item';
     var cvs=document.createElement('canvas');cvs.width=iw;cvs.height=ih;
-    var ctx=cvs.getContext('2d');
-    drawPop(ctx,0,0,iw,ih,item,gst());
+    cvs._item=item;
+    if(observer&&idx>=20){
+      observer.observe(cvs);
+    } else {
+      cvs._drawn=true;
+      var ctx=cvs.getContext('2d');
+      drawPop(ctx,0,0,iw,ih,item,cfg);
+    }
     wrap.appendChild(cvs);
     // 削除ボタン
     var del=document.createElement('button');del.className='pop-del';del.textContent='✕';
@@ -3311,7 +3339,7 @@ function onXlToyoakeFile(event){
       if(statusEl)statusEl.textContent='Square Excel準備完了（'+sqRows.length+'件）';
 
       toast('豊明花き: '+added+'件を追加 + Square Excel準備完了');
-    }catch(err){toast('読み込み失敗: '+err.message+' ('+err.stack+')');}
+    }catch(err){toast('読み込み失敗: '+err.message);}
   };
   reader.onerror=function(){toast('ファイル読み込みに失敗しました');};
   reader.readAsArrayBuffer(file);
