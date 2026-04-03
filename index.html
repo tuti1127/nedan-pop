@@ -538,8 +538,109 @@ input:focus,button:focus{outline:none;}
 .print-btn-do{height:34px;padding:0 18px;border:none;border-radius:7px;background:#fff;color:#1c5c34;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
 .print-btn-close{height:34px;padding:0 14px;border:1.5px solid rgba(255,255,255,.4);border-radius:7px;background:transparent;color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
 #print-pages{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+
+/* ════ Square変換ツール CSS ════ */
+.sq-tool{
+  --sq-cream:#faf8f3;--sq-white:#ffffff;
+  --sq-green-dark:#2c4a3e;--sq-green-mid:#4a7c6f;--sq-green-light:#a8c5bb;--sq-green-pale:#e8f0ee;
+  --sq-sage:#8fad97;--sq-gold:#c9a84c;
+  --sq-text-dark:#1e2e28;--sq-text-mid:#4a5c55;--sq-text-muted:#8a9e97;--sq-border:#d4e0da;
+  --sq-red:#b03030;--sq-red-light:#fdf0ef;
+  --sq-orange:#c97d10;--sq-orange-light:#fef6ea;
+  --sq-blue-light:#eaf2fb;
+  font-family:'Hiragino Sans','Meiryo','Yu Gothic',sans-serif;
+}
+.sq-tool::before{
+  content:'';position:absolute;pointer-events:none;
+  background:radial-gradient(ellipse 60% 50% at 10% 20%,rgba(168,197,187,.15) 0%,transparent 70%),
+             radial-gradient(ellipse 50% 60% at 90% 80%,rgba(201,168,76,.06) 0%,transparent 70%);
+  inset:0;z-index:0;
+}
+.sq-header{text-align:center;margin-bottom:2rem;position:relative;}
+.sq-logo-mark{display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;background:var(--sq-green-dark);border-radius:50%;margin-bottom:1rem;font-size:1.6rem;}
+.sq-h1{font-size:1.5rem;font-weight:700;color:var(--sq-green-dark);letter-spacing:.04em;line-height:1.4;margin:0;}
+.sq-subtitle{margin-top:.5rem;font-size:.82rem;color:var(--sq-text-muted);font-weight:300;}
+.sq-arrow-badge{display:inline-block;background:var(--sq-gold);color:#fff;font-size:.7rem;font-weight:700;padding:.15rem .55rem;border-radius:2px;margin:0 .3rem;vertical-align:middle;}
+.sq-version-badge{display:inline-block;background:var(--sq-green-dark);color:#fff;font-size:.65rem;font-weight:700;padding:.1rem .45rem;border-radius:10px;margin-left:.4rem;vertical-align:middle;}
+
+.sq-card{background:var(--sq-white);border:1px solid var(--sq-border);border-radius:12px;padding:1.6rem 1.8rem;margin-bottom:1.25rem;box-shadow:0 2px 12px rgba(44,74,62,.06);}
+.sq-card:hover{box-shadow:0 4px 20px rgba(44,74,62,.10);}
+.sq-card-label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sq-sage);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+.sq-card-label::after{content:'';flex:1;height:1px;background:var(--sq-green-pale);}
+
+.sq-notice-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+@media(max-width:600px){.sq-notice-grid{grid-template-columns:1fr;}}
+.sq-notice{border-radius:8px;padding:.85rem 1rem;border-left:3px solid;font-size:.8rem;line-height:1.6;}
+.sq-fixed{background:var(--sq-green-pale);border-color:var(--sq-green-mid);}
+.sq-warn{background:var(--sq-orange-light);border-color:var(--sq-orange);}
+.sq-notice-title{font-weight:700;margin-bottom:.2rem;}
+.sq-fixed .sq-notice-title{color:var(--sq-green-dark);}
+.sq-warn .sq-notice-title{color:var(--sq-orange);}
+.sq-notice-body{color:var(--sq-text-mid);}
+
+.sq-settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:500px){.sq-settings-grid{grid-template-columns:1fr;}}
+.sq-field{display:flex;flex-direction:column;gap:.4rem;}
+.sq-field label{font-size:.78rem;font-weight:500;color:var(--sq-text-mid);}
+.sq-field small{font-size:.7rem;color:var(--sq-text-muted);}
+.sq-field input,.sq-field select{border:1px solid var(--sq-border);border-radius:8px;padding:.55rem .9rem;font-size:.9rem;font-family:inherit;color:var(--sq-text-dark);background:var(--sq-cream);transition:border-color .2s,box-shadow .2s;outline:none;width:100%;}
+.sq-field input:focus,.sq-field select:focus{border-color:var(--sq-green-mid);box-shadow:0 0 0 3px rgba(74,124,111,.12);background:var(--sq-white);}
+
+#sq-dropZone{border:2px dashed var(--sq-green-light);border-radius:12px;padding:2.5rem 2rem;text-align:center;cursor:pointer;background:var(--sq-green-pale);transition:all .25s;}
+#sq-dropZone:hover,#sq-dropZone.sq-drag-over{border-color:var(--sq-green-mid);background:rgba(74,124,111,.08);}
+#sq-dropZone.sq-has-file{border-style:solid;border-color:var(--sq-green-mid);background:var(--sq-white);}
+#sq-fileInput{display:none;}
+.sq-upload-icon{font-size:2.2rem;margin-bottom:.75rem;display:block;}
+.sq-upload-primary{font-size:1rem;font-weight:700;color:var(--sq-green-dark);margin-bottom:.3rem;}
+.sq-upload-secondary{font-size:.78rem;color:var(--sq-text-muted);}
+.sq-file-name-display{font-size:.85rem;font-weight:500;color:var(--sq-green-mid);margin-top:.75rem;display:none;}
+#sq-dropZone.sq-has-file .sq-file-name-display{display:block;}
+#sq-dropZone.sq-has-file .sq-upload-icon{display:none;}
+
+#sq-previewSection{display:none;}
+.sq-preview-meta{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+.sq-meta-chip{display:flex;flex-direction:column;gap:.1rem;}
+.sq-meta-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--sq-text-muted);font-weight:700;}
+.sq-meta-value{font-size:1.1rem;font-weight:700;color:var(--sq-green-dark);}
+.sq-meta-value.sq-meta-warn{color:var(--sq-orange);}
+
+.sq-vbox{border-radius:8px;padding:.85rem 1.1rem;font-size:.8rem;line-height:1.7;margin-bottom:.5rem;}
+.sq-vbox.sq-ok{background:var(--sq-green-pale);border:1px solid var(--sq-green-light);color:var(--sq-green-dark);}
+.sq-vbox.sq-vwarn{background:var(--sq-orange-light);border:1px solid #e8c07a;color:var(--sq-orange);}
+.sq-vbox ul{margin:.3rem 0 0 1.2rem;}
+
+.sq-preview-table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--sq-border);margin-top:1rem;}
+.sq-preview-table{width:100%;border-collapse:collapse;font-size:.77rem;}
+.sq-preview-table th{background:var(--sq-green-dark);color:#fff;padding:.5rem .7rem;text-align:left;font-weight:500;white-space:nowrap;}
+.sq-preview-table td{padding:.45rem .7rem;border-bottom:1px solid var(--sq-green-pale);white-space:nowrap;max-width:170px;overflow:hidden;text-overflow:ellipsis;color:var(--sq-text-mid);}
+.sq-preview-table tr:last-child td{border-bottom:none;}
+.sq-preview-table tr:nth-child(even) td{background:var(--sq-cream);}
+.sq-sku-col{font-family:monospace;font-size:.73rem!important;color:var(--sq-green-mid)!important;}
+.sq-price-col{text-align:right!important;font-weight:500!important;}
+
+#sq-mappingSection{display:none;}
+.sq-mapping-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem 1.5rem;}
+@media(max-width:500px){.sq-mapping-grid{grid-template-columns:1fr;}}
+.sq-mapping-row{display:flex;align-items:flex-start;gap:.5rem;font-size:.8rem;padding:.35rem 0;border-bottom:1px solid var(--sq-green-pale);}
+.sq-mapping-src{font-weight:600;color:var(--sq-text-dark);flex-shrink:0;}
+.sq-mapping-arrow{color:var(--sq-gold);font-size:.7rem;flex-shrink:0;margin-top:.1rem;}
+.sq-mapping-dst{color:var(--sq-text-muted);font-size:.76rem;flex:1;}
+.sq-mapping-note{font-size:.67rem;color:var(--sq-green-mid);font-weight:700;background:var(--sq-green-pale);padding:.05rem .35rem;border-radius:4px;white-space:nowrap;}
+
+#sq-convertBtn{display:block;width:100%;padding:1.1rem;background:var(--sq-green-dark,#2c4a3e);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:1.05rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:all .2s;margin-top:.5rem;}
+#sq-convertBtn:disabled{background:#a8c5bb;cursor:not-allowed;color:rgba(255,255,255,.5);}
+#sq-convertBtn:not(:disabled):hover{background:#4a7c6f;transform:translateY(-1px);box-shadow:0 6px 20px rgba(44,74,62,.3);}
+#sq-convertBtn:not(:disabled):active{transform:translateY(0);}
+
+#sq-statusMsg{margin-top:1rem;padding:.9rem 1.2rem;border-radius:8px;font-size:.85rem;display:none;align-items:flex-start;gap:.6rem;}
+#sq-statusMsg.sq-success{display:flex;background:#e8f0ee;border:1px solid #a8c5bb;color:#2c4a3e;}
+#sq-statusMsg.sq-error{display:flex;background:#fdf0ef;border:1px solid #e8b4b0;color:#b03030;}
+.sq-status-text{line-height:1.6;}
+
+.sq-footer{text-align:center;margin-top:3rem;font-size:.72rem;color:#8a9e97;font-weight:300;}
 </style>
 </head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <body>
 
 <!-- Header -->
@@ -555,6 +656,7 @@ input:focus,button:focus{outline:none;}
   <button class="tnb active" onclick="switchTab('input',this)">入力・生成</button>
   <button class="tnb" onclick="switchTab('template',this)">テンプレート</button>
   <button class="tnb" onclick="switchTab('settings',this)">設定</button>
+  <button class="tnb" onclick="switchTab('square',this)">Square変換</button>
 </nav>
 
 <!-- Phone Bottom Nav -->
@@ -567,6 +669,9 @@ input:focus,button:focus{outline:none;}
   </button>
   <button class="bnb" id="bnav-settings" onclick="switchTab('settings',this)">
     <span class="bnb-i">⚙️</span><span class="bnb-l">設定</span>
+  </button>
+  <button class="bnb" id="bnav-square" onclick="switchTab('square',this)">
+    <span class="bnb-i">📊</span><span class="bnb-l">Square</span>
   </button>
 </nav>
 
@@ -772,6 +877,125 @@ input:focus,button:focus{outline:none;}
   </div>
 </div>
 
+<!-- ─── SQUARE変換 ──────────────────────────── -->
+<div class="panel" id="panel-square">
+<div class="sq-tool" style="max-width:820px;margin:0 auto;padding:20px 14px 40px;">
+
+  <div class="sq-header">
+    <div class="sq-logo-mark">🌿</div>
+    <h2 class="sq-h1">豊明花き<span class="sq-arrow-badge">→</span>Square<span class="sq-version-badge">v2</span></h2>
+    <p class="sq-subtitle">入荷明細CSV（Shift-JIS）をSquareインポート用Excelに自動変換</p>
+  </div>
+
+  <!-- 対策内容カード -->
+  <div class="sq-card">
+    <div class="sq-card-label">面談資料で確認した修正・対策内容</div>
+    <div class="sq-notice-grid">
+      <div class="sq-notice sq-fixed">
+        <div class="sq-notice-title">✅ SKU重複を自動解決</div>
+        <div class="sq-notice-body">荷受番号は約3ヶ月で循環する連番。<strong>「売立日＋荷受番号」</strong>を組み合わせてSKUを生成。同日同番号が複数ある場合は連番サフィックス（-2,-3…）を自動付与。</div>
+      </div>
+      <div class="sq-notice sq-fixed">
+        <div class="sq-notice-title">✅ 鉢単価を÷100補正</div>
+        <div class="sq-notice-body">豊明データの鉢単価は<strong>100倍の整数で格納</strong>（例：50000→¥500）。÷100して正しい円単位でSquareの原価に登録。</div>
+      </div>
+      <div class="sq-notice sq-fixed">
+        <div class="sq-notice-title">✅ 品名コード（6桁）を使用</div>
+        <div class="sq-notice-body">旧5桁のJFコードでなく<strong>品名コード（9列目・正規6桁）</strong>を参照ハンドルに使用。同一品種の入荷をSquareで正しくグループ化できる。</div>
+      </div>
+      <div class="sq-notice sq-warn">
+        <div class="sq-notice-title">⚠️ カテゴリ名称は変動する</div>
+        <div class="sq-notice-body">JFコード分類は学術的変更で更新される場合があります。定期的に最新データで再インポートすることを推奨。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 設定 -->
+  <div class="sq-card">
+    <div class="sq-card-label">設定</div>
+    <div class="sq-settings-grid">
+      <div class="sq-field">
+        <label>Square 店舗名（ロケーション名）</label>
+        <input type="text" id="sq-storeName" value="北山ナーセリー" placeholder="例: 北山ナーセリー">
+        <small>Squareの在庫管理ロケーション名に合わせてください</small>
+      </div>
+      <div class="sq-field">
+        <label>消費税（内税10%）</label>
+        <select id="sq-taxValue">
+          <option value="Y" selected>Y — 適用する</option>
+          <option value="N">N — 適用しない</option>
+        </select>
+      </div>
+      <div class="sq-field">
+        <label>販売価格の設定方法</label>
+        <select id="sq-priceMode">
+          <option value="case" selected>ケース単価をそのまま（セット価格）</option>
+          <option value="per_unit">ケース単価 ÷ 入数（1本あたり単価）</option>
+        </select>
+        <small>セット販売→ケース単価、バラ販売→÷入数</small>
+      </div>
+      <div class="sq-field">
+        <label>商品タイプ</label>
+        <select id="sq-productType">
+          <option value="有形商品" selected>有形商品</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ファイル選択 -->
+  <div class="sq-card" style="padding:1.5rem 2rem">
+    <div class="sq-card-label">Step 1 — ファイル選択</div>
+    <div id="sq-dropZone" onclick="document.getElementById('sq-fileInput').click()">
+      <input type="file" id="sq-fileInput" accept=".csv,.CSV">
+      <span class="sq-upload-icon">📂</span>
+      <div class="sq-upload-primary">豊明花きの入荷明細CSVをドロップ</div>
+      <div class="sq-upload-secondary">またはクリックしてファイルを選択（Shift-JIS / カンマ区切りCSV）</div>
+      <div class="sq-file-name-display">✓ <span id="sq-fileNameText"></span></div>
+    </div>
+  </div>
+
+  <!-- データ確認 -->
+  <div class="sq-card" id="sq-previewSection">
+    <div class="sq-card-label">Step 2 — データ確認・バリデーション</div>
+    <div class="sq-preview-meta">
+      <div class="sq-meta-chip"><span class="sq-meta-label">レコード数</span><span class="sq-meta-value" id="sq-metaRows">—</span></div>
+      <div class="sq-meta-chip"><span class="sq-meta-label">仕入日</span><span class="sq-meta-value" id="sq-metaDate">—</span></div>
+      <div class="sq-meta-chip"><span class="sq-meta-label">合計金額</span><span class="sq-meta-value" id="sq-metaTotal">—</span></div>
+      <div class="sq-meta-chip"><span class="sq-meta-label">荷受番号重複</span><span class="sq-meta-value" id="sq-metaDupes">—</span></div>
+    </div>
+    <div id="sq-validationBox"></div>
+    <div style="font-size:0.74rem;font-weight:600;color:#8a9e97;margin-top:1.2rem;margin-bottom:0.5rem;letter-spacing:0.05em;">SQUARE登録プレビュー（先頭5件）</div>
+    <div class="sq-preview-table-wrap">
+      <table class="sq-preview-table">
+        <thead id="sq-previewHead"></thead>
+        <tbody id="sq-previewBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- マッピング -->
+  <div class="sq-card" id="sq-mappingSection">
+    <div class="sq-card-label">列マッピング詳細</div>
+    <div class="sq-mapping-grid" id="sq-mappingGrid"></div>
+  </div>
+
+  <!-- ダウンロード -->
+  <button id="sq-convertBtn" disabled>⬇ Squareインポート用 Excel をダウンロード</button>
+  <div id="sq-statusMsg">
+    <span id="sq-statusIcon" style="font-size:1rem;flex-shrink:0;margin-top:0.05rem"></span>
+    <span class="sq-status-text" id="sq-statusText"></span>
+  </div>
+
+  <div class="sq-footer">
+    豊明花き入荷明細 → Square 商品マスタ 変換ツール v2｜面談資料（2026/03/20）対応版<br>
+    すべての処理はブラウザ内で完結します。データはサーバーに送信されません。
+  </div>
+
+</div>
+</div>
+
 </main>
 
 <!-- 印刷プレビューオーバーレイ -->
@@ -883,7 +1107,9 @@ function makeNameRow(){
   lead.appendChild(req);frow.appendChild(lead);
   // ラベル
   var lbl=document.createElement('div');lbl.className='efo-field-lbl';
-  lbl.innerHTML='<span class="efo-lbl-text">植物名</span><span class="efo-req-badge">必須</span>';
+  var lblText=document.createElement('span');lblText.className='efo-lbl-text';lblText.textContent='植物名';
+  var lblReq=document.createElement('span');lblReq.className='efo-req-badge';lblReq.textContent='必須';
+  lbl.appendChild(lblText);lbl.appendChild(lblReq);
   frow.appendChild(lbl);
   // 入力
   var inp_wrap=document.createElement('div');inp_wrap.className='efo-field-inp';
@@ -956,7 +1182,9 @@ function makePriceRow(){
   lead.appendChild(req);frow.appendChild(lead);
   // ラベル
   var lbl=document.createElement('div');lbl.className='efo-field-lbl';
-  lbl.innerHTML='<span class="efo-lbl-text" id="price-lbl">'+(PRICE_MODE==='excl'?'税抜価格':'税込価格')+'</span><span class="efo-req-badge">必須</span>';
+  var plblText=document.createElement('span');plblText.className='efo-lbl-text';plblText.id='price-lbl';plblText.textContent=(PRICE_MODE==='excl'?'税抜価格':'税込価格');
+  var plblReq=document.createElement('span');plblReq.className='efo-req-badge';plblReq.textContent='必須';
+  lbl.appendChild(plblText);lbl.appendChild(plblReq);
   frow.appendChild(lbl);
   // 入力
   var inp_wrap=document.createElement('div');inp_wrap.className='efo-field-inp';
@@ -1003,11 +1231,11 @@ function switchTab(name,btn){
   if(panel)panel.classList.add('on');
   if(btn)btn.classList.add('active');
   // bnav同期
-  var bmap={input:'bnav-input',template:'bnav-template',settings:'bnav-settings'};
+  var bmap={input:'bnav-input',template:'bnav-template',settings:'bnav-settings',square:'bnav-square'};
   var bb=document.getElementById(bmap[name]);
   if(bb)bb.classList.add('active');
   // topnav同期
-  var order=['input','template','settings'];
+  var order=['input','template','settings','square'];
   var idx=order.indexOf(name);
   var tnbs=document.querySelectorAll('.tnb');
   if(tnbs[idx])tnbs[idx].classList.add('active');
@@ -1842,7 +2070,7 @@ function buildElList(){
 
       // 行1：フォントサイズ + 文字色
       var r1=document.createElement('div');r1.className='iprop-row';
-      r1.innerHTML='<span class="iprop-lbl">サイズ</span>';
+      var szLbl=document.createElement('span');szLbl.className='iprop-lbl';szLbl.textContent='サイズ';r1.appendChild(szLbl);
       var fsz=document.createElement('div');fsz.className='fsz-ctrl';
       var bm=document.createElement('button');bm.className='fsz-btn';bm.textContent='−';
       bm.addEventListener('click',function(){nudge(el.id,'size',-1);refreshItemProps(el.id);});
@@ -1862,7 +2090,7 @@ function buildElList(){
       props.appendChild(r1);
 
       // 行2：スタイル（太字）＋ 横揃え
-      var r2=document.createElement('div');r2.className='iprop-row';r2.innerHTML='<span class="iprop-lbl">スタイル</span>';
+      var r2=document.createElement('div');r2.className='iprop-row';var stLbl=document.createElement('span');stLbl.className='iprop-lbl';stLbl.textContent='スタイル';r2.appendChild(stLbl);
       var sb=document.createElement('div');sb.className='style-btns';
       function mkBtn(lbl,cls,active,cb){
         var b=document.createElement('button');b.className='s-btn'+(active?' on':'');b.textContent=lbl;
@@ -1950,7 +2178,7 @@ function buildPropsPanel(el){
 
 // ━━ TEMPLATES ━━
 function loadT(){try{return JSON.parse(localStorage.getItem('popT'))||[];}catch(ex){return[];}}
-function saveT(a){try{localStorage.setItem('popT',JSON.stringify(a));}catch(ex){toast('保存失敗');}}
+function saveT(a){try{var json=JSON.stringify(a);if(json.length>4*1024*1024){toast('テンプレートデータが大きすぎます（4MB超）。不要なテンプレートを削除してください');return false;}localStorage.setItem('popT',json);return true;}catch(ex){if(ex.name==='QuotaExceededError'){toast('ブラウザのストレージ容量を超えました。不要なテンプレートを削除してください');}else{toast('保存失敗: '+ex.message);}return false;}}
 
 function saveTmpl(){
   var author=(document.getElementById('tmpl-author')||{value:''}).value.trim();
@@ -2280,8 +2508,8 @@ function onXlFile(event){
       var priceCol=document.getElementById('xl-price-col');
       nameCol.innerHTML=''; priceCol.innerHTML='';
       xlHeaders.forEach(function(h,i){
-        nameCol.innerHTML+='<option value="'+i+'">'+escXl(h)+'</option>';
-        priceCol.innerHTML+='<option value="'+i+'">'+escXl(h)+'</option>';
+        var o1=document.createElement('option');o1.value=i;o1.textContent=h;nameCol.appendChild(o1);
+        var o2=document.createElement('option');o2.value=i;o2.textContent=h;priceCol.appendChild(o2);
       });
       // 列自動推測
       var nameGuess=0, priceGuess=1;
@@ -2301,7 +2529,7 @@ function onXlFile(event){
   reader.readAsArrayBuffer(file);
 }
 
-function escXl(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escXl(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function updateXlPreview(){
   var nc=parseInt(document.getElementById('xl-name-col').value);
@@ -2580,6 +2808,338 @@ window.addEventListener('DOMContentLoaded',function(){
   initPresetTemplates();
   var ni=document.getElementById('inp-name');if(ni)ni.focus();
 });
+</script>
+
+<!-- ════ Square変換ツール JavaScript ════ -->
+<script>
+(function(){
+  'use strict';
+
+  // ─── CSV (Shift-JIS) ─────────────────────────────────────
+  function sqReadCSVShiftJIS(file) {
+    return new Promise(function(res, rej) {
+      var r = new FileReader();
+      r.onload = function(e) {
+        try { res(sqParseCSV(new TextDecoder('shift-jis').decode(e.target.result))); }
+        catch(err){ rej(err); }
+      };
+      r.onerror = function(){ rej(new Error('ファイルを読み込めませんでした。ファイルが破損していないか確認してください。')); };
+      r.readAsArrayBuffer(file);
+    });
+  }
+
+  function sqParseCSV(text) {
+    var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
+    if (lines.length < 2) throw new Error('CSVファイルにデータ行が含まれていません。正しいファイルを選択してください。');
+    var headers = sqParseCSVLine(lines[0]).map(function(h){ return h.trim(); });
+    var rows = [];
+    for (var i = 1; i < lines.length; i++) {
+      var vals = sqParseCSVLine(lines[i]);
+      if (vals.length < 5) continue;
+      var obj = {};
+      headers.forEach(function(h, idx){ obj[h] = (vals[idx] || '').trim(); });
+      rows.push(obj);
+    }
+    return { headers: headers, rows: rows };
+  }
+
+  function sqParseCSVLine(line) {
+    var res = [], cur = '', inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (c === '"') {
+        if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (c === ',' && !inQ) { res.push(cur); cur = ''; }
+      else cur += c;
+    }
+    res.push(cur);
+    return res;
+  }
+
+  // ─── 数値パース ───────────────────────────────────────────
+  function sqPn(v) { var n = parseInt((v||'').replace(/,/g,'').trim(), 10); return isNaN(n) ? 0 : n; }
+
+  // ─── バリデーション ───────────────────────────────────────
+  function sqValidate(rows) {
+    var skuMap = {};
+    rows.forEach(function(r){
+      var k = r['売立日'] + '-' + r['荷受番号'];
+      skuMap[k] = (skuMap[k] || 0) + 1;
+    });
+    var dupes   = Object.values(skuMap).filter(function(v){ return v > 1; }).length;
+    var noName  = rows.filter(function(r){ return !r['品名'] || !r['品名'].trim(); }).length;
+    var noPrice = rows.filter(function(r){ return sqPn(r['ケース単価']) === 0; }).length;
+    var noJF    = rows.filter(function(r){ return (r['JFコード']||'').trim() === '00000'; }).length;
+    return { dupes: dupes, noName: noName, noPrice: noPrice, noJF: noJF };
+  }
+
+  // ─── Square列ヘッダー ─────────────────────────────────────
+  function sqHeaders(store) {
+    return ['参照ハンドル','トークン','商品名','お客さま向けの名称','フリガナ','バリエーション名','商品番号（SKU）','説明','カテゴリ','レポートカテゴリ','SEOタイトル','SEOの説明','パーマリンク','GTIN','Square オンラインビジネスの商品の表示/非表示','商品タイプ','重量(キログラム)','ソーシャルメディアのリンクのタイトル','ソーシャルメディアのリンクの説明','配送有効化済み','セルフオーダー有効化済み','デリバリー有効化済み','受け取り有効化済み','価格','オンラインセール価格','アーカイブ済み','販売可能','アルコールを含む','在庫保有可能','POSレジで詳細画面をスキップする','オプション名1','オプション値1','オプション名2','オプション値2','既定の単位原価','既定の取引先名','既定の取引先コード','現在の数量 '+store,'新規の数量 '+store,'在庫アラート有効（'+store+'）','在庫アラート基準値（'+store+'）','税金 - 消費税内税10％ (10%)'];
+  }
+
+  // ─── 変換 ────────────────────────────────────────────────
+  function sqConvertRows(rows, store, tax, priceMode, ptype) {
+    var skuCount = {};
+    return rows.map(function(r){
+      var t = function(v){ return (v||'').trim(); };
+      var refHandle = t(r['品名コード']) || t(r['JFコード']);
+      var hinmei    = t(r['品名']);
+      var baseKey   = t(r['売立日']) + '-' + t(r['荷受番号']);
+      skuCount[baseKey] = (skuCount[baseKey] || 0) + 1;
+      var sku = skuCount[baseKey] === 1 ? baseKey : baseKey + '-' + skuCount[baseKey];
+      var cat  = [t(r['中分類名称']), t(r['小分類名称'])].filter(Boolean).join(' > ');
+      var daib = t(r['大分類名称']);
+      var shit = t(r['仕立略称']); var hachi = t(r['鉢サイズ']);
+      var vari = [shit, hachi].filter(Boolean).join(' ') || '標準';
+      var casePr = sqPn(r['ケース単価']); var nyu = sqPn(r['入数']) || 1;
+      var price  = priceMode === 'per_unit' ? Math.round(casePr / nyu) : casePr;
+      var kostRaw = sqPn(r['鉢単価']); var cost = kostRaw > 0 ? Math.round(kostRaw / 100) : '';
+      var kuchi = sqPn(r['口数']) || 1; var stockQty = nyu * kuchi;
+      var aname = t(r['荷主名称']); var acode = t(r['荷主コード']);
+      var desc = [t(r['記事１']), t(r['記事２'])].filter(Boolean).join('　');
+      return [refHandle,'',hinmei,hinmei,'',vari,sku,desc,cat,daib,'','','','','',ptype,'','','','','','','',price,'','N','Y','N','Y','N',shit?'仕立':'',shit,hachi?'サイズ':'',hachi,cost,aname,acode,'',stockQty,'','',tax];
+    });
+  }
+
+  // ─── XLSX生成 ─────────────────────────────────────────────
+  function sqBuildXLSX(rows, store, tax, priceMode, ptype) {
+    var heads = sqHeaders(store);
+    var data  = sqConvertRows(rows, store, tax, priceMode, ptype);
+    var all   = [['指示・説明'],['各行に商品名が含まれていること、カテゴリ・説明が一致していること。'],[],heads].concat(data);
+    var ws = XLSX.utils.aoa_to_sheet(all);
+    ws['!cols'] = heads.map(function(_,i){ return { wch: i < 9 ? 22 : 16 }; });
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '商品');
+    return wb;
+  }
+
+  // ─── マッピング定義 ───────────────────────────────────────
+  var SQ_MAPPING = [
+    {src:'品名コード（9列目・正規6桁）', dst:'参照ハンドル', note:'★修正'},
+    {src:'売立日 + 荷受番号',           dst:'商品番号（SKU）', note:'★修正'},
+    {src:'品名',                        dst:'商品名 / お客さま向けの名称', note:''},
+    {src:'中分類名称 > 小分類名称',     dst:'カテゴリ', note:''},
+    {src:'大分類名称',                  dst:'レポートカテゴリ', note:''},
+    {src:'仕立略称 + 鉢サイズ',         dst:'バリエーション名', note:''},
+    {src:'ケース単価（設定で変更可）',  dst:'価格', note:''},
+    {src:'鉢単価 ÷ 100',               dst:'既定の単位原価', note:'★修正'},
+    {src:'口数 × 入数',                dst:'新規の数量（在庫数）', note:'★修正'},
+    {src:'荷主名称 / 荷主コード',       dst:'既定の取引先名 / コード', note:''},
+    {src:'記事１ + 記事２',             dst:'説明', note:''},
+  ];
+
+  // ─── UI状態 ──────────────────────────────────────────────
+  var sqParsedData = null;
+
+  function sqShowStatus(type, icon, text) {
+    var el = document.getElementById('sq-statusMsg');
+    el.className = type;
+    document.getElementById('sq-statusIcon').textContent = icon;
+    document.getElementById('sq-statusText').textContent = text;
+    el.style.display = 'flex';
+  }
+
+  function sqRenderPreview(data) {
+    var rows  = data.rows;
+    var v     = sqValidate(rows);
+    var store = document.getElementById('sq-storeName').value || '北山ナーセリー';
+    var pmode = document.getElementById('sq-priceMode').value;
+
+    document.getElementById('sq-metaRows').textContent = rows.length + '件';
+    var d = rows[0] ? (rows[0]['売立日'] || '') : '';
+    if (d.length === 8) document.getElementById('sq-metaDate').textContent = d.slice(0,4)+'/'+d.slice(4,6)+'/'+d.slice(6,8);
+    document.getElementById('sq-metaTotal').textContent = '¥' + rows.reduce(function(s,r){ return s + sqPn(r['金額']); }, 0).toLocaleString();
+    var dupEl = document.getElementById('sq-metaDupes');
+    dupEl.textContent = v.dupes === 0 ? '重複なし' : v.dupes + '件（自動補正）';
+    dupEl.className = 'sq-meta-value' + (v.dupes > 0 ? ' sq-meta-warn' : '');
+
+    var vbox = document.getElementById('sq-validationBox');
+    vbox.innerHTML = '';
+    if (v.noName > 0) {
+      var d1 = document.createElement('div'); d1.className = 'sq-vbox sq-vwarn';
+      d1.textContent = '⚠️ 品名が空の行が ' + v.noName + ' 件あります。確認してください。';
+      vbox.appendChild(d1);
+    }
+    if (v.noPrice > 0) {
+      var d2 = document.createElement('div'); d2.className = 'sq-vbox sq-vwarn';
+      d2.textContent = '⚠️ ケース単価が0円の行が ' + v.noPrice + ' 件あります。変換前に確認してください。';
+      vbox.appendChild(d2);
+    }
+    if (v.noJF > 0) {
+      var d3 = document.createElement('div'); d3.className = 'sq-vbox sq-vwarn';
+      d3.textContent = '⚠️ JFコード未設定の行が ' + v.noJF + ' 件あります。品名コードで代替済みです。';
+      vbox.appendChild(d3);
+    }
+    var infos = [];
+    if (v.dupes > 0) infos.push('荷受番号の重複 ' + v.dupes + ' 件を検出 → SKUに連番サフィックスを自動付与しました');
+    if (infos.length > 0) {
+      var d4 = document.createElement('div'); d4.className = 'sq-vbox sq-ok';
+      d4.textContent = 'ℹ️ 自動対応済み・参考情報：' + infos.join('、');
+      vbox.appendChild(d4);
+    }
+    if (!vbox.hasChildNodes()) {
+      var d5 = document.createElement('div'); d5.className = 'sq-vbox sq-ok';
+      d5.textContent = '✅ データに問題は検出されませんでした。変換可能です。';
+      vbox.appendChild(d5);
+    }
+
+    // プレビューテーブル
+    var cols = ['商品名','参照ハンドル','SKU','カテゴリ','バリエーション','価格','原価(÷100)','在庫数'];
+    var thead = document.getElementById('sq-previewHead');
+    thead.innerHTML = '';
+    var htr = document.createElement('tr');
+    cols.forEach(function(c){ var th = document.createElement('th'); th.textContent = c; htr.appendChild(th); });
+    thead.appendChild(htr);
+    var skuCount = {};
+    var tbodyEl = document.getElementById('sq-previewBody');
+    tbodyEl.innerHTML = '';
+    rows.slice(0,5).forEach(function(r){
+      var casePr = sqPn(r['ケース単価']); var nyu = sqPn(r['入数'])||1; var kuchi = sqPn(r['口数'])||1;
+      var price  = pmode === 'per_unit' ? Math.round(casePr/nyu) : casePr;
+      var cost   = sqPn(r['鉢単価']) > 0 ? Math.round(sqPn(r['鉢単価'])/100) : '—';
+      var bk     = (r['売立日']||'') + '-' + (r['荷受番号']||'').trim();
+      skuCount[bk] = (skuCount[bk]||0)+1;
+      var sku    = skuCount[bk]===1 ? bk : bk+'-'+skuCount[bk];
+      var cat    = [(r['中分類名称']||'').trim(),(r['小分類名称']||'').trim()].filter(Boolean).join('>');
+      var vari   = [(r['仕立略称']||'').trim(),(r['鉢サイズ']||'').trim()].filter(Boolean).join(' ')||'標準';
+      var ref    = (r['品名コード']||'').trim() || (r['JFコード']||'').trim();
+      var cells  = [(r['品名']||'').trim().slice(0,18), ref, sku, cat.slice(0,20), vari, '¥'+price.toLocaleString(), typeof cost==='number'?'¥'+cost.toLocaleString():cost, (nyu*kuchi)+'本'];
+      var tr = document.createElement('tr');
+      cells.forEach(function(v,i){
+        var td = document.createElement('td');
+        td.className = i===2 ? 'sq-sku-col' : (i===5||i===6 ? 'sq-price-col' : '');
+        td.title = v; td.textContent = v;
+        tr.appendChild(td);
+      });
+      tbodyEl.appendChild(tr);
+    });
+    if (rows.length > 5) {
+      var tr2=document.createElement('tr');var td2=document.createElement('td');
+      td2.colSpan=cols.length;td2.style.cssText='text-align:center;color:#8a9e97;padding:0.6rem;font-size:0.74rem';
+      td2.textContent='… 他 '+(rows.length-5)+' 件';tr2.appendChild(td2);tbodyEl.appendChild(tr2);
+    }
+
+    // マッピング
+    var mg = document.getElementById('sq-mappingGrid');
+    mg.innerHTML = '';
+    SQ_MAPPING.forEach(function(m){
+      var row = document.createElement('div'); row.className = 'sq-mapping-row';
+      var src = document.createElement('span'); src.className = 'sq-mapping-src'; src.textContent = m.src;
+      var arrow = document.createElement('span'); arrow.className = 'sq-mapping-arrow'; arrow.textContent = '▶';
+      var dst = document.createElement('span'); dst.className = 'sq-mapping-dst'; dst.textContent = m.dst;
+      if (m.note) {
+        var note = document.createElement('span'); note.className = 'sq-mapping-note'; note.textContent = m.note;
+        dst.appendChild(document.createTextNode(' ')); dst.appendChild(note);
+      }
+      row.appendChild(src); row.appendChild(arrow); row.appendChild(dst);
+      mg.appendChild(row);
+    });
+
+    document.getElementById('sq-previewSection').style.display = 'block';
+    document.getElementById('sq-mappingSection').style.display = 'block';
+    document.getElementById('sq-convertBtn').disabled = v.noName > 0;
+  }
+
+  function sqHandleFile(file) {
+    if (!file) return;
+    document.getElementById('sq-statusMsg').style.display = 'none';
+    document.getElementById('sq-convertBtn').disabled = true;
+    document.getElementById('sq-previewSection').style.display = 'none';
+    document.getElementById('sq-mappingSection').style.display = 'none';
+    var dz = document.getElementById('sq-dropZone');
+    dz.classList.add('sq-has-file');
+    document.getElementById('sq-fileNameText').textContent = file.name;
+    sqReadCSVShiftJIS(file).then(function(data){
+      if (!data.rows.length) throw new Error('データ行が見つかりませんでした');
+      sqParsedData = data;
+      sqRenderPreview(sqParsedData);
+      sqShowStatus('sq-success', '✓', data.rows.length + '件のデータを読み込みました。バリデーション結果を確認の上、ダウンロードしてください。');
+    }).catch(function(e){
+      sqParsedData = null; dz.classList.remove('sq-has-file');
+      sqShowStatus('sq-error', '⚠', '読み込みエラー：' + e.message);
+    });
+  }
+
+  // ─── イベント登録（DOMContentLoaded後） ──────────────────
+  window.addEventListener('DOMContentLoaded', function(){
+    var fileInput = document.getElementById('sq-fileInput');
+    var dz = document.getElementById('sq-dropZone');
+    var convertBtn = document.getElementById('sq-convertBtn');
+    var priceModeEl = document.getElementById('sq-priceMode');
+
+    if (fileInput) fileInput.addEventListener('change', function(e){ if(e.target.files[0]) sqHandleFile(e.target.files[0]); });
+    if (dz) {
+      dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.classList.add('sq-drag-over'); });
+      dz.addEventListener('dragleave', function(){ dz.classList.remove('sq-drag-over'); });
+      dz.addEventListener('drop', function(e){ e.preventDefault(); dz.classList.remove('sq-drag-over'); if(e.dataTransfer.files[0]) sqHandleFile(e.dataTransfer.files[0]); });
+    }
+    if (priceModeEl) priceModeEl.addEventListener('change', function(){ if(sqParsedData) sqRenderPreview(sqParsedData); });
+
+    if (convertBtn) convertBtn.addEventListener('click', function(){
+      if (!sqParsedData) return;
+      var v = sqValidate(sqParsedData.rows);
+      if (v.noPrice > 0 || v.noJF > 0) {
+        var msgs = [];
+        if (v.noPrice > 0) msgs.push('ケース単価が0円の行が ' + v.noPrice + ' 件');
+        if (v.noJF > 0) msgs.push('JFコード未設定の行が ' + v.noJF + ' 件');
+        if (!confirm('以下の警告があります：\n' + msgs.join('\n') + '\n\nこのまま変換を続行しますか？')) return;
+      }
+      var store = document.getElementById('sq-storeName').value.trim() || '北山ナーセリー';
+      var tax   = document.getElementById('sq-taxValue').value;
+      var pmode = document.getElementById('sq-priceMode').value;
+      var ptype = document.getElementById('sq-productType').value;
+      try {
+        if (typeof XLSX === 'undefined') { sqShowStatus('sq-error', '⚠', 'XLSXライブラリが読み込まれていません。オンライン環境で使用してください。'); return; }
+        var wb = sqBuildXLSX(sqParsedData.rows, store, tax, pmode, ptype);
+        var date = (sqParsedData.rows[0] ? (sqParsedData.rows[0]['売立日'] || '') : '').slice(0,8) || new Date().toISOString().slice(0,10).replace(/-/g,'');
+        var fn   = 'square_import_' + date + '.xlsx';
+        XLSX.writeFile(wb, fn);
+        sqShowStatus('sq-success', '🎉', fn + ' をダウンロードしました。Squareの 商品管理 → インポート からファイルを読み込んでください。');
+      } catch(e) {
+        sqShowStatus('sq-error', '⚠', 'Excelファイルの生成に失敗しました。ブラウザの設定やディスク容量を確認してください。');
+      }
+    });
+
+    // localStorage設定読み込み
+    function sqLoadSettings() {
+      var s  = localStorage.getItem('sq_storeName');
+      var t  = localStorage.getItem('sq_taxValue');
+      var p  = localStorage.getItem('sq_priceMode');
+      var pt = localStorage.getItem('sq_productType');
+      var storeEl = document.getElementById('sq-storeName');
+      var taxEl   = document.getElementById('sq-taxValue');
+      var pmEl    = document.getElementById('sq-priceMode');
+      var ptEl    = document.getElementById('sq-productType');
+      if (s !== null && storeEl) storeEl.value = s;
+      if (t !== null && taxEl)   taxEl.value = t;
+      if (p !== null && pmEl)    pmEl.value = p;
+      if (pt !== null && ptEl)   ptEl.value = pt;
+    }
+    function sqSaveSettings() {
+      try {
+        var storeEl = document.getElementById('sq-storeName');
+        var taxEl   = document.getElementById('sq-taxValue');
+        var pmEl    = document.getElementById('sq-priceMode');
+        var ptEl    = document.getElementById('sq-productType');
+        if (storeEl) localStorage.setItem('sq_storeName', storeEl.value);
+        if (taxEl)   localStorage.setItem('sq_taxValue',  taxEl.value);
+        if (pmEl)    localStorage.setItem('sq_priceMode', pmEl.value);
+        if (ptEl)    localStorage.setItem('sq_productType', ptEl.value);
+      } catch(e) {}
+    }
+    sqLoadSettings();
+    var storeEl = document.getElementById('sq-storeName');
+    var taxEl   = document.getElementById('sq-taxValue');
+    var pmEl2   = document.getElementById('sq-priceMode');
+    var ptEl    = document.getElementById('sq-productType');
+    if (storeEl) storeEl.addEventListener('input', sqSaveSettings);
+    if (taxEl)   taxEl.addEventListener('change', sqSaveSettings);
+    if (pmEl2)   pmEl2.addEventListener('change', sqSaveSettings);
+    if (ptEl)    ptEl.addEventListener('change', sqSaveSettings);
+  });
+})();
 </script>
 </body>
 </html>
