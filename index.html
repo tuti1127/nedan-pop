@@ -4036,10 +4036,11 @@ function toggleTheme(){
       var bk     = (r['売立日']||'') + '-' + (r['荷受番号']||'').trim();
       skuCount[bk] = (skuCount[bk]||0)+1;
       var sku    = skuCount[bk]===1 ? bk : bk+'-'+skuCount[bk];
-      var cat    = [(r['中分類名称']||'').trim(),(r['小分類名称']||'').trim()].filter(Boolean).join('>');
-      var vari   = [(r['仕立略称']||'').trim(),(r['鉢サイズ']||'').trim()].filter(Boolean).join(' ')||'標準';
+      var zen = typeof hanToZen==='function' ? hanToZen : function(s){return s;};
+      var cat    = [zen((r['中分類名称']||'').trim()),zen((r['小分類名称']||'').trim())].filter(Boolean).join('>');
+      var vari   = [zen((r['仕立略称']||'').trim()),(r['鉢サイズ']||'').trim()].filter(Boolean).join(' ')||'標準';
       var ref    = (r['品名コード']||'').trim() || (r['JFコード']||'').trim();
-      var cells  = [(r['品名']||'').trim().slice(0,18), ref, sku, cat.slice(0,20), vari, '¥'+price.toLocaleString(), typeof cost==='number'?'¥'+cost.toLocaleString():cost, (nyu*kuchi)+'本'];
+      var cells  = [zen((r['品名']||'').trim()).slice(0,18), ref, sku, cat.slice(0,20), vari, '¥'+price.toLocaleString(), typeof cost==='number'?'¥'+cost.toLocaleString():cost, (nyu*kuchi)+'本'];
       var tr = document.createElement('tr');
       cells.forEach(function(v,i){
         var td = document.createElement('td');
