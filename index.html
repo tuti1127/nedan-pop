@@ -3331,21 +3331,32 @@ function onXlToyoake(){
 function onXlToyoakeFile(event){
   var file=event.target.files[0];if(!file)return;
   event.target.value='';
-  // 豊明花きフォーマット：列1=植物名, 列2=価格（税抜）と想定
-  xlsxToRows(file,function(err,rows){
-    if(err){toast('読み込み失敗:'+err.message);return;}
-    if(!rows||rows.length<2){toast('データがありません');return;}
-    var added=0;
-    // ヘッダー行をスキップ
-    for(var i=1;i<rows.length;i++){
-      var row=rows[i];
-      var name=row[0]?String(row[0]).trim():'';
-      var price=parseInt(row[1])||0;
-      if(name&&price){items.push({name:name,price:price,extras:{}});added++;}
-    }
-    renderList();updateBadge();
-    toast('豊明花き: '+added+'件を追加しました');
-  });
+  // 豊明花きCSVはShift-JIS（CP932）エンコード
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var text=new TextDecoder('shift-jis').decode(e.target.result);
+      var rows=parseCSV(text);
+      if(!rows||rows.length<2){toast('データがありません');return;}
+      // ヘッダー行からカラムインデックスを特定
+      var hdr=rows[0].map(function(h){return String(h).trim();});
+      var nameIdx=hdr.indexOf('品名');
+      var priceIdx=hdr.indexOf('ケース単価');
+      if(nameIdx<0) nameIdx=9;   // fallback: 豊明CSVの品名は列9
+      if(priceIdx<0) priceIdx=18; // fallback: ケース単価は列18
+      var added=0;
+      for(var i=1;i<rows.length;i++){
+        var row=rows[i];
+        var name=row[nameIdx]?String(row[nameIdx]).trim():'';
+        var price=parseInt(String(row[priceIdx]||'').replace(/[^\d]/g,''))||0;
+        if(name&&price){items.push({id:Date.now()+Math.random(),name:name,price:price,extras:{}});added++;}
+      }
+      renderList();updateBadge();redrawPrev();
+      toast('豊明花き: '+added+'件を追加しました');
+    }catch(err){toast('読み込み失敗: '+err.message);}
+  };
+  reader.onerror=function(){toast('ファイル読み込みに失敗しました');};
+  reader.readAsArrayBuffer(file);
 }
 window.addEventListener('DOMContentLoaded',function(){
   buildGrid();updateOrientInfo();
