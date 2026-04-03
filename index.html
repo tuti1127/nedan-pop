@@ -939,7 +939,7 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
 /* tax-popover anchor */
 .price-row-wrap{position:relative;z-index:10;}
 
-/* ════ テンプレートパネル グリッドエディタ ════ */
+/* ════ テンプレートパネル：Canva/Avery風エディタ ════ */
 .tmpl-layout{
   display:flex;flex-direction:column;gap:14px;
 }
@@ -961,7 +961,7 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
   .tmpl-left-col::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:3px;}
 }
 
-/* グリッドエディタ Canvas エリア */
+/* Canvasラッパー */
 .tmpl-cvs-wrap{
   background:var(--surface);
   border:1px solid var(--outline-var);
@@ -986,41 +986,77 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
 }
 .cvs-reset-btn:hover{border-color:var(--primary);color:var(--primary);}
 .cvs-reset-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;}
-#pop-canvas{width:100%;display:block;cursor:crosshair;touch-action:none;}
 
-/* 要素配置ボタンバー */
-.el-place-bar{
+/* Canvas本体：カーソルはJS側で動的変更 */
+#pop-canvas{width:100%;display:block;cursor:default;touch-action:none;}
+
+/* 要素追加バー */
+.el-add-bar{
   display:flex;flex-wrap:wrap;gap:6px;
   padding:10px 13px;
   border-bottom:1px solid var(--outline-var);
   background:var(--surface-var);
+  align-items:center;
 }
-.el-place-btn{
-  height:32px;padding:0 10px;
+.el-add-bar-lbl{
+  font-size:9px;font-weight:700;color:var(--on-surface-dim);
+  letter-spacing:.06em;text-transform:uppercase;
+  white-space:nowrap;margin-right:2px;
+}
+.el-add-btn{
+  height:30px;padding:0 10px;
   border:1.5px solid var(--outline-var);
   border-radius:var(--radius-sm);
   background:var(--surface);font-family:inherit;font-size:11px;font-weight:700;
   color:var(--on-surface-var);cursor:pointer;
-  display:flex;align-items:center;gap:4px;
+  display:flex;align-items:center;gap:3px;
   transition:all .2s cubic-bezier(.4,0,.2,1);
-  min-height:32px;
+  min-height:30px;
 }
-.el-place-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-cnt);}
-.el-place-btn:active{transform:scale(.96);}
-.el-place-btn.active-type{border-color:var(--primary);background:var(--primary);color:var(--on-primary);}
-.el-place-info{
-  padding:7px 13px;font-size:11px;color:var(--on-surface-dim);
-  background:var(--surface-cnt);border-bottom:1px solid var(--outline-var);
-  min-height:28px;display:flex;align-items:center;gap:6px;
-}
-.el-place-info span{color:var(--primary);font-weight:700;}
+.el-add-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-cnt);}
+.el-add-btn:active{transform:scale(.96);}
+.el-add-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.5;}
 
-/* 選択中要素のプロパティパネル */
-.sel-el-panel{
-  padding:10px 13px;
+/* 配置済み要素リスト */
+.ed-ellist-wrap{
   border-top:1px solid var(--outline-var);
+  background:var(--surface-var);
+}
+.ed-ellist-hdr{
+  padding:7px 13px;font-size:9px;font-weight:700;
+  color:var(--on-surface-dim);letter-spacing:.06em;text-transform:uppercase;
+  border-bottom:1px solid var(--outline-var);
+}
+.ed-el-card{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 13px;
+  border-bottom:1px solid var(--outline-var);
+  cursor:pointer;
+  transition:background .15s;
+}
+.ed-el-card:last-child{border-bottom:none;}
+.ed-el-card:hover{background:var(--surface-cnt);}
+.ed-el-card.sel{background:var(--primary-cnt);}
+[data-theme="dark"] .ed-el-card.sel{background:var(--surface-cnt);}
+.ed-el-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ed-el-lbl{flex:1;font-size:12px;font-weight:700;color:var(--on-surface);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ed-el-card.sel .ed-el-lbl{color:var(--primary);}
+.ed-el-pos{font-size:10px;color:var(--on-surface-dim);white-space:nowrap;flex-shrink:0;}
+.ed-el-del{
+  width:26px;height:26px;border:none;background:none;
+  border-radius:var(--radius-sm);cursor:pointer;flex-shrink:0;
+  color:var(--on-surface-dim);display:flex;align-items:center;justify-content:center;
+  transition:all .15s;min-height:26px;
+}
+.ed-el-del:hover{background:var(--error-cnt);color:var(--error);}
+.ed-el-del svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;}
+
+/* プロパティパネル */
+.sel-el-panel{
+  padding:10px 13px 13px;
+  border-top:2px solid var(--primary);
   background:var(--primary-cnt);
-  display:none;flex-direction:column;gap:8px;
+  display:none;flex-direction:column;gap:9px;
 }
 [data-theme="dark"] .sel-el-panel{background:var(--surface-cnt);}
 .sel-el-panel.show{display:flex;}
@@ -1067,19 +1103,14 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
 }
 .tmpl-item:last-child{border-bottom:none;}
 .tmpl-item:hover{background:var(--surface-cnt);}
-.tmpl-item.act{
-  background:var(--primary-cnt);
-}
+.tmpl-item.act{background:var(--primary-cnt);}
 [data-theme="dark"] .tmpl-item.act{background:var(--primary-cnt);}
 .tmpl-item-dot{
   width:9px;height:9px;border-radius:50%;
   background:var(--outline);flex-shrink:0;
   transition:background .2s,transform .2s;
 }
-.tmpl-item.act .tmpl-item-dot{
-  background:var(--primary);
-  transform:scale(1.2);
-}
+.tmpl-item.act .tmpl-item-dot{background:var(--primary);transform:scale(1.2);}
 .tmpl-item-info{flex:1;min-width:0;}
 .tmpl-item-nm{
   font-size:clamp(11px,1.2vw,13px);font-weight:700;
@@ -1769,29 +1800,50 @@ button:focus,input:focus,select:focus{outline:none;}
 <div class="panel" id="panel-template">
   <div class="tmpl-layout">
 
-    <!-- 左列：グリッドエディタ Canvas + テンプレート管理 -->
+    <!-- 左列：Canvaスタイルエディタ + テンプレート管理 -->
     <div class="tmpl-left-col">
 
-      <!-- グリッドエディタ -->
+      <!-- Canvasエディタ本体 -->
       <div class="tmpl-cvs-wrap">
+        <!-- ツールバー -->
         <div class="cvs-lbl-bar">
-          グリッドエディタ（12×10）
-          <button class="cvs-reset-btn" onclick="resetEl()"><svg viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 1 0 .49-4.98" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 初期値</button>
+          ライブプレビュー（ドラッグで移動・角をドラッグでリサイズ）
+          <button class="cvs-reset-btn" onclick="resetEl()">
+            <svg viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 1 0 .49-4.98" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            初期値
+          </button>
         </div>
-        <!-- 要素配置ボタンバー -->
-        <div class="el-place-bar">
-          <button class="el-place-btn" id="place-btn-name" onclick="setPlaceType('name')">品名</button>
-          <button class="el-place-btn" id="place-btn-price" onclick="setPlaceType('price')">価格</button>
-          <button class="el-place-btn" id="place-btn-tax" onclick="setPlaceType('tax')">税込</button>
-          <button class="el-place-btn" id="place-btn-custom" onclick="setPlaceType('custom')">テキスト+</button>
-          <button class="el-place-btn" onclick="clearGridSel()" style="margin-left:auto;color:var(--on-surface-dim);">選択解除</button>
+
+        <!-- 要素追加バー -->
+        <div class="el-add-bar">
+          <span class="el-add-bar-lbl">要素を追加:</span>
+          <button class="el-add-btn" onclick="edAddEl('name')">
+            <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            品名
+          </button>
+          <button class="el-add-btn" onclick="edAddEl('price')">
+            <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            価格
+          </button>
+          <button class="el-add-btn" onclick="edAddEl('tax')">
+            <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            税込
+          </button>
+          <button class="el-add-btn" onclick="edAddEl('custom')">
+            <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            テキスト
+          </button>
         </div>
-        <!-- 操作説明 -->
-        <div class="el-place-info" id="grid-info">
-          セルをドラッグして範囲選択 → ボタンで要素を配置
-        </div>
-        <!-- グリッドCanvas -->
+
+        <!-- プレビューCanvas -->
         <canvas id="pop-canvas"></canvas>
+
+        <!-- 配置済み要素リスト -->
+        <div class="ed-ellist-wrap">
+          <div class="ed-ellist-hdr">配置済み要素</div>
+          <div id="ellist"></div>
+        </div>
+
         <!-- 選択中要素プロパティ -->
         <div class="sel-el-panel" id="sel-el-panel">
           <div class="sel-el-hdr">
@@ -1854,19 +1906,11 @@ button:focus,input:focus,select:focus{outline:none;}
     <!-- 右列：背景設定 -->
     <div class="tmpl-right-col">
 
-      <!-- 配置済み要素リスト -->
-      <div class="items-section">
-        <div class="items-hdr">
-          <span>配置済み要素</span>
-        </div>
-        <div id="ellist"></div>
-      </div>
-
       <!-- 背景追加 -->
       <div class="bg-section">
-        <div class="bg-hdr">背景追加</div>
+        <div class="bg-hdr">背景設定</div>
         <div class="bg-body">
-          <div class="bg-note">デザインソフトで作成した背景画像を読み込むか、アプリで直接作成できます。</div>
+          <div class="bg-note">スタイルを選択するか、デザインソフトで作成した背景画像を読み込んでください。</div>
           <div class="clr-row"><span class="clr-lbl">枠・アクセント色</span><input type="color" id="caccent" value="#2d7a4f" onchange="markEdited();redrawAll()"></div>
           <div class="clr-row"><span class="clr-lbl">背景色</span><input type="color" id="cbg" value="#fffef8" onchange="markEdited();redrawAll()"></div>
           <select class="dstyle-sel" id="dstyle" onchange="markEdited();redrawAll();rebuildInpFields();">
@@ -1989,9 +2033,16 @@ var xlRows=[], xlHeaders=[];
 
 // ━━ グリッドエディタ STATE ━━
 var GRID_COLS=12, GRID_ROWS=10; // グリッド分割数
-var gridSelStart=null, gridSelEnd=null, gridDragging=false; // セル選択
 var selGridEl=null;   // 選択中のグリッド要素ID
-var placeType=null;   // 配置モード: 'name'|'price'|'tax'|'custom'|null
+
+// ドラッグ・リサイズ用
+var _edDragging=false, _edResizing=false, _edResizeHandle='';
+var _edDragStartCell={col:0,row:0}, _edOrigEl=null;
+var _edMouseDownCell={col:0,row:0};
+
+// 後方互換のためスタブを残す
+var gridSelStart=null, gridSelEnd=null, gridDragging=false;
+var placeType=null;
 
 // ━━ PRESETS ━━
 var PRESETS=[
@@ -2740,7 +2791,7 @@ function redrawPrev(){
   drawPop(ctx,0,0,W,H,sample,gst());
 }
 
-// ━━ グリッドエディタ Canvas ━━
+// ━━ グリッドエディタ Canvas（Canva/Avery風ドラッグ操作） ━━
 var _edCvsInited=false;
 function initEdCvs(){
   var c=document.getElementById('pop-canvas');if(!c)return;
@@ -2768,7 +2819,7 @@ function epos(clientX,clientY){
   return{x:(clientX-r.left)*(c.width/c.clientWidth),y:(clientY-r.top)*(c.height/c.clientHeight)};
 }
 
-// 論理座標 → グリッドセル座標
+// 論理座標 → グリッドセル座標（浮動小数点も返す）
 function posToCell(px,py){
   var c=document.getElementById('pop-canvas');
   var W=c.width,H=c.height;
@@ -2779,9 +2830,16 @@ function posToCell(px,py){
   return{col:col,row:row};
 }
 
-// クリック座標にある配置済み要素を探す
+// 座標をグリッドの連続値で返す（リサイズ計算用）
+function posToCellFloat(px,py){
+  var c=document.getElementById('pop-canvas');
+  var W=c.width,H=c.height;
+  return{col:px/W*GRID_COLS, row:py/H*GRID_ROWS};
+}
+
+// クリック座標にある配置済み要素を探す（最前面優先=配列末尾）
 function findElAtCell(col,row){
-  for(var i=0;i<ELS.length;i++){
+  for(var i=ELS.length-1;i>=0;i--){
     var el=normalizeEl(ELS[i]);
     if(col>=el.col && col<el.col+el.colSpan && row>=el.row && row<el.row+el.rowSpan){
       return ELS[i].id;
@@ -2790,135 +2848,214 @@ function findElAtCell(col,row){
   return null;
 }
 
-// 選択セル範囲の正規化（start/end順不同に対応）
-function normSel(){
-  if(!gridSelStart||!gridSelEnd)return null;
-  return{
-    c1:Math.min(gridSelStart.col,gridSelEnd.col),
-    r1:Math.min(gridSelStart.row,gridSelEnd.row),
-    c2:Math.max(gridSelStart.col,gridSelEnd.col),
-    r2:Math.max(gridSelStart.row,gridSelEnd.row)
+// リサイズハンドルの判定（8点）
+// 選択中要素のピクセル矩形を受け取って、どのハンドルか返す
+var HANDLE_R = 6; // ハンドル半径（論理ピクセル）
+function hitTestHandles(pxX, pxY, el){
+  var c=document.getElementById('pop-canvas');
+  var W=c.width,H=c.height;
+  var cellW=W/GRID_COLS, cellH=H/GRID_ROWS;
+  var ex=el.col*cellW, ey=el.row*cellH;
+  var ew=el.colSpan*cellW, eh=el.rowSpan*cellH;
+
+  var handles={
+    'nw':{x:ex,     y:ey},
+    'n' :{x:ex+ew/2,y:ey},
+    'ne':{x:ex+ew,  y:ey},
+    'e' :{x:ex+ew,  y:ey+eh/2},
+    'se':{x:ex+ew,  y:ey+eh},
+    's' :{x:ex+ew/2,y:ey+eh},
+    'sw':{x:ex,     y:ey+eh},
+    'w' :{x:ex,     y:ey+eh/2}
   };
+  var hr=HANDLE_R*2.5; // 当たり判定を少し広めに
+  for(var k in handles){
+    var h=handles[k];
+    if(Math.abs(pxX-h.x)<hr && Math.abs(pxY-h.y)<hr) return k;
+  }
+  return null;
 }
+
+// リサイズハンドルカーソル
+var HANDLE_CURSORS={
+  'nw':'nw-resize','n':'n-resize','ne':'ne-resize',
+  'e':'e-resize','se':'se-resize','s':'s-resize',
+  'sw':'sw-resize','w':'w-resize'
+};
 
 function edDn(e){
   var p=epos(e.clientX,e.clientY);
   var cell=posToCell(p.x,p.y);
 
-  // 既存要素クリック → その要素を選択（プロパティ編集モード）
+  // 選択中要素のリサイズハンドル判定
+  if(selGridEl){
+    var el=gEl(selGridEl);
+    if(el){
+      var elN=normalizeEl(el);
+      var handle=hitTestHandles(p.x,p.y,elN);
+      if(handle){
+        _edResizing=true;
+        _edResizeHandle=handle;
+        _edOrigEl=Object.assign({},elN);
+        _edDragStartCell=posToCellFloat(p.x,p.y);
+        return;
+      }
+      // 要素内部クリック → ドラッグ移動開始
+      if(cell.col>=elN.col && cell.col<elN.col+elN.colSpan && cell.row>=elN.row && cell.row<elN.row+elN.rowSpan){
+        _edDragging=true;
+        _edDragStartCell=posToCellFloat(p.x,p.y);
+        _edOrigEl=Object.assign({},elN);
+        return;
+      }
+    }
+  }
+
+  // 別の要素をクリック
   var hitId=findElAtCell(cell.col,cell.row);
   if(hitId){
     selGridEl=hitId;
-    gridSelStart=null;gridSelEnd=null;gridDragging=false;
     showSelElPanel();
-    redrawEd();return;
+    buildElList();
+    redrawEd();
+    // ドラッグ開始も設定
+    var el=gEl(hitId);
+    if(el){
+      var elN2=normalizeEl(el);
+      _edDragging=true;
+      _edDragStartCell=posToCellFloat(p.x,p.y);
+      _edOrigEl=Object.assign({},elN2);
+    }
+    return;
   }
 
-  // 配置モードまたは範囲選択
-  gridDragging=true;
-  gridSelStart=cell;
-  gridSelEnd=cell;
+  // 何もない場所 → 選択解除
   selGridEl=null;
   updateSelElPanel(null);
+  buildElList();
   redrawEd();
 }
 
 function edMv(e){
-  if(!gridDragging)return;
   var p=epos(e.clientX,e.clientY);
-  var cell=posToCell(p.x,p.y);
-  gridSelEnd=cell;
-  redrawEd();
-  updateGridInfo();
+  var c=document.getElementById('pop-canvas');
+  var cellFloat=posToCellFloat(p.x,p.y);
+
+  if(_edDragging && selGridEl){
+    var el=gEl(selGridEl);
+    if(el && _edOrigEl){
+      var dx=Math.round(cellFloat.col - _edDragStartCell.col);
+      var dy=Math.round(cellFloat.row - _edDragStartCell.row);
+      el.col=Math.max(0,Math.min(GRID_COLS-(_edOrigEl.colSpan||1), _edOrigEl.col+dx));
+      el.row=Math.max(0,Math.min(GRID_ROWS-(_edOrigEl.rowSpan||1), _edOrigEl.row+dy));
+      redrawEd();
+    }
+    c.style.cursor='grabbing';
+    return;
+  }
+
+  if(_edResizing && selGridEl){
+    var el=gEl(selGridEl);
+    if(el && _edOrigEl){
+      var cf=cellFloat;
+      var h=_edResizeHandle;
+      var o=_edOrigEl;
+      var col=el.col, row=el.row, colSpan=el.colSpan, rowSpan=el.rowSpan;
+
+      if(h==='se'){
+        colSpan=Math.max(1,Math.round(cf.col-o.col));
+        rowSpan=Math.max(1,Math.round(cf.row-o.row));
+      } else if(h==='s'){
+        rowSpan=Math.max(1,Math.round(cf.row-o.row));
+      } else if(h==='e'){
+        colSpan=Math.max(1,Math.round(cf.col-o.col));
+      } else if(h==='nw'){
+        var newCol=Math.max(0,Math.min(o.col+o.colSpan-1,Math.round(cf.col)));
+        var newRow=Math.max(0,Math.min(o.row+o.rowSpan-1,Math.round(cf.row)));
+        colSpan=o.col+o.colSpan-newCol; rowSpan=o.row+o.rowSpan-newRow;
+        col=newCol; row=newRow;
+      } else if(h==='n'){
+        var newRow2=Math.max(0,Math.min(o.row+o.rowSpan-1,Math.round(cf.row)));
+        rowSpan=o.row+o.rowSpan-newRow2; row=newRow2;
+      } else if(h==='ne'){
+        var newRow3=Math.max(0,Math.min(o.row+o.rowSpan-1,Math.round(cf.row)));
+        rowSpan=o.row+o.rowSpan-newRow3; row=newRow3;
+        colSpan=Math.max(1,Math.round(cf.col-o.col));
+      } else if(h==='sw'){
+        var newCol2=Math.max(0,Math.min(o.col+o.colSpan-1,Math.round(cf.col)));
+        colSpan=o.col+o.colSpan-newCol2; col=newCol2;
+        rowSpan=Math.max(1,Math.round(cf.row-o.row));
+      } else if(h==='w'){
+        var newCol3=Math.max(0,Math.min(o.col+o.colSpan-1,Math.round(cf.col)));
+        colSpan=o.col+o.colSpan-newCol3; col=newCol3;
+      }
+
+      // 境界チェック
+      colSpan=Math.max(1,Math.min(GRID_COLS-col,colSpan));
+      rowSpan=Math.max(1,Math.min(GRID_ROWS-row,rowSpan));
+      el.col=col; el.row=row; el.colSpan=colSpan; el.rowSpan=rowSpan;
+      redrawEd();
+    }
+    c.style.cursor=HANDLE_CURSORS[_edResizeHandle]||'se-resize';
+    return;
+  }
+
+  // ホバー：カーソルを更新
+  if(selGridEl){
+    var el=gEl(selGridEl);
+    if(el){
+      var elN=normalizeEl(el);
+      var h2=hitTestHandles(p.x,p.y,elN);
+      if(h2){c.style.cursor=HANDLE_CURSORS[h2];return;}
+      var cell2=posToCell(p.x,p.y);
+      if(cell2.col>=elN.col && cell2.col<elN.col+elN.colSpan && cell2.row>=elN.row && cell2.row<elN.row+elN.rowSpan){
+        c.style.cursor='grab';return;
+      }
+    }
+  }
+  var hoverEl=findElAtCell(posToCell(p.x,p.y).col,posToCell(p.x,p.y).row);
+  c.style.cursor=hoverEl?'grab':'default';
 }
 
 function edUp(){
-  if(gridDragging){
-    gridDragging=false;
-    updateGridInfo();
-    // 配置モードが有効なら自動配置
-    if(placeType){
-      placeElAtSel();
-    }
+  if(_edDragging||_edResizing){
+    _edDragging=false;_edResizing=false;_edResizeHandle='';_edOrigEl=null;
+    markEdited();
+    buildElList();
+    updateSelElPanel(gEl(selGridEl));
+    var c=document.getElementById('pop-canvas');
+    if(c)c.style.cursor='default';
   }
 }
 
-// 選択範囲に要素を配置
-function placeElAtSel(){
-  var sel=normSel();if(!sel)return;
-  // placeTypeに対応するIDを決定
-  var typeMap={name:'name',price:'price',tax:'tax'};
-  var id,label,type;
-  if(typeMap[placeType]){
-    id=placeType;label={name:'植物名',price:'税込価格',tax:'税込文字'}[placeType];type=placeType==='name'?'text':placeType;
-  } else {
-    id='custom_'+Date.now();label='テキスト';type='custom';
+// 要素をデフォルト位置に追加（「+品名」ボタン等）
+function edAddEl(type){
+  var customId='custom_'+Date.now();
+  var defMap={
+    name: {id:'name',  label:'植物名',   col:1,row:2,colSpan:10,rowSpan:2,color:'#2d5a1e',bold:true, type:'text',  inputField:true, optional:false,fontSize:'auto',align:'center',valign:'middle'},
+    price:{id:'price', label:'税込価格', col:2,row:5,colSpan:8, rowSpan:3,color:'#b45309',bold:true, type:'price', inputField:false,optional:false,fontSize:'auto',align:'center',valign:'middle'},
+    tax:  {id:'tax',   label:'税込文字', col:3,row:8,colSpan:6, rowSpan:1,color:'#9ca3af',bold:false,type:'tax',   inputField:false,optional:false,fontSize:'auto',align:'center',valign:'middle'},
+    custom:{id:customId,label:'テキスト',col:1,row:4,colSpan:10,rowSpan:2,color:'#333333',bold:false,type:'custom',inputField:false,optional:false,fontSize:'auto',align:'center',valign:'middle',text:'テキスト'}
+  };
+  var def=defMap[type];if(!def)return;
+  // name/price/taxは既存を削除して追加
+  if(type!=='custom'){
+    ELS=ELS.filter(function(e){return e.id!==type;});
   }
-
-  // 既存の同IDを削除（name/price/taxは1つのみ）
-  if(typeMap[placeType]){
-    ELS=ELS.filter(function(e){return e.id!==id;});
-  }
-
-  // デフォルトカラー
-  var defColors={name:'#2d5a1e',price:'#b45309',tax:'#9ca3af',custom:'#333333'};
-
-  ELS.push({
-    id:id, label:label, type:type,
-    col:sel.c1, row:sel.r1,
-    colSpan:sel.c2-sel.c1+1, rowSpan:sel.r2-sel.r1+1,
-    color:defColors[placeType]||'#333333',
-    bold:placeType!=='tax', align:'center', valign:'middle',
-    fontSize:'auto',
-    inputField:(placeType==='name'), optional:false,
-    text:(type==='custom'?'テキスト':'')
-  });
-
+  ELS.push(Object.assign({},def));
+  selGridEl=def.id;
   markEdited();
-  selGridEl=id;
-  gridSelStart=null;gridSelEnd=null;
   showSelElPanel();
   buildElList();
   redrawEd();
   rebuildInpFields();
-  toast(label+'を配置しました');
+  toast(def.label+'を追加しました');
 }
 
-function clearGridSel(){
-  gridSelStart=null;gridSelEnd=null;gridDragging=false;
-  selGridEl=null;
-  setPlaceType(null);
-  updateSelElPanel(null);
-  redrawEd();
-}
-
-function setPlaceType(t){
-  placeType=(placeType===t)?null:t; // 同じボタンで解除
-  ['name','price','tax','custom'].forEach(function(k){
-    var b=document.getElementById('place-btn-'+k);
-    if(b)b.classList.toggle('active-type',placeType===k);
-  });
-  updateGridInfo();
-}
-
-function updateGridInfo(){
-  var info=document.getElementById('grid-info');if(!info)return;
-  var sel=normSel();
-  if(placeType){
-    var labels={name:'品名',price:'価格',tax:'税込',custom:'テキスト'};
-    if(sel){
-      info.innerHTML='<span>'+(sel.c2-sel.c1+1)+'×'+(sel.r2-sel.r1+1)+'列</span>の範囲選択中 → 「'+labels[placeType]+'」を配置';
-    } else {
-      info.innerHTML='セルをドラッグで範囲選択 → <span>'+labels[placeType]+'</span>を配置します';
-    }
-  } else {
-    if(sel){
-      info.innerHTML='<span>'+(sel.c2-sel.c1+1)+'×'+(sel.r2-sel.r1+1)+'列</span>選択中 — 上のボタンで要素を配置';
-    } else {
-      info.textContent='セルをドラッグして範囲選択 → ボタンで要素を配置';
-    }
-  }
-}
+// 後方互換スタブ
+function clearGridSel(){selGridEl=null;updateSelElPanel(null);buildElList();redrawEd();}
+function setPlaceType(t){placeType=t;}
+function updateGridInfo(){}
+function normSel(){return null;}
 
 // 選択要素プロパティパネルを表示
 function showSelElPanel(){
@@ -3011,16 +3148,17 @@ function deleteSelEl(){
   toast(lbl+'を削除しました');
 }
 
-// ━━ エディタCanvas描画 ━━
+// ━━ エディタCanvas描画（Canva/Avery風） ━━
 function redrawEd(){
   var c=document.getElementById('pop-canvas');if(!c||!c.width)return;
   var ctx=c.getContext('2d'),W=c.width,H=c.height;
   ctx.clearRect(0,0,W,H);
 
-  var sample=items[0]||{name:'コルクチューブ SS',price:5000};
+  // サンプルデータ（最初のアイテムまたはデフォルト）
+  var sample=items[0]||{name:'モンステラ デリシオーサ',price:1980};
   var cfg=gst();
 
-  // POP背景（drawPopと同じ）
+  // ── POP背景 ──
   if(cfg.st==='custom' && customBgImg && customBgImg.complete && customBgImg.naturalWidth>0){
     ctx.save(); rrect(ctx,0,0,W,H,W*.02); ctx.clip();
     ctx.drawImage(customBgImg,0,0,W,H); ctx.restore();
@@ -3033,9 +3171,9 @@ function redrawEd(){
 
   // ── グリッド線（薄いドット） ──
   ctx.save();
-  ctx.strokeStyle='rgba(0,0,0,0.08)';
+  ctx.strokeStyle='rgba(0,0,0,0.06)';
   ctx.lineWidth=1;
-  if(ctx.setLineDash)ctx.setLineDash([2,2]);
+  if(ctx.setLineDash)ctx.setLineDash([2,4]);
   for(var ci=1;ci<GRID_COLS;ci++){
     ctx.beginPath();ctx.moveTo(ci*cellW,0);ctx.lineTo(ci*cellW,H);ctx.stroke();
   }
@@ -3045,85 +3183,102 @@ function redrawEd(){
   if(ctx.setLineDash)ctx.setLineDash([]);
   ctx.restore();
 
-  // ── 配置済み要素を描画 ──
+  // ── 配置済み要素 ──
   var prices=sample.price?calcPrices(sample.price):{base:0,incl:0};
-  var EL_COLORS={name:'rgba(46,125,50,0.18)',price:'rgba(180,83,9,0.18)',tax:'rgba(156,163,175,0.18)',custom:'rgba(100,100,200,0.18)'};
-  var EL_BORDERS={name:'#2d5a1e',price:'#b45309',tax:'#9ca3af',custom:'#4444cc'};
+  var EL_BG={name:'rgba(46,125,50,0.10)',price:'rgba(180,83,9,0.10)',tax:'rgba(156,163,175,0.10)',custom:'rgba(80,80,200,0.10)'};
+  var EL_STROKE={name:'#2d5a1e',price:'#b45309',tax:'#9ca3af',custom:'#4444cc'};
 
   ELS.forEach(function(elRaw){
     var el=normalizeEl(elRaw);
     var ex=el.col*cellW, ey=el.row*cellH;
     var ew=el.colSpan*cellW, eh=el.rowSpan*cellH;
     var isSel=selGridEl===el.id;
+    var strokeColor=EL_STROKE[el.type]||EL_STROKE[el.id]||'#888888';
 
-    // セル背景
-    ctx.fillStyle=EL_COLORS[el.type]||EL_COLORS[el.id]||'rgba(100,100,100,0.1)';
-    ctx.fillRect(ex+1,ey+1,ew-2,eh-2);
+    // 半透明背景
+    ctx.fillStyle=EL_BG[el.type]||EL_BG[el.id]||'rgba(100,100,100,0.08)';
+    ctx.fillRect(ex,ey,ew,eh);
 
-    // セル枠
-    ctx.strokeStyle=isSel
-      ? (EL_BORDERS[el.type]||EL_BORDERS[el.id]||'#888')
-      : (EL_BORDERS[el.type]||EL_BORDERS[el.id]||'#888');
-    ctx.lineWidth=isSel?2.5:1.5;
-    ctx.strokeRect(ex+1,ey+1,ew-2,eh-2);
+    // 枠線（選択時は太く）
+    ctx.strokeStyle=strokeColor;
+    ctx.lineWidth=isSel?2.5:1.2;
+    if(!isSel && ctx.setLineDash) ctx.setLineDash([3,3]);
+    ctx.strokeRect(ex+0.5,ey+0.5,ew-1,eh-1);
+    if(ctx.setLineDash) ctx.setLineDash([]);
 
-    // ラベル（上部）
-    var labelColor=EL_BORDERS[el.type]||EL_BORDERS[el.id]||'#888';
-    ctx.font='bold 10px sans-serif';
-    ctx.fillStyle=labelColor;
-    ctx.textAlign='left';
-    ctx.textBaseline='top';
-    ctx.fillText(el.label,ex+4,ey+3);
+    // サンプルテキスト描画（drawPopと同じロジック）
+    var text='';
+    if(el.type==='text'||el.id==='name') text=sample.name||'植物名';
+    else if(el.type==='price') text='¥'+prices.incl.toLocaleString();
+    else if(el.type==='tax')   text='税込 ¥'+prices.incl.toLocaleString();
+    else if(el.type==='custom') text=el.text||el.label||'テキスト';
 
-    // テキストプレビュー
-    var previewText='';
-    if(el.type==='text'||el.id==='name') previewText=sample.name||'植物名';
-    else if(el.type==='price') previewText='¥'+prices.incl.toLocaleString();
-    else if(el.type==='tax')   previewText='税込 ¥'+prices.incl.toLocaleString();
-    else if(el.type==='custom') previewText=el.text||el.label||'テキスト';
-
-    if(previewText){
+    if(text){
       var fs;
       if(el.fontSize==='auto'||!el.fontSize){
-        fs=Math.floor(eh*0.42);
+        fs=Math.floor(eh*0.52);
+        var fontStyle2=(el.bold?'700':'400')+' __FS__px sans-serif';
+        var fit2=fitFs(ctx,text,fontStyle2,fs,ew*0.90,eh*0.85,6);
+        fs=fit2.fs;
+        ctx.fillStyle=el.color||'#333';
+        ctx.font=(el.bold?'700 ':'400 ')+fs+'px sans-serif';
+        ctx.textAlign=el.align||'center';
+        var tx2=el.align==='left'?ex+5:el.align==='right'?ex+ew-5:ex+ew/2;
+        var totalH2=fit2.lines.length*fs*1.25;
+        var ty2;
+        if(el.valign==='top') ty2=ey+4;
+        else if(el.valign==='bottom') ty2=ey+eh-totalH2-2;
+        else ty2=ey+(eh-totalH2)/2;
+        ctx.textBaseline='top';
+        fit2.lines.forEach(function(ln,li){ctx.fillText(ln,tx2,ty2+li*fs*1.25);});
       } else {
         fs=Number(el.fontSize)||12;
+        ctx.fillStyle=el.color||'#333';
+        ctx.font=(el.bold?'700 ':'400 ')+fs+'px sans-serif';
+        ctx.textAlign=el.align||'center';
+        ctx.textBaseline='middle';
+        var tx3=el.align==='left'?ex+5:el.align==='right'?ex+ew-5:ex+ew/2;
+        ctx.fillText(text,tx3,ey+eh/2);
       }
-      fs=Math.max(8,Math.min(fs,eh*0.6));
-      ctx.font=(el.bold?'700 ':'400 ')+fs+'px sans-serif';
-      // 幅に収まるよう縮小
-      while(ctx.measureText(previewText).width>ew*0.85&&fs>7){fs--;ctx.font=(el.bold?'700 ':'400 ')+fs+'px sans-serif';}
-      ctx.fillStyle=el.color||'#333';
-      ctx.textAlign=el.align||'center';
-      ctx.textBaseline='middle';
-      var tx=el.align==='left'?ex+6:el.align==='right'?ex+ew-6:ex+ew/2;
-      ctx.fillText(previewText,tx,ey+eh*0.6);
     }
 
-    // 選択時：外枠ハイライト
+    // 選択時：青い選択枠 + リサイズハンドル（8点）
     if(isSel){
+      // 選択枠
       ctx.save();
-      ctx.strokeStyle=labelColor;
-      ctx.lineWidth=3;
-      ctx.shadowColor=labelColor;
-      ctx.shadowBlur=6;
+      ctx.strokeStyle='#1565c0';
+      ctx.lineWidth=2.5;
+      ctx.shadowColor='rgba(21,101,192,0.4)';
+      ctx.shadowBlur=8;
       ctx.strokeRect(ex+1,ey+1,ew-2,eh-2);
       ctx.restore();
+
+      // リサイズハンドル（8点）
+      var handlePositions=[
+        {x:ex,     y:ey},      // nw
+        {x:ex+ew/2,y:ey},      // n
+        {x:ex+ew,  y:ey},      // ne
+        {x:ex+ew,  y:ey+eh/2}, // e
+        {x:ex+ew,  y:ey+eh},   // se
+        {x:ex+ew/2,y:ey+eh},   // s
+        {x:ex,     y:ey+eh},   // sw
+        {x:ex,     y:ey+eh/2}  // w
+      ];
+      handlePositions.forEach(function(hp){
+        ctx.save();
+        ctx.fillStyle='#ffffff';
+        ctx.strokeStyle='#1565c0';
+        ctx.lineWidth=1.5;
+        ctx.shadowColor='rgba(0,0,0,0.2)';
+        ctx.shadowBlur=3;
+        ctx.beginPath();
+        ctx.arc(hp.x,hp.y,HANDLE_R,0,Math.PI*2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      });
     }
   });
-
-  // ── ドラッグ選択範囲ハイライト ──
-  var sel=normSel();
-  if(sel){
-    var sx=sel.c1*cellW, sy=sel.r1*cellH;
-    var sw=(sel.c2-sel.c1+1)*cellW, sh=(sel.r2-sel.r1+1)*cellH;
-    var pc=document.documentElement.style.getPropertyValue('--primary')||'#2e7d32';
-    ctx.fillStyle='rgba(46,125,50,0.22)';
-    ctx.fillRect(sx,sy,sw,sh);
-    ctx.strokeStyle='#2e7d32';
-    ctx.lineWidth=2;
-    ctx.strokeRect(sx,sy,sw,sh);
-  }
 }
 
 function resetEl(){
@@ -3155,58 +3310,56 @@ function delEl(id){
   buildElList();redrawEd();rebuildInpFields();
 }
 
-// ━━ ELEMENT LIST (配置済み要素一覧) ━━
+// ━━ ELEMENT LIST（Canva風カード形式） ━━
 function buildElList(){
   var wrap=document.getElementById('ellist');if(!wrap)return;
   wrap.innerHTML='';
-  var EL_COLORS={name:'#e67e22',price:'#2980b9',tax:'#8e44ad',custom:'#4444cc'};
-  var FIXED={name:1,price:1,tax:1};
+  var EL_DOT_COLORS={name:'#2d5a1e',price:'#b45309',tax:'#9ca3af',custom:'#4444cc'};
 
   if(!ELS.length){
     var empty=document.createElement('div');
-    empty.style.cssText='font-size:12px;color:var(--on-surface-dim);padding:12px 13px;';
-    empty.textContent='要素がまだありません。グリッドで範囲選択して配置してください。';
-    wrap.appendChild(empty);return;
+    empty.style.cssText='font-size:12px;color:var(--on-surface-dim);padding:12px 13px;line-height:1.8;';
+    empty.textContent='上の「+品名」「+価格」ボタンで要素を追加できます。';
+    wrap.appendChild(empty);
+    return;
   }
 
   ELS.forEach(function(el){
-    var isFixed=!!FIXED[el.id];
     var elN=normalizeEl(el);
-    var dotColor=EL_COLORS[el.type]||EL_COLORS[el.id]||el.color||'#888';
+    var dotColor=EL_DOT_COLORS[el.type]||EL_DOT_COLORS[el.id]||el.color||'#888';
     var isSel=selGridEl===el.id;
 
-    var row=document.createElement('div');
-    row.className='item-row'+(isSel?' open':'');
-
-    var main=document.createElement('div');main.className='item-row-main';
+    var card=document.createElement('div');
+    card.className='ed-el-card'+(isSel?' sel':'');
 
     var dot=document.createElement('div');
-    dot.className='item-dot';dot.style.background=dotColor;
-    main.appendChild(dot);
+    dot.className='ed-el-dot';dot.style.background=dotColor;
+    card.appendChild(dot);
 
-    var nm=document.createElement('div');nm.className='item-nm';
-    // グリッド座標も表示
-    nm.textContent=el.label+' ('+elN.col+','+elN.row+')';
-    main.appendChild(nm);
+    var lbl=document.createElement('div');
+    lbl.className='ed-el-lbl';lbl.textContent=el.label;
+    card.appendChild(lbl);
 
-    var acts=document.createElement('div');acts.className='item-acts';
-    if(!isFixed||el.type==='custom'){
-      var delBtn=document.createElement('button');delBtn.className='item-act';
-      delBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" width="14" height="14"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      delBtn.addEventListener('click',function(e){e.stopPropagation();delEl(el.id);});
-      acts.appendChild(delBtn);
-    }
-    main.appendChild(acts);
+    var pos=document.createElement('div');
+    pos.className='ed-el-pos';
+    pos.textContent='行'+(elN.row+1)+'-'+(elN.row+elN.rowSpan)+' / 列'+(elN.col+1)+'-'+(elN.col+elN.colSpan);
+    card.appendChild(pos);
 
-    main.addEventListener('click',function(){
+    var delBtn=document.createElement('button');
+    delBtn.className='ed-el-del';
+    delBtn.title=el.label+'を削除';
+    delBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    delBtn.addEventListener('click',function(e){e.stopPropagation();delEl(el.id);});
+    card.appendChild(delBtn);
+
+    card.addEventListener('click',function(){
       var wasOpen=selGridEl===el.id;
       selGridEl=wasOpen?null:el.id;
       if(selGridEl)showSelElPanel();
       else updateSelElPanel(null);
       buildElList();redrawEd();
     });
-    row.appendChild(main);
-    wrap.appendChild(row);
+    wrap.appendChild(card);
   });
 }
 
