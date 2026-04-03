@@ -3311,7 +3311,7 @@ function onXlToyoakeFile(event){
       if(statusEl)statusEl.textContent='Square Excel準備完了（'+sqRows.length+'件）';
 
       toast('豊明花き: '+added+'件を追加 + Square Excel準備完了');
-    }catch(err){toast('読み込み失敗: '+err.message);}
+    }catch(err){toast('読み込み失敗: '+err.message+' ('+err.stack+')');}
   };
   reader.onerror=function(){toast('ファイル読み込みに失敗しました');};
   reader.readAsArrayBuffer(file);
