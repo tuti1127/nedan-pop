@@ -2081,7 +2081,8 @@ function rebuildInpFields(){
   cf.innerHTML='';
   ELS.forEach(function(el){
     if(el.id==='name'||el.id==='price'||el.id==='tax'||el.id==='shop') return;
-    if(el.type==='text'&&el.inputField){
+    // type:'text'またはtype:'custom'のinputFieldを対象にフォーム行を生成
+    if(el.inputField && (el.type==='text'||el.type==='custom')){
       cf.appendChild(makeCustomRow(el));
     }
   });
@@ -2195,8 +2196,9 @@ function getCustomFieldValues(){
   var vals={};
   ELS.forEach(function(el){
     if(el.id==='name'||el.id==='price'||el.id==='tax'||el.id==='shop') return;
-    if(el.type==='text'&&el.inputField){
-      var row=document.querySelector('.efo-field[data-el-id="'+el.id+'"]');
+    // type:'text'またはtype:'custom'のinputFieldを対象に値を収集
+    if(el.inputField && (el.type==='text'||el.type==='custom')){
+      var row=document.querySelector('[data-el-id="'+el.id+'"]');
       if(!row)return;
       var ck=row.querySelector('input[type=checkbox]');
       var inp=row.querySelector('.efo-inp');
@@ -2608,6 +2610,67 @@ function drawFrame(ctx, cx, cy, cw, ch, ca, st) {
     // IKEAスタイル：角なし・太い黒枠
     ctx.strokeStyle = '#111'; ctx.lineWidth = lw*1.6;
     ctx.strokeRect(cx+lw, cy+lw, cw-lw*2, ch-lw*2);
+  } else if(st === 'craft') {
+    // クラフトナチュラル：ダークブラウン点線の角丸枠
+    ctx.save();
+    ctx.strokeStyle = '#5a4a3a'; ctx.lineWidth = lw*1.1;
+    ctx.setLineDash([cw*.025, cw*.018]);
+    rrect(ctx, cx+lw*1.2, cy+lw*1.2, cw-lw*2.4, ch-lw*2.4, cw*.03); ctx.stroke();
+    ctx.setLineDash([]);
+    // 上部装飾ライン（植物ラインアート風）
+    var lineY = cy + ch * .16;
+    ctx.strokeStyle = h2rgba('#5a4a3a', .35); ctx.lineWidth = lw * .5;
+    ctx.beginPath();
+    ctx.moveTo(cx + cw*.08, lineY); ctx.lineTo(cx + cw*.92, lineY);
+    ctx.stroke();
+    // 小さな葉っぱ風ダイヤモンド装飾（左右）
+    var dmx1=cx+cw*.04, dmx2=cx+cw*.96, dmy=lineY, dms=cw*.018;
+    ctx.fillStyle=h2rgba('#5a4a3a',.45);
+    ctx.beginPath(); ctx.moveTo(dmx1,dmy-dms); ctx.lineTo(dmx1+dms,dmy); ctx.lineTo(dmx1,dmy+dms); ctx.lineTo(dmx1-dms,dmy); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(dmx2,dmy-dms); ctx.lineTo(dmx2+dms,dmy); ctx.lineTo(dmx2,dmy+dms); ctx.lineTo(dmx2-dms,dmy); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  } else if(st === 'chalk') {
+    // 黒板チョーク：白二重枠＋四隅オーナメント
+    ctx.save();
+    // 外枠（太め）
+    ctx.strokeStyle = 'rgba(245,230,200,.70)'; ctx.lineWidth = lw*1.4;
+    rrect(ctx, cx+lw*1.5, cy+lw*1.5, cw-lw*3, ch-lw*3, cw*.015); ctx.stroke();
+    // 内枠（細め）
+    ctx.strokeStyle = 'rgba(245,230,200,.35)'; ctx.lineWidth = lw*.5;
+    rrect(ctx, cx+lw*3.5, cy+lw*3.5, cw-lw*7, ch-lw*7, cw*.01); ctx.stroke();
+    // 四隅コーナーオーナメント（小さな十字）
+    var corners=[
+      [cx+lw*2.5, cy+lw*2.5],[cx+cw-lw*2.5, cy+lw*2.5],
+      [cx+lw*2.5, cy+ch-lw*2.5],[cx+cw-lw*2.5, cy+ch-lw*2.5]
+    ];
+    var cs=cw*.025;
+    ctx.strokeStyle='rgba(245,230,200,.55)'; ctx.lineWidth=lw*.55;
+    corners.forEach(function(c){
+      ctx.beginPath(); ctx.moveTo(c[0]-cs,c[1]); ctx.lineTo(c[0]+cs,c[1]); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(c[0],c[1]-cs); ctx.lineTo(c[0],c[1]+cs); ctx.stroke();
+    });
+    ctx.restore();
+  } else if(st === 'botanical') {
+    // ボタニカルホワイト：上下の細い深緑ライン
+    ctx.save();
+    ctx.strokeStyle = '#1a5c32'; ctx.lineWidth = lw * .7;
+    // 上ライン
+    ctx.beginPath();
+    ctx.moveTo(cx+cw*.06, cy+ch*.05); ctx.lineTo(cx+cw*.94, cy+ch*.05);
+    ctx.stroke();
+    // 下ライン
+    ctx.beginPath();
+    ctx.moveTo(cx+cw*.06, cy+ch*.95); ctx.lineTo(cx+cw*.94, cy+ch*.95);
+    ctx.stroke();
+    // 上ラインの極細追加ライン（余白感）
+    ctx.strokeStyle = h2rgba('#1a5c32',.3); ctx.lineWidth = lw*.3;
+    ctx.beginPath();
+    ctx.moveTo(cx+cw*.10, cy+ch*.06); ctx.lineTo(cx+cw*.90, cy+ch*.06);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx+cw*.10, cy+ch*.94); ctx.lineTo(cx+cw*.90, cy+ch*.94);
+    ctx.stroke();
+    ctx.restore();
   }
 }
 
@@ -2669,6 +2732,26 @@ function drawPop(ctx, cx, cy, cw, ch, sample, cfg) {
   if(st==='custom' && customBgImg && customBgImg.complete && customBgImg.naturalWidth>0){
     ctx.save(); rrect(ctx,cx,cy,cw,ch,cw*.02); ctx.clip();
     ctx.drawImage(customBgImg,cx,cy,cw,ch); ctx.restore();
+  } else if(st==='craft'){
+    // クラフトナチュラル：クラフト紙テクスチャ風ベタ塗り
+    ctx.fillStyle=cb; rrect(ctx,cx,cy,cw,ch,cw*.035); ctx.fill();
+    // 軽いノイズ風グラデーション（紙の質感）
+    var cg=ctx.createLinearGradient(cx,cy,cx+cw,cy+ch);
+    cg.addColorStop(0,'rgba(180,150,100,.08)');
+    cg.addColorStop(.4,'rgba(210,190,150,.05)');
+    cg.addColorStop(1,'rgba(160,130,90,.10)');
+    ctx.fillStyle=cg; rrect(ctx,cx,cy,cw,ch,cw*.035); ctx.fill();
+  } else if(st==='chalk'){
+    // 黒板チョーク：深緑ベタ塗り
+    ctx.fillStyle=cb; rrect(ctx,cx,cy,cw,ch,cw*.02); ctx.fill();
+    // わずかなグラデーションで黒板の深みを表現
+    var cg2=ctx.createRadialGradient(cx+cw*.5,cy+ch*.5,0,cx+cw*.5,cy+ch*.5,cw*.8);
+    cg2.addColorStop(0,'rgba(80,120,80,.08)');
+    cg2.addColorStop(1,'rgba(0,0,0,.18)');
+    ctx.fillStyle=cg2; rrect(ctx,cx,cy,cw,ch,cw*.02); ctx.fill();
+  } else if(st==='botanical'){
+    // ボタニカルホワイト：純白背景
+    ctx.fillStyle=cb; rrect(ctx,cx,cy,cw,ch,cw*.025); ctx.fill();
   } else {
     ctx.fillStyle=cb; rrect(ctx,cx,cy,cw,ch,cw*.04); ctx.fill();
   }
@@ -2713,7 +2796,13 @@ function drawPop(ctx, cx, cy, cw, ch, sample, cfg) {
         text = '税込 ¥0';
       }
     } else if(el.type === 'custom'){
-      text = el.text || el.label || '';
+      // inputField:trueの場合はsample.extrasから値を取得
+      if(el.inputField && sample && sample.extras && sample.extras[el.id]){
+        var extEntry = sample.extras[el.id];
+        text = (extEntry.enabled !== false && extEntry.value) ? extEntry.value : (el.text || el.label || '');
+      } else {
+        text = el.text || el.label || '';
+      }
     }
 
     if(!text) return;
@@ -3498,8 +3587,11 @@ function renderTmplList(){
 // ━━ INIT PRESET TEMPLATES ━━
 function initPresetTemplates(){
   var arr=loadT();
-  var hasStd =arr.some(function(t){return t.id==='preset_std';});
-  var hasIkea=arr.some(function(t){return t.id==='preset_ikea';});
+  var hasStd    =arr.some(function(t){return t.id==='preset_std';});
+  var hasIkea   =arr.some(function(t){return t.id==='preset_ikea';});
+  var hasSolso  =arr.some(function(t){return t.id==='preset_solso';});
+  var hasOzaki  =arr.some(function(t){return t.id==='preset_ozaki';});
+  var hasFarm   =arr.some(function(t){return t.id==='preset_farm';});
 
   // 旧preset_stampが残っていれば削除
   arr=arr.filter(function(t){return t.id!=='preset_stamp';});
@@ -3532,6 +3624,57 @@ function initPresetTemplates(){
          col:1, row:3, colSpan:10, rowSpan:4, color:'#111111', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
         {id:'tax',  label:'税込文字',inputField:false,optional:false,type:'tax',
          col:2, row:7, colSpan:8,  rowSpan:2, color:'#444444', bold:false, align:'center', valign:'middle', fontSize:'auto'},
+      ]
+    });
+  }
+
+  // ③ クラフトナチュラル（SOLSO FARM風）
+  if(!hasSolso){
+    arr.push({
+      id:'preset_solso',name:'クラフトナチュラル',author:'プリセット',date:'初期設定',
+      ca:'#5a4a3a',cb:'#d4c4a8',st:'craft',
+      els:[
+        {id:'name', label:'植物名',  inputField:true, optional:false, type:'text',
+         col:1, row:1, colSpan:10, rowSpan:3, color:'#3a3028', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+        {id:'price',label:'税込価格',inputField:false,optional:false, type:'price',
+         col:3, row:5, colSpan:6,  rowSpan:3, color:'#5a4a3a', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+        {id:'tax',  label:'税込文字',inputField:false,optional:false, type:'tax',
+         col:4, row:8, colSpan:4,  rowSpan:1, color:'#8a7a6a', bold:false, align:'center', valign:'middle', fontSize:'auto'},
+      ]
+    });
+  }
+
+  // ④ 黒板チョーク（オザキフラワーパーク風）
+  if(!hasOzaki){
+    arr.push({
+      id:'preset_ozaki',name:'黒板チョーク',author:'プリセット',date:'初期設定',
+      ca:'#f5e6c8',cb:'#2a3a2a',st:'chalk',
+      els:[
+        {id:'name', label:'植物名',  inputField:true, optional:false, type:'text',
+         col:1, row:1, colSpan:10, rowSpan:2, color:'#ffffff', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+        {id:'price',label:'税込価格',inputField:false,optional:false, type:'price',
+         col:2, row:4, colSpan:8,  rowSpan:3, color:'#f5d56e', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+        {id:'tax',  label:'税込文字',inputField:false,optional:false, type:'tax',
+         col:3, row:7, colSpan:6,  rowSpan:2, color:'#c8c8b8', bold:false, align:'center', valign:'middle', fontSize:'auto'},
+      ]
+    });
+  }
+
+  // ⑤ ボタニカルホワイト（THE FARM風）
+  if(!hasFarm){
+    arr.push({
+      id:'preset_farm',name:'ボタニカルホワイト',author:'プリセット',date:'初期設定',
+      ca:'#1a5c32',cb:'#ffffff',st:'botanical',
+      els:[
+        {id:'name',     label:'植物名',  inputField:true, optional:false, type:'text',
+         col:1, row:1, colSpan:10, rowSpan:2, color:'#1a5c32', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+        {id:'botname',  label:'学名',    inputField:true, optional:true,  type:'custom',
+         col:2, row:3, colSpan:8,  rowSpan:1, color:'#8aaa8a', bold:false, align:'center', valign:'middle', fontSize:'auto',
+         text:'botanical name'},
+        {id:'price',    label:'税込価格',inputField:false,optional:false, type:'price',
+         col:2, row:5, colSpan:8,  rowSpan:3, color:'#1a1a1a', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
+        {id:'tax',      label:'税込文字',inputField:false,optional:false, type:'tax',
+         col:3, row:8, colSpan:6,  rowSpan:1, color:'#999999', bold:false, align:'center', valign:'middle', fontSize:'auto'},
       ]
     });
   }
