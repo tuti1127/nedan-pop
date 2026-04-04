@@ -4296,7 +4296,7 @@ function openExtDesignApp(){
   ];
   // トーストでガイド
   toast('アプリで背景を作成 → PNG書き出し → 「ファイルから」で読み込んでください');
-  window.open(choices[0].url,'_blank');
+  window.open(choices[0].url,'_blank','noopener,noreferrer');
 }
 // ━━ EXTERNAL DESIGN TOOL INTEGRATION ━━
 
@@ -4310,18 +4310,18 @@ var POP_SIZE_HINT = '推奨サイズ：140mm × 97mm（A4横向き4面分割）'
 
 function openCanva(){
   // Canvaトップページ → ユーザーが自分でサイズ指定して作成
-  window.open('https://www.canva.com/', '_blank');
+  window.open('https://www.canva.com/', '_blank', 'noopener,noreferrer');
   toast('Canvaが開きます。カスタムサイズ 140×97mm で新規作成してください');
 }
 
 function openFigma(){
-  window.open('https://www.figma.com/files/recent', '_blank');
+  window.open('https://www.figma.com/files/recent', '_blank', 'noopener,noreferrer');
   showExtGuide('Figma');
 }
 
 function openGoogleSlides(){
   // スライドのカスタムサイズ（140×97mm）
-  window.open('https://docs.google.com/presentation/create', '_blank');
+  window.open('https://docs.google.com/presentation/create', '_blank', 'noopener,noreferrer');
   showExtGuide('Googleスライド');
 }
 
@@ -4877,7 +4877,7 @@ function toggleTheme(){
         if (taxEl)   localStorage.setItem('sq_taxValue',  taxEl.value);
         if (pmEl)    localStorage.setItem('sq_priceMode', pmEl.value);
         if (ptEl)    localStorage.setItem('sq_productType', ptEl.value);
-      } catch(e) {}
+      } catch(e) { /* localStorage書き込みエラー（プライベートモード等）は無視 */ }
     }
     sqLoadSettings();
     var storeEl = document.getElementById('sq-storeName');
