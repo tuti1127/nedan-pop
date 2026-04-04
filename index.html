@@ -940,25 +940,15 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
 .price-row-wrap{position:relative;z-index:10;}
 
 /* ════ テンプレートパネル：Canva/Avery風エディタ ════ */
+/* 1カラムレイアウト（tmpl-right-colは廃止） */
 .tmpl-layout{
   display:flex;flex-direction:column;gap:14px;
-}
-@media(min-width:680px){
-  .tmpl-layout{
-    display:grid;
-    grid-template-columns:minmax(200px,48%) 1fr;
-    gap:14px;align-items:start;
-  }
+  max-width:640px;margin:0 auto;
 }
 
-/* 左列 */
+/* 左列（1カラム化で実質メインカラム） */
 .tmpl-left-col{
   display:flex;flex-direction:column;gap:10px;
-}
-@media(min-width:680px){
-  .tmpl-left-col{position:sticky;top:90px;max-height:calc(100vh - 105px);overflow-y:auto;}
-  .tmpl-left-col::-webkit-scrollbar{width:3px;}
-  .tmpl-left-col::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:3px;}
 }
 
 /* Canvasラッパー */
@@ -990,7 +980,7 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
 /* Canvas本体：カーソルはJS側で動的変更 */
 #pop-canvas{width:100%;display:block;cursor:default;touch-action:none;}
 
-/* 要素追加バー */
+/* 要素追加バー（旧・後方互換用） */
 .el-add-bar{
   display:flex;flex-wrap:wrap;gap:6px;
   padding:10px 13px;
@@ -1016,6 +1006,120 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
 .el-add-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-cnt);}
 .el-add-btn:active{transform:scale(.96);}
 .el-add-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.5;}
+
+/* ── 新カード形式 要素追加グリッド ── */
+.el-add-section{
+  border-bottom:1px solid var(--outline-var);
+  background:var(--surface-var);
+}
+.el-add-section-lbl{
+  padding:7px 13px 0;
+  font-size:9px;font-weight:700;color:var(--on-surface-dim);
+  letter-spacing:.07em;text-transform:uppercase;
+}
+.el-add-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  padding:6px 10px 10px;
+}
+.el-add-card{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:10px 4px;border:1.5px solid var(--outline-var);
+  border-radius:var(--radius-md);background:var(--surface);
+  cursor:pointer;transition:all .15s;font-family:inherit;
+}
+.el-add-card:hover{
+  border-color:var(--primary);background:var(--primary-cnt);
+  transform:translateY(-1px);
+}
+.el-add-card:active{transform:scale(.96);}
+.el-add-card-icon{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;
+}
+.el-add-card-label{font-size:12px;font-weight:700;color:var(--on-surface);}
+.el-add-card-desc{font-size:9px;color:var(--on-surface-dim);text-align:center;line-height:1.3;}
+
+/* ── 配置済み要素カード（プレビューストリップ付き） ── */
+.ed-el-card-new{
+  display:flex;align-items:center;gap:0;
+  border-bottom:1px solid var(--outline-var);
+  cursor:pointer;transition:background .15s;overflow:hidden;
+}
+.ed-el-card-new:last-child{border-bottom:none;}
+.ed-el-card-new:hover{background:var(--surface-cnt);}
+.ed-el-card-new.sel{background:var(--primary-cnt);}
+[data-theme="dark"] .ed-el-card-new.sel{background:var(--surface-cnt);}
+.ed-el-strip{width:5px;align-self:stretch;flex-shrink:0;}
+.ed-el-info{flex:1;padding:9px 10px;min-width:0;}
+.ed-el-name{font-size:12px;font-weight:700;color:var(--on-surface);}
+.ed-el-card-new.sel .ed-el-name{color:var(--primary);}
+.ed-el-meta{font-size:10px;color:var(--on-surface-dim);margin-top:2px;}
+.ed-el-del-new{
+  width:32px;height:32px;border:none;background:none;
+  border-radius:var(--radius-sm);cursor:pointer;flex-shrink:0;margin-right:6px;
+  color:var(--on-surface-dim);display:flex;align-items:center;justify-content:center;
+  transition:all .15s;min-height:32px;
+}
+.ed-el-del-new:hover{background:var(--error-cnt);color:var(--error);}
+.ed-el-del-new svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;}
+
+/* ── プロパティパネル常時表示 ── */
+.sel-el-panel-wrap{
+  border-top:1px solid var(--outline-var);
+  background:var(--surface-var);
+  min-height:56px;
+}
+.sel-el-empty-msg{
+  padding:16px 13px;
+  font-size:12px;color:var(--on-surface-dim);
+  text-align:center;line-height:1.8;
+}
+
+/* ── Canvas操作ガイド（Canvas上部ツールチップ） ── */
+.cvs-op-tip{
+  padding:6px 13px;
+  font-size:11px;color:var(--on-surface-dim);
+  background:var(--surface-cnt);
+  border-bottom:1px solid var(--outline-var);
+  text-align:center;
+  transition:all .2s;
+}
+.cvs-op-tip.selected{
+  background:var(--primary-cnt);
+  color:var(--primary);
+  font-weight:600;
+}
+[data-theme="dark"] .cvs-op-tip.selected{color:var(--on-primary);}
+
+/* ── 背景設定（1カラム統合版） ── */
+.bg-section-inline{
+  background:var(--surface);
+  border:1px solid var(--outline-var);
+  border-radius:var(--radius-md);
+  overflow:hidden;box-shadow:var(--shadow-sm);
+}
+.bg-inline-hdr{
+  padding:9px 13px;font-size:10px;font-weight:700;
+  color:var(--on-surface-var);background:var(--surface-cnt);
+  border-bottom:1px solid var(--outline-var);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.bg-inline-body{padding:10px 13px;display:flex;flex-direction:column;gap:8px;}
+.bg-clr-row{display:flex;align-items:center;gap:10px;}
+.bg-clr-lbl{flex:1;font-size:clamp(12px,1.3vw,13px);color:var(--on-surface-var);font-weight:500;}
+.bg-file-row{display:flex;gap:8px;}
+.bg-file-btn{
+  flex:1;height:40px;padding:0 10px;
+  border:1.5px solid var(--outline-var);
+  border-radius:var(--radius-sm);
+  background:var(--surface-cnt);font-family:inherit;font-size:12px;font-weight:700;
+  color:var(--on-surface-var);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  transition:all .2s cubic-bezier(.4,0,.2,1);min-height:40px;
+}
+.bg-file-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-cnt);}
+.bg-file-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;}
 
 /* 配置済み要素リスト */
 .ed-ellist-wrap{
@@ -1168,15 +1272,8 @@ input[type=color]{width:100%;height:38px;border:1.5px solid var(--outline);borde
 }
 .tmpl-save-btn:active{transform:scale(.98);}
 
-/* 右列 */
-.tmpl-right-col{
-  display:flex;flex-direction:column;gap:10px;
-}
-@media(min-width:680px){
-  .tmpl-right-col{max-height:calc(100vh - 90px);overflow-y:auto;padding-bottom:20px;}
-  .tmpl-right-col::-webkit-scrollbar{width:3px;}
-  .tmpl-right-col::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:3px;}
-}
+/* 右列（廃止・後方互換スタブ） */
+.tmpl-right-col{display:none;}
 
 /* 項目セクション */
 .items-section{
@@ -1800,43 +1897,53 @@ button:focus,input:focus,select:focus{outline:none;}
 <div class="panel" id="panel-template">
   <div class="tmpl-layout">
 
-    <!-- 左列：Canvaスタイルエディタ + テンプレート管理 -->
+    <!-- 1カラム：Canvas + 要素追加 + 配置リスト + プロパティ + 背景設定 + テンプレート管理 -->
     <div class="tmpl-left-col">
 
       <!-- Canvasエディタ本体 -->
       <div class="tmpl-cvs-wrap">
+
         <!-- ツールバー -->
         <div class="cvs-lbl-bar">
-          ライブプレビュー（ドラッグで移動・角をドラッグでリサイズ）
+          ライブプレビュー
           <button class="cvs-reset-btn" onclick="resetEl()">
             <svg viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 1 0 .49-4.98" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            初期値
+            初期値に戻す
           </button>
         </div>
 
-        <!-- 要素追加バー -->
-        <div class="el-add-bar">
-          <span class="el-add-bar-lbl">要素を追加:</span>
-          <button class="el-add-btn" onclick="edAddEl('name')">
-            <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-            品名
-          </button>
-          <button class="el-add-btn" onclick="edAddEl('price')">
-            <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-            価格
-          </button>
-          <button class="el-add-btn" onclick="edAddEl('tax')">
-            <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-            税込
-          </button>
-          <button class="el-add-btn" onclick="edAddEl('custom')">
-            <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-            テキスト
-          </button>
-        </div>
+        <!-- Canvas操作ガイド（選択状態に応じて変化） -->
+        <div class="cvs-op-tip" id="cvs-op-tip">要素をタップして選択 / ドラッグで移動 / 角をドラッグでリサイズ</div>
 
         <!-- プレビューCanvas -->
         <canvas id="pop-canvas"></canvas>
+
+        <!-- カード形式 要素追加グリッド -->
+        <div class="el-add-section">
+          <div class="el-add-section-lbl">要素を追加</div>
+          <div class="el-add-grid">
+            <button class="el-add-card" onclick="edAddEl('name')">
+              <span class="el-add-card-icon" style="background:#2d5a1e22;color:#2d5a1e;">Aa</span>
+              <span class="el-add-card-label">品名</span>
+              <span class="el-add-card-desc">植物名を表示</span>
+            </button>
+            <button class="el-add-card" onclick="edAddEl('price')">
+              <span class="el-add-card-icon" style="background:#b4530922;color:#b45309;">¥</span>
+              <span class="el-add-card-label">価格</span>
+              <span class="el-add-card-desc">税込価格</span>
+            </button>
+            <button class="el-add-card" onclick="edAddEl('tax')">
+              <span class="el-add-card-icon" style="background:#9ca3af22;color:#6b7280;">税</span>
+              <span class="el-add-card-label">税込表示</span>
+              <span class="el-add-card-desc">税込文字列</span>
+            </button>
+            <button class="el-add-card" onclick="edAddEl('custom')">
+              <span class="el-add-card-icon" style="background:#6366f122;color:#6366f1;">T</span>
+              <span class="el-add-card-label">テキスト</span>
+              <span class="el-add-card-desc">自由テキスト</span>
+            </button>
+          </div>
+        </div>
 
         <!-- 配置済み要素リスト -->
         <div class="ed-ellist-wrap">
@@ -1844,101 +1951,108 @@ button:focus,input:focus,select:focus{outline:none;}
           <div id="ellist"></div>
         </div>
 
-        <!-- 選択中要素プロパティ -->
-        <div class="sel-el-panel" id="sel-el-panel">
-          <div class="sel-el-hdr">
-            <span id="sel-el-label">選択中の要素</span>
-            <button class="sel-el-del" onclick="deleteSelEl()">
-              <svg viewBox="0 0 24 24" fill="none" width="12" height="12"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              削除
+        <!-- プロパティパネル（常時表示・選択時に内容切替） -->
+        <div class="sel-el-panel-wrap" id="sel-el-panel-wrap">
+          <!-- 未選択時メッセージ -->
+          <div class="sel-el-empty-msg" id="sel-el-empty-msg">
+            要素をタップして選択すると、ここで編集できます
+          </div>
+          <!-- 選択中プロパティ（既存パネルをここに移動） -->
+          <div class="sel-el-panel" id="sel-el-panel">
+            <div class="sel-el-hdr">
+              <span id="sel-el-label">選択中の要素</span>
+              <button class="sel-el-del" onclick="deleteSelEl()">
+                <svg viewBox="0 0 24 24" fill="none" width="12" height="12"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                削除
+              </button>
+            </div>
+            <!-- フォントサイズ -->
+            <div class="iprop-row">
+              <span class="iprop-lbl">サイズ</span>
+              <div class="fsz-ctrl">
+                <button class="fsz-btn" onclick="selElNudge('fontSize',-1)">−</button>
+                <input class="fsz-val" type="number" id="sel-el-fs" min="6" max="120" value="14" oninput="selElSetFs(this.value)">
+                <button class="fsz-btn" onclick="selElNudge('fontSize',1)">＋</button>
+              </div>
+              <span style="font-size:9px;color:var(--on-surface-dim);margin-left:6px;">px / auto</span>
+              <button class="fsz-btn" id="sel-el-auto-btn" onclick="selElToggleAuto()" style="margin-left:4px;font-size:10px;padding:0 6px;width:auto;">auto</button>
+            </div>
+            <!-- 文字色 -->
+            <div class="iprop-row">
+              <span class="iprop-lbl">色</span>
+              <input type="color" class="clr-btn" id="sel-el-color" value="#1a1a1a" onchange="selElSet('color',this.value)">
+            </div>
+            <!-- スタイル・揃え -->
+            <div class="iprop-row">
+              <span class="iprop-lbl">スタイル</span>
+              <div class="style-btns">
+                <button class="s-btn" id="sel-el-bold" onclick="selElToggleBold()">B</button>
+                <button class="s-btn" id="sel-el-left"   onclick="selElSet('align','left')">←</button>
+                <button class="s-btn" id="sel-el-center" onclick="selElSet('align','center')">中</button>
+                <button class="s-btn" id="sel-el-right"  onclick="selElSet('align','right')">→</button>
+                <button class="s-btn" id="sel-el-vtop"   onclick="selElSet('valign','top')">上</button>
+                <button class="s-btn" id="sel-el-vmid"   onclick="selElSet('valign','middle')">中</button>
+                <button class="s-btn" id="sel-el-vbot"   onclick="selElSet('valign','bottom')">下</button>
+              </div>
+            </div>
+            <!-- カスタムテキスト入力 -->
+            <div class="iprop-row" id="sel-el-text-row" style="display:none;">
+              <span class="iprop-lbl">テキスト</span>
+              <input class="prop-inp" type="text" id="sel-el-text" placeholder="テキストを入力" oninput="selElSet('text',this.value)" style="flex:1;height:34px;margin-left:6px;">
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tmpl-cvs-wrap -->
+
+      <!-- 背景設定（1カラムに統合） -->
+      <div class="bg-section-inline">
+        <div class="bg-inline-hdr">背景設定</div>
+        <div class="bg-inline-body">
+          <div class="bg-clr-row">
+            <span class="bg-clr-lbl">枠・アクセント色</span>
+            <input type="color" id="caccent" value="#2d7a4f" onchange="markEdited();redrawAll()">
+          </div>
+          <div class="bg-clr-row">
+            <span class="bg-clr-lbl">背景色</span>
+            <input type="color" id="cbg" value="#fffef8" onchange="markEdited();redrawAll()">
+          </div>
+          <select class="dstyle-sel" id="dstyle" onchange="markEdited();redrawAll();rebuildInpFields();">
+            <option value="natural" selected>シンプルポップ</option>
+            <option value="custom">カスタム背景（外部画像）</option>
+          </select>
+          <div class="bg-file-row">
+            <button class="bg-file-btn" onclick="document.getElementById('bg-img-file').click()">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              画像ファイルから読み込み
             </button>
           </div>
-          <!-- フォントサイズ -->
-          <div class="iprop-row">
-            <span class="iprop-lbl">サイズ</span>
-            <div class="fsz-ctrl">
-              <button class="fsz-btn" onclick="selElNudge('fontSize',-1)">−</button>
-              <input class="fsz-val" type="number" id="sel-el-fs" min="6" max="120" value="14" oninput="selElSetFs(this.value)">
-              <button class="fsz-btn" onclick="selElNudge('fontSize',1)">＋</button>
-            </div>
-            <span style="font-size:9px;color:var(--on-surface-dim);margin-left:6px;">px / auto</span>
-            <button class="fsz-btn" id="sel-el-auto-btn" onclick="selElToggleAuto()" style="margin-left:4px;font-size:10px;padding:0 6px;width:auto;">auto</button>
-          </div>
-          <!-- 文字色 -->
-          <div class="iprop-row">
-            <span class="iprop-lbl">色</span>
-            <input type="color" class="clr-btn" id="sel-el-color" value="#1a1a1a" onchange="selElSet('color',this.value)">
-          </div>
-          <!-- スタイル・揃え -->
-          <div class="iprop-row">
-            <span class="iprop-lbl">スタイル</span>
-            <div class="style-btns">
-              <button class="s-btn" id="sel-el-bold" onclick="selElToggleBold()">B</button>
-              <button class="s-btn" id="sel-el-left"   onclick="selElSet('align','left')">←</button>
-              <button class="s-btn" id="sel-el-center" onclick="selElSet('align','center')">中</button>
-              <button class="s-btn" id="sel-el-right"  onclick="selElSet('align','right')">→</button>
-              <button class="s-btn" id="sel-el-vtop"   onclick="selElSet('valign','top')">上</button>
-              <button class="s-btn" id="sel-el-vmid"   onclick="selElSet('valign','middle')">中</button>
-              <button class="s-btn" id="sel-el-vbot"   onclick="selElSet('valign','bottom')">下</button>
-            </div>
-          </div>
-          <!-- カスタムテキスト入力 -->
-          <div class="iprop-row" id="sel-el-text-row" style="display:none;">
-            <span class="iprop-lbl">テキスト</span>
-            <input class="prop-inp" type="text" id="sel-el-text" placeholder="テキストを入力" oninput="selElSet('text',this.value)" style="flex:1;height:34px;margin-left:6px;">
+          <input type="file" id="bg-img-file" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="loadBgImage(event)">
+          <div class="bg-preview" id="bg-img-preview">
+            <img id="bg-img-thumb">
+            <button class="bg-preview-clr" onclick="clearBgImage()">
+              <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
           </div>
         </div>
       </div>
 
       <!-- テンプレート管理 -->
       <div class="tmpl-mgr">
-        <div class="tmpl-mgr-hdr">テンプレート管理</div>
+        <div class="tmpl-mgr-hdr">テンプレート保存・管理</div>
         <div class="tmpl-list-inner" id="tmpl-list"></div>
         <div class="tmpl-save-area">
           <input class="tmpl-save-inp" type="text" id="tmpl-author" placeholder="作成者名" maxlength="20">
           <input class="tmpl-save-inp" type="text" id="tmpl-inp" placeholder="テンプレート名" maxlength="30">
-          <button class="tmpl-save-btn" onclick="saveTmpl()">保存する</button>
+          <button class="tmpl-save-btn" onclick="saveTmpl()">このデザインを保存する</button>
         </div>
       </div>
 
     </div>
 
-    <!-- 右列：背景設定 -->
-    <div class="tmpl-right-col">
+    <!-- 右列（廃止・非表示） -->
+    <div class="tmpl-right-col"></div>
 
-      <!-- 背景追加 -->
-      <div class="bg-section">
-        <div class="bg-hdr">背景設定</div>
-        <div class="bg-body">
-          <div class="bg-note">スタイルを選択するか、デザインソフトで作成した背景画像を読み込んでください。</div>
-          <div class="clr-row"><span class="clr-lbl">枠・アクセント色</span><input type="color" id="caccent" value="#2d7a4f" onchange="markEdited();redrawAll()"></div>
-          <div class="clr-row"><span class="clr-lbl">背景色</span><input type="color" id="cbg" value="#fffef8" onchange="markEdited();redrawAll()"></div>
-          <select class="dstyle-sel" id="dstyle" onchange="markEdited();redrawAll();rebuildInpFields();">
-            <option value="custom">カスタム背景（外部ソフト）</option>
-            <option value="natural" selected>シンプルポップ</option>
-            <option value="ikea">IKEAスタイル</option>
-          </select>
-          <div class="bg-btns">
-            <button class="bg-btn" onclick="document.getElementById('bg-img-file').click()">
-              <span class="bg-btn-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              <span class="bg-btn-lbl">ファイルから</span>
-              <span class="bg-btn-sub">PNG / JPG</span>
-            </button>
-            <button class="bg-btn" onclick="openExtDesignApp()">
-              <span class="bg-btn-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="13.5" cy="6.5" r=".5" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="10.5" r=".5" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="7.5" r=".5" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="12.5" r=".5" stroke="currentColor" stroke-width="2"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" stroke="currentColor" stroke-width="1.8"/></svg></span>
-              <span class="bg-btn-lbl">アプリから</span>
-              <span class="bg-btn-sub">Canva / Figma 他</span>
-            </button>
-          </div>
-          <input type="file" id="bg-img-file" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="loadBgImage(event)">
-          <div class="bg-preview" id="bg-img-preview">
-            <img id="bg-img-thumb">
-            <button class="bg-preview-clr" onclick="clearBgImage()"><svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg></button>
-          </div>
-        </div>
-      </div>
-
-    </div>
   </div>
 </div>
 <!-- ─── SETTINGS ──────────────────────────── -->
@@ -2598,80 +2712,14 @@ function drawFrame(ctx, cx, cy, cw, ch, ca, st) {
   var lw = cw * .012;
   // カスタム背景：枠線は描画しない（背景画像が枠を持つため）
   if(st === 'custom') { return; }
-  if(st === 'natural') {
-    ctx.strokeStyle = ca; ctx.lineWidth = lw*1.3;
-    rrect(ctx, cx+lw, cy+lw, cw-lw*2, ch-lw*2, cw*.034); ctx.stroke();
-    var p2 = cw*.04;
-    ctx.lineWidth = lw*.4; ctx.strokeStyle = h2rgba(ca,.4);
-    rrect(ctx, cx+p2, cy+p2, cw-p2*2, ch-p2*2, cw*.024); ctx.stroke();
-    ctx.fillStyle = h2rgba(ca,.07);
-    ctx.fillRect(cx+p2, cy+p2, cw-p2*2, ch*.12);
-  } else if(st === 'ikea') {
-    // IKEAスタイル：角なし・太い黒枠
-    ctx.strokeStyle = '#111'; ctx.lineWidth = lw*1.6;
-    ctx.strokeRect(cx+lw, cy+lw, cw-lw*2, ch-lw*2);
-  } else if(st === 'craft') {
-    // クラフトナチュラル：ダークブラウン点線の角丸枠
-    ctx.save();
-    ctx.strokeStyle = '#5a4a3a'; ctx.lineWidth = lw*1.1;
-    ctx.setLineDash([cw*.025, cw*.018]);
-    rrect(ctx, cx+lw*1.2, cy+lw*1.2, cw-lw*2.4, ch-lw*2.4, cw*.03); ctx.stroke();
-    ctx.setLineDash([]);
-    // 上部装飾ライン（植物ラインアート風）
-    var lineY = cy + ch * .16;
-    ctx.strokeStyle = h2rgba('#5a4a3a', .35); ctx.lineWidth = lw * .5;
-    ctx.beginPath();
-    ctx.moveTo(cx + cw*.08, lineY); ctx.lineTo(cx + cw*.92, lineY);
-    ctx.stroke();
-    // 小さな葉っぱ風ダイヤモンド装飾（左右）
-    var dmx1=cx+cw*.04, dmx2=cx+cw*.96, dmy=lineY, dms=cw*.018;
-    ctx.fillStyle=h2rgba('#5a4a3a',.45);
-    ctx.beginPath(); ctx.moveTo(dmx1,dmy-dms); ctx.lineTo(dmx1+dms,dmy); ctx.lineTo(dmx1,dmy+dms); ctx.lineTo(dmx1-dms,dmy); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(dmx2,dmy-dms); ctx.lineTo(dmx2+dms,dmy); ctx.lineTo(dmx2,dmy+dms); ctx.lineTo(dmx2-dms,dmy); ctx.closePath(); ctx.fill();
-    ctx.restore();
-  } else if(st === 'chalk') {
-    // 黒板チョーク：白二重枠＋四隅オーナメント
-    ctx.save();
-    // 外枠（太め）
-    ctx.strokeStyle = 'rgba(245,230,200,.70)'; ctx.lineWidth = lw*1.4;
-    rrect(ctx, cx+lw*1.5, cy+lw*1.5, cw-lw*3, ch-lw*3, cw*.015); ctx.stroke();
-    // 内枠（細め）
-    ctx.strokeStyle = 'rgba(245,230,200,.35)'; ctx.lineWidth = lw*.5;
-    rrect(ctx, cx+lw*3.5, cy+lw*3.5, cw-lw*7, ch-lw*7, cw*.01); ctx.stroke();
-    // 四隅コーナーオーナメント（小さな十字）
-    var corners=[
-      [cx+lw*2.5, cy+lw*2.5],[cx+cw-lw*2.5, cy+lw*2.5],
-      [cx+lw*2.5, cy+ch-lw*2.5],[cx+cw-lw*2.5, cy+ch-lw*2.5]
-    ];
-    var cs=cw*.025;
-    ctx.strokeStyle='rgba(245,230,200,.55)'; ctx.lineWidth=lw*.55;
-    corners.forEach(function(c){
-      ctx.beginPath(); ctx.moveTo(c[0]-cs,c[1]); ctx.lineTo(c[0]+cs,c[1]); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(c[0],c[1]-cs); ctx.lineTo(c[0],c[1]+cs); ctx.stroke();
-    });
-    ctx.restore();
-  } else if(st === 'botanical') {
-    // ボタニカルホワイト：上下の細い深緑ライン
-    ctx.save();
-    ctx.strokeStyle = '#1a5c32'; ctx.lineWidth = lw * .7;
-    // 上ライン
-    ctx.beginPath();
-    ctx.moveTo(cx+cw*.06, cy+ch*.05); ctx.lineTo(cx+cw*.94, cy+ch*.05);
-    ctx.stroke();
-    // 下ライン
-    ctx.beginPath();
-    ctx.moveTo(cx+cw*.06, cy+ch*.95); ctx.lineTo(cx+cw*.94, cy+ch*.95);
-    ctx.stroke();
-    // 上ラインの極細追加ライン（余白感）
-    ctx.strokeStyle = h2rgba('#1a5c32',.3); ctx.lineWidth = lw*.3;
-    ctx.beginPath();
-    ctx.moveTo(cx+cw*.10, cy+ch*.06); ctx.lineTo(cx+cw*.90, cy+ch*.06);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx+cw*.10, cy+ch*.94); ctx.lineTo(cx+cw*.90, cy+ch*.94);
-    ctx.stroke();
-    ctx.restore();
-  }
+  // natural（シンプルポップ）のみ
+  ctx.strokeStyle = ca; ctx.lineWidth = lw*1.3;
+  rrect(ctx, cx+lw, cy+lw, cw-lw*2, ch-lw*2, cw*.034); ctx.stroke();
+  var p2 = cw*.04;
+  ctx.lineWidth = lw*.4; ctx.strokeStyle = h2rgba(ca,.4);
+  rrect(ctx, cx+p2, cy+p2, cw-p2*2, ch-p2*2, cw*.024); ctx.stroke();
+  ctx.fillStyle = h2rgba(ca,.07);
+  ctx.fillRect(cx+p2, cy+p2, cw-p2*2, ch*.12);
 }
 
 // Fit font size so that `lines` rendered at LINE_GAP fits within maxH px.
@@ -2728,30 +2776,10 @@ function normalizeEl(el){
 function drawPop(ctx, cx, cy, cw, ch, sample, cfg) {
   var ca=cfg.ca, cb=cfg.cb, st=cfg.st;
 
-  // 背景描画
+  // 背景描画（custom または natural のみ）
   if(st==='custom' && customBgImg && customBgImg.complete && customBgImg.naturalWidth>0){
     ctx.save(); rrect(ctx,cx,cy,cw,ch,cw*.02); ctx.clip();
     ctx.drawImage(customBgImg,cx,cy,cw,ch); ctx.restore();
-  } else if(st==='craft'){
-    // クラフトナチュラル：クラフト紙テクスチャ風ベタ塗り
-    ctx.fillStyle=cb; rrect(ctx,cx,cy,cw,ch,cw*.035); ctx.fill();
-    // 軽いノイズ風グラデーション（紙の質感）
-    var cg=ctx.createLinearGradient(cx,cy,cx+cw,cy+ch);
-    cg.addColorStop(0,'rgba(180,150,100,.08)');
-    cg.addColorStop(.4,'rgba(210,190,150,.05)');
-    cg.addColorStop(1,'rgba(160,130,90,.10)');
-    ctx.fillStyle=cg; rrect(ctx,cx,cy,cw,ch,cw*.035); ctx.fill();
-  } else if(st==='chalk'){
-    // 黒板チョーク：深緑ベタ塗り
-    ctx.fillStyle=cb; rrect(ctx,cx,cy,cw,ch,cw*.02); ctx.fill();
-    // わずかなグラデーションで黒板の深みを表現
-    var cg2=ctx.createRadialGradient(cx+cw*.5,cy+ch*.5,0,cx+cw*.5,cy+ch*.5,cw*.8);
-    cg2.addColorStop(0,'rgba(80,120,80,.08)');
-    cg2.addColorStop(1,'rgba(0,0,0,.18)');
-    ctx.fillStyle=cg2; rrect(ctx,cx,cy,cw,ch,cw*.02); ctx.fill();
-  } else if(st==='botanical'){
-    // ボタニカルホワイト：純白背景
-    ctx.fillStyle=cb; rrect(ctx,cx,cy,cw,ch,cw*.025); ctx.fill();
   } else {
     ctx.fillStyle=cb; rrect(ctx,cx,cy,cw,ch,cw*.04); ctx.fill();
   }
@@ -3154,7 +3182,13 @@ function showSelElPanel(){
 
 function updateSelElPanel(el){
   var panel=document.getElementById('sel-el-panel');if(!panel)return;
-  if(!el){panel.classList.remove('show');return;}
+  var emptyMsg=document.getElementById('sel-el-empty-msg');
+  if(!el){
+    panel.classList.remove('show');
+    if(emptyMsg)emptyMsg.style.display='block';
+    return;
+  }
+  if(emptyMsg)emptyMsg.style.display='none';
   panel.classList.add('show');
   var lbl=document.getElementById('sel-el-label');
   if(lbl)lbl.textContent=(el.label||'要素')+'のプロパティ';
@@ -3258,9 +3292,9 @@ function redrawEd(){
 
   var cellW=W/GRID_COLS, cellH=H/GRID_ROWS;
 
-  // ── グリッド線（薄いドット） ──
+  // ── グリッド線（さらに薄く） ──
   ctx.save();
-  ctx.strokeStyle='rgba(0,0,0,0.06)';
+  ctx.strokeStyle='rgba(0,0,0,0.04)';
   ctx.lineWidth=1;
   if(ctx.setLineDash)ctx.setLineDash([2,4]);
   for(var ci=1;ci<GRID_COLS;ci++){
@@ -3271,6 +3305,32 @@ function redrawEd(){
   }
   if(ctx.setLineDash)ctx.setLineDash([]);
   ctx.restore();
+
+  // ── 要素が0個のとき：中央にガイドテキスト ──
+  if(!ELS.length){
+    ctx.save();
+    ctx.fillStyle='rgba(100,120,100,0.55)';
+    ctx.font='700 '+(W*0.045)+'px sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('下のボタンで要素を追加してください',W/2,H/2);
+    ctx.restore();
+    // Canvas操作ガイドも更新
+    var tip=document.getElementById('cvs-op-tip');
+    if(tip){tip.textContent='下のボタンで要素を追加してください';tip.classList.remove('selected');}
+    return;
+  }
+
+  // Canvas操作ガイドを選択状態に応じて更新
+  var tip2=document.getElementById('cvs-op-tip');
+  if(tip2){
+    if(selGridEl){
+      tip2.textContent='ドラッグで移動 / 角をドラッグでリサイズ';
+      tip2.classList.add('selected');
+    } else {
+      tip2.textContent='要素をタップして選択してください';
+      tip2.classList.remove('selected');
+    }
+  }
 
   // ── 配置済み要素 ──
   var prices=sample.price?calcPrices(sample.price):{base:0,incl:0};
@@ -3284,16 +3344,24 @@ function redrawEd(){
     var isSel=selGridEl===el.id;
     var strokeColor=EL_STROKE[el.type]||EL_STROKE[el.id]||'#888888';
 
-    // 半透明背景
-    ctx.fillStyle=EL_BG[el.type]||EL_BG[el.id]||'rgba(100,100,100,0.08)';
+    // 半透明背景（選択時は少し濃く）
+    ctx.fillStyle=isSel
+      ? (EL_BG[el.type]||EL_BG[el.id]||'rgba(46,125,50,0.14)').replace(/[\d.]+\)$/,'0.20)')
+      : (EL_BG[el.type]||EL_BG[el.id]||'rgba(100,100,100,0.08)');
     ctx.fillRect(ex,ey,ew,eh);
 
-    // 枠線（選択時は太く）
-    ctx.strokeStyle=strokeColor;
-    ctx.lineWidth=isSel?2.5:1.2;
-    if(!isSel && ctx.setLineDash) ctx.setLineDash([3,3]);
+    // 枠線（選択時は緑で太く）
+    if(isSel){
+      ctx.strokeStyle=cfg.ca||'#2e7d32';
+      ctx.lineWidth=2.5;
+      if(ctx.setLineDash)ctx.setLineDash([]);
+    } else {
+      ctx.strokeStyle=strokeColor;
+      ctx.lineWidth=1.2;
+      if(ctx.setLineDash)ctx.setLineDash([3,3]);
+    }
     ctx.strokeRect(ex+0.5,ey+0.5,ew-1,eh-1);
-    if(ctx.setLineDash) ctx.setLineDash([]);
+    if(ctx.setLineDash)ctx.setLineDash([]);
 
     // サンプルテキスト描画（drawPopと同じロジック）
     var text='';
@@ -3331,18 +3399,18 @@ function redrawEd(){
       }
     }
 
-    // 選択時：青い選択枠 + リサイズハンドル（8点）
+    // 選択時：太い緑枠 + 半透明ハイライト + 大きいリサイズハンドル（8点）
     if(isSel){
-      // 選択枠
+      // 緑の選択枠（グロー効果）
       ctx.save();
-      ctx.strokeStyle='#1565c0';
-      ctx.lineWidth=2.5;
-      ctx.shadowColor='rgba(21,101,192,0.4)';
-      ctx.shadowBlur=8;
+      ctx.strokeStyle=cfg.ca||'#2e7d32';
+      ctx.lineWidth=3;
+      ctx.shadowColor='rgba(46,125,50,0.45)';
+      ctx.shadowBlur=10;
       ctx.strokeRect(ex+1,ey+1,ew-2,eh-2);
       ctx.restore();
 
-      // リサイズハンドル（8点）
+      // リサイズハンドル（8点・大きめの白丸+緑枠）
       var handlePositions=[
         {x:ex,     y:ey},      // nw
         {x:ex+ew/2,y:ey},      // n
@@ -3356,10 +3424,10 @@ function redrawEd(){
       handlePositions.forEach(function(hp){
         ctx.save();
         ctx.fillStyle='#ffffff';
-        ctx.strokeStyle='#1565c0';
-        ctx.lineWidth=1.5;
-        ctx.shadowColor='rgba(0,0,0,0.2)';
-        ctx.shadowBlur=3;
+        ctx.strokeStyle=cfg.ca||'#2e7d32';
+        ctx.lineWidth=2;
+        ctx.shadowColor='rgba(0,0,0,0.25)';
+        ctx.shadowBlur=4;
         ctx.beginPath();
         ctx.arc(hp.x,hp.y,HANDLE_R,0,Math.PI*2);
         ctx.fill();
@@ -3399,45 +3467,54 @@ function delEl(id){
   buildElList();redrawEd();rebuildInpFields();
 }
 
-// ━━ ELEMENT LIST（Canva風カード形式） ━━
+// ━━ ELEMENT LIST（プレビューストリップ付きカード形式） ━━
 function buildElList(){
   var wrap=document.getElementById('ellist');if(!wrap)return;
   wrap.innerHTML='';
-  var EL_DOT_COLORS={name:'#2d5a1e',price:'#b45309',tax:'#9ca3af',custom:'#4444cc'};
+  var EL_STRIP_COLORS={name:'#2d5a1e',price:'#b45309',tax:'#9ca3af',custom:'#6366f1'};
 
   if(!ELS.length){
     var empty=document.createElement('div');
-    empty.style.cssText='font-size:12px;color:var(--on-surface-dim);padding:12px 13px;line-height:1.8;';
-    empty.textContent='上の「+品名」「+価格」ボタンで要素を追加できます。';
+    empty.style.cssText='font-size:12px;color:var(--on-surface-dim);padding:14px 13px;text-align:center;line-height:1.8;';
+    empty.textContent='上のボタンで要素を追加できます';
     wrap.appendChild(empty);
+    // 未選択状態のプロパティパネルを更新
+    updateSelElPanel(null);
     return;
   }
 
   ELS.forEach(function(el){
     var elN=normalizeEl(el);
-    var dotColor=EL_DOT_COLORS[el.type]||EL_DOT_COLORS[el.id]||el.color||'#888';
+    var stripColor=EL_STRIP_COLORS[el.type]||EL_STRIP_COLORS[el.id]||el.color||'#888';
     var isSel=selGridEl===el.id;
 
     var card=document.createElement('div');
-    card.className='ed-el-card'+(isSel?' sel':'');
+    card.className='ed-el-card-new'+(isSel?' sel':'');
 
-    var dot=document.createElement('div');
-    dot.className='ed-el-dot';dot.style.background=dotColor;
-    card.appendChild(dot);
+    // 左側の色ストリップ
+    var strip=document.createElement('div');
+    strip.className='ed-el-strip';
+    strip.style.background=stripColor;
+    card.appendChild(strip);
 
-    var lbl=document.createElement('div');
-    lbl.className='ed-el-lbl';lbl.textContent=el.label;
-    card.appendChild(lbl);
+    // テキスト情報
+    var info=document.createElement('div');
+    info.className='ed-el-info';
+    var nm=document.createElement('div');
+    nm.className='ed-el-name';nm.textContent=el.label;
+    var meta=document.createElement('div');
+    meta.className='ed-el-meta';
+    meta.textContent='行'+(elN.row+1)+'-'+(elN.row+elN.rowSpan)+' / 列'+(elN.col+1)+'-'+(elN.col+elN.colSpan);
+    var alignLabel=(el.align==='left'?'左揃え':el.align==='right'?'右揃え':'中央揃え');
+    meta.textContent+=' / '+alignLabel;
+    info.appendChild(nm);info.appendChild(meta);
+    card.appendChild(info);
 
-    var pos=document.createElement('div');
-    pos.className='ed-el-pos';
-    pos.textContent='行'+(elN.row+1)+'-'+(elN.row+elN.rowSpan)+' / 列'+(elN.col+1)+'-'+(elN.col+elN.colSpan);
-    card.appendChild(pos);
-
+    // 削除ボタン
     var delBtn=document.createElement('button');
-    delBtn.className='ed-el-del';
+    delBtn.className='ed-el-del-new';
     delBtn.title=el.label+'を削除';
-    delBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    delBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>';
     delBtn.addEventListener('click',function(e){e.stopPropagation();delEl(el.id);});
     card.appendChild(delBtn);
 
@@ -3587,16 +3664,15 @@ function renderTmplList(){
 // ━━ INIT PRESET TEMPLATES ━━
 function initPresetTemplates(){
   var arr=loadT();
-  var hasStd    =arr.some(function(t){return t.id==='preset_std';});
-  var hasIkea   =arr.some(function(t){return t.id==='preset_ikea';});
-  var hasSolso  =arr.some(function(t){return t.id==='preset_solso';});
-  var hasOzaki  =arr.some(function(t){return t.id==='preset_ozaki';});
-  var hasFarm   =arr.some(function(t){return t.id==='preset_farm';});
+  var hasStd=arr.some(function(t){return t.id==='preset_std';});
 
-  // 旧preset_stampが残っていれば削除
-  arr=arr.filter(function(t){return t.id!=='preset_stamp';});
+  // 不要なプリセットを削除（ikea/solso/ozaki/farm/stamp）
+  arr=arr.filter(function(t){
+    return t.id!=='preset_stamp'&&t.id!=='preset_ikea'&&
+           t.id!=='preset_solso'&&t.id!=='preset_ozaki'&&t.id!=='preset_farm';
+  });
 
-  // ① シンプルポップ（グリッド座標ベース・12×10）
+  // シンプルポップ（グリッド座標ベース・12×10）
   if(!hasStd){
     arr.unshift({
       id:'preset_std',name:'シンプルポップ',author:'プリセット',date:'初期設定',
@@ -3608,73 +3684,6 @@ function initPresetTemplates(){
          col:2, row:5, colSpan:8,  rowSpan:3, color:'#b45309', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
         {id:'tax',  label:'税込文字',inputField:false,optional:false,type:'tax',
          col:3, row:8, colSpan:6,  rowSpan:1, color:'#9ca3af', bold:false, align:'center', valign:'middle', fontSize:'auto'},
-      ]
-    });
-  }
-
-  // ② IKEAスタイル（グリッド座標ベース・12×10）
-  if(!hasIkea){
-    arr.unshift({
-      id:'preset_ikea',name:'IKEAスタイル',author:'プリセット',date:'初期設定',
-      ca:'#111111',cb:'#ffffff',st:'ikea',
-      els:[
-        {id:'name', label:'植物名',  inputField:true, optional:false,type:'text',
-         col:1, row:0, colSpan:10, rowSpan:2, color:'#111111', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
-        {id:'price',label:'税込価格',inputField:false,optional:false,type:'price',
-         col:1, row:3, colSpan:10, rowSpan:4, color:'#111111', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
-        {id:'tax',  label:'税込文字',inputField:false,optional:false,type:'tax',
-         col:2, row:7, colSpan:8,  rowSpan:2, color:'#444444', bold:false, align:'center', valign:'middle', fontSize:'auto'},
-      ]
-    });
-  }
-
-  // ③ クラフトナチュラル（SOLSO FARM風）
-  if(!hasSolso){
-    arr.push({
-      id:'preset_solso',name:'クラフトナチュラル',author:'プリセット',date:'初期設定',
-      ca:'#5a4a3a',cb:'#d4c4a8',st:'craft',
-      els:[
-        {id:'name', label:'植物名',  inputField:true, optional:false, type:'text',
-         col:1, row:1, colSpan:10, rowSpan:3, color:'#3a3028', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
-        {id:'price',label:'税込価格',inputField:false,optional:false, type:'price',
-         col:3, row:5, colSpan:6,  rowSpan:3, color:'#5a4a3a', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
-        {id:'tax',  label:'税込文字',inputField:false,optional:false, type:'tax',
-         col:4, row:8, colSpan:4,  rowSpan:1, color:'#8a7a6a', bold:false, align:'center', valign:'middle', fontSize:'auto'},
-      ]
-    });
-  }
-
-  // ④ 黒板チョーク（オザキフラワーパーク風）
-  if(!hasOzaki){
-    arr.push({
-      id:'preset_ozaki',name:'黒板チョーク',author:'プリセット',date:'初期設定',
-      ca:'#f5e6c8',cb:'#2a3a2a',st:'chalk',
-      els:[
-        {id:'name', label:'植物名',  inputField:true, optional:false, type:'text',
-         col:1, row:1, colSpan:10, rowSpan:2, color:'#ffffff', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
-        {id:'price',label:'税込価格',inputField:false,optional:false, type:'price',
-         col:2, row:4, colSpan:8,  rowSpan:3, color:'#f5d56e', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
-        {id:'tax',  label:'税込文字',inputField:false,optional:false, type:'tax',
-         col:3, row:7, colSpan:6,  rowSpan:2, color:'#c8c8b8', bold:false, align:'center', valign:'middle', fontSize:'auto'},
-      ]
-    });
-  }
-
-  // ⑤ ボタニカルホワイト（THE FARM風）
-  if(!hasFarm){
-    arr.push({
-      id:'preset_farm',name:'ボタニカルホワイト',author:'プリセット',date:'初期設定',
-      ca:'#1a5c32',cb:'#ffffff',st:'botanical',
-      els:[
-        {id:'name',     label:'植物名',  inputField:true, optional:false, type:'text',
-         col:1, row:1, colSpan:10, rowSpan:2, color:'#1a5c32', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
-        {id:'botname',  label:'学名',    inputField:true, optional:true,  type:'custom',
-         col:2, row:3, colSpan:8,  rowSpan:1, color:'#8aaa8a', bold:false, align:'center', valign:'middle', fontSize:'auto',
-         text:'botanical name'},
-        {id:'price',    label:'税込価格',inputField:false,optional:false, type:'price',
-         col:2, row:5, colSpan:8,  rowSpan:3, color:'#1a1a1a', bold:true,  align:'center', valign:'middle', fontSize:'auto'},
-        {id:'tax',      label:'税込文字',inputField:false,optional:false, type:'tax',
-         col:3, row:8, colSpan:6,  rowSpan:1, color:'#999999', bold:false, align:'center', valign:'middle', fontSize:'auto'},
       ]
     });
   }
