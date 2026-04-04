@@ -1461,6 +1461,69 @@ button:focus:not(:focus-visible),
 input:focus:not(:focus-visible),
 select:focus:not(:focus-visible){outline:none;}
 
+/* ════ スケッチモード ════ */
+
+/* スケッチトグルボタン本体 */
+.sketch-toggle{
+  height:28px;padding:0 10px;
+  border:1.5px solid var(--outline-var);
+  border-radius:var(--radius-sm);
+  background:var(--surface);font-family:inherit;font-size:10px;font-weight:700;
+  color:var(--on-surface-var);cursor:pointer;
+  display:flex;align-items:center;gap:5px;
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+  min-height:28px;
+}
+.sketch-toggle:hover{border-color:var(--primary);color:var(--primary);}
+.sketch-toggle.on{
+  background:#16a34a;
+  border-color:#16a34a;
+  color:#fff;
+  box-shadow:0 2px 8px rgba(22,163,74,.35);
+}
+.sketch-toggle.on:hover{background:#15803d;border-color:#15803d;}
+.sketch-toggle svg{flex-shrink:0;}
+
+/* スケッチモード時のCanvas */
+#pop-canvas.sketch-mode{
+  cursor:crosshair;
+  border:2px dashed var(--primary);
+  box-sizing:border-box;
+}
+
+/* 役割選択ポップオーバー */
+.sketch-assign{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  padding:10px 12px;
+  background:var(--surface);
+  border:2px solid var(--primary);
+  border-top:none;
+  border-radius:0 0 var(--radius-md) var(--radius-md);
+  box-shadow:var(--shadow-md);
+  animation:fadeSlideIn .2s ease;
+}
+.sketch-assign-label{
+  font-size:12px;font-weight:700;color:var(--on-surface);white-space:nowrap;
+}
+.sketch-assign-btn{
+  height:36px;padding:0 14px;border:2px solid var(--ac,#2e7d32);
+  border-radius:8px;background:transparent;
+  font-family:inherit;font-size:13px;font-weight:700;
+  color:var(--ac,#2e7d32);cursor:pointer;transition:all .15s;
+  min-height:36px;
+}
+.sketch-assign-btn:hover{background:var(--ac,#2e7d32);color:#fff;}
+.sketch-assign-cancel{
+  width:28px;height:28px;border:none;border-radius:50%;
+  background:var(--surface-cnt);color:var(--on-surface-dim);
+  font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  margin-left:auto;transition:background .15s;
+  min-height:28px;flex-shrink:0;
+}
+.sketch-assign-cancel:hover{background:var(--error-cnt);color:var(--error);}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+
 /* ── 印刷プレビューオーバーレイ ── */
 #print-overlay{display:none;position:fixed;inset:0;z-index:800;background:#444;flex-direction:column;}
 #print-toolbar{
@@ -1906,10 +1969,22 @@ button:focus,input:focus,select:focus{outline:none;}
         <!-- ツールバー -->
         <div class="cvs-lbl-bar">
           ライブプレビュー
-          <button class="cvs-reset-btn" onclick="resetEl()">
-            <svg viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 1 0 .49-4.98" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            初期値に戻す
-          </button>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <!-- スケッチモードトグル -->
+            <button class="sketch-toggle" id="sketch-toggle" onclick="toggleSketchMode()" title="Canvas上にドラッグして要素を配置">
+              <svg viewBox="0 0 24 24" fill="none" width="14" height="14">
+                <path d="M12 19l7-7 3 3-7 7-3-3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 2l7.586 7.586" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="11" cy="11" r="2" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              スケッチ
+            </button>
+            <button class="cvs-reset-btn" onclick="resetEl()">
+              <svg viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 1 0 .49-4.98" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              初期値に戻す
+            </button>
+          </div>
         </div>
 
         <!-- Canvas操作ガイド（選択状態に応じて変化） -->
@@ -1917,6 +1992,16 @@ button:focus,input:focus,select:focus{outline:none;}
 
         <!-- プレビューCanvas -->
         <canvas id="pop-canvas"></canvas>
+
+        <!-- スケッチモード：役割選択ポップオーバー（ドラッグ完了時に表示） -->
+        <div class="sketch-assign" id="sketch-assign" style="display:none;">
+          <span class="sketch-assign-label">この領域の役割:</span>
+          <button class="sketch-assign-btn" style="--ac:#2d5a1e;" onclick="assignSketch('name')">品名</button>
+          <button class="sketch-assign-btn" style="--ac:#b45309;" onclick="assignSketch('price')">価格</button>
+          <button class="sketch-assign-btn" style="--ac:#6b7280;" onclick="assignSketch('tax')">税込</button>
+          <button class="sketch-assign-btn" style="--ac:#6366f1;" onclick="assignSketch('custom')">テキスト</button>
+          <button class="sketch-assign-cancel" onclick="cancelSketch()" title="キャンセル">✕</button>
+        </div>
 
         <!-- カード形式 要素追加グリッド -->
         <div class="el-add-section">
@@ -2153,6 +2238,12 @@ var selGridEl=null;   // 選択中のグリッド要素ID
 var _edDragging=false, _edResizing=false, _edResizeHandle='';
 var _edDragStartCell={col:0,row:0}, _edOrigEl=null;
 var _edMouseDownCell={col:0,row:0};
+
+// ━━ スケッチモード STATE ━━
+var sketchMode=false;
+var sketchStart=null;     // ドラッグ開始座標（Canvas論理px）
+var sketchRect=null;      // ドラッグ中の矩形 {x,y,w,h}
+var sketchPendingRect=null; // 確定待ちのグリッド座標 {col,row,colSpan,rowSpan}
 
 // 後方互換のためスタブを残す
 var gridSelStart=null, gridSelEnd=null, gridDragging=false;
@@ -3002,6 +3093,16 @@ var HANDLE_CURSORS={
 
 function edDn(e){
   var p=epos(e.clientX,e.clientY);
+
+  // ── スケッチモード：ドラッグ開始 ──
+  if(sketchMode){
+    // 確定待ち状態なら先にキャンセル
+    if(sketchPendingRect) cancelSketch();
+    sketchStart={x:p.x,y:p.y};
+    sketchRect={x:p.x,y:p.y,w:0,h:0};
+    return;
+  }
+
   var cell=posToCell(p.x,p.y);
 
   // 選択中要素のリサイズハンドル判定
@@ -3055,6 +3156,32 @@ function edDn(e){
 function edMv(e){
   var p=epos(e.clientX,e.clientY);
   var c=document.getElementById('pop-canvas');
+
+  // ── スケッチモード：ドラッグ中の矩形をリアルタイム描画 ──
+  if(sketchMode){
+    if(sketchStart){
+      sketchRect={
+        x:Math.min(sketchStart.x,p.x),
+        y:Math.min(sketchStart.y,p.y),
+        w:Math.abs(p.x-sketchStart.x),
+        h:Math.abs(p.y-sketchStart.y)
+      };
+      // 背景を再描画してからスケッチ矩形を重ね書き
+      redrawEd();
+      var ctx=c.getContext('2d');
+      ctx.save();
+      ctx.setLineDash([6,4]);
+      ctx.strokeStyle='rgba(37,99,235,0.8)';
+      ctx.lineWidth=2.5;
+      ctx.fillStyle='rgba(37,99,235,0.08)';
+      ctx.fillRect(sketchRect.x,sketchRect.y,sketchRect.w,sketchRect.h);
+      ctx.strokeRect(sketchRect.x,sketchRect.y,sketchRect.w,sketchRect.h);
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+    return;
+  }
+
   var cellFloat=posToCellFloat(p.x,p.y);
 
   if(_edDragging && selGridEl){
@@ -3134,6 +3261,45 @@ function edMv(e){
 }
 
 function edUp(){
+  // ── スケッチモード：ドラッグ完了 → グリッドスナップ → ポップオーバー表示 ──
+  if(sketchMode && sketchStart){
+    var c=document.getElementById('pop-canvas');
+    if(sketchRect && sketchRect.w>10 && sketchRect.h>10){
+      // Canvas座標 → グリッド座標に変換（最近グリッドにスナップ）
+      var W=c.width,H=c.height;
+      var cellW=W/GRID_COLS, cellH=H/GRID_ROWS;
+      var col=Math.max(0,Math.round(sketchRect.x/cellW));
+      var row=Math.max(0,Math.round(sketchRect.y/cellH));
+      var colEnd=Math.round((sketchRect.x+sketchRect.w)/cellW);
+      var rowEnd=Math.round((sketchRect.y+sketchRect.h)/cellH);
+      var colSpan=Math.max(1,colEnd-col);
+      var rowSpan=Math.max(1,rowEnd-row);
+      // グリッド境界内に収める
+      if(col>=GRID_COLS) col=GRID_COLS-1;
+      if(row>=GRID_ROWS) row=GRID_ROWS-1;
+      if(col+colSpan>GRID_COLS) colSpan=GRID_COLS-col;
+      if(row+rowSpan>GRID_ROWS) rowSpan=GRID_ROWS-row;
+      sketchPendingRect={col:col,row:row,colSpan:colSpan,rowSpan:rowSpan};
+      // 役割選択ポップオーバーを表示
+      var assignEl=document.getElementById('sketch-assign');
+      if(assignEl) assignEl.style.display='flex';
+      // スナップ後矩形をCanvasに表示
+      redrawEd();
+      var ctx=c.getContext('2d');
+      ctx.save();
+      ctx.fillStyle='rgba(37,99,235,0.12)';
+      ctx.strokeStyle='rgba(37,99,235,0.75)';
+      ctx.lineWidth=2.5;
+      ctx.fillRect(col*cellW,row*cellH,colSpan*cellW,rowSpan*cellH);
+      ctx.strokeRect(col*cellW+1,row*cellH+1,colSpan*cellW-2,rowSpan*cellH-2);
+      ctx.restore();
+      updateOpTip(ELS.length?'続けて領域を描くか、スケッチOFFで編集モードへ':'この領域の役割を選択してください');
+    }
+    sketchStart=null;
+    sketchRect=null;
+    return;
+  }
+
   if(_edDragging||_edResizing){
     _edDragging=false;_edResizing=false;_edResizeHandle='';_edOrigEl=null;
     markEdited();
@@ -3292,9 +3458,9 @@ function redrawEd(){
 
   var cellW=W/GRID_COLS, cellH=H/GRID_ROWS;
 
-  // ── グリッド線（さらに薄く） ──
+  // ── グリッド線（スケッチモード時はやや濃く・スナップ先が見えるように） ──
   ctx.save();
-  ctx.strokeStyle='rgba(0,0,0,0.04)';
+  ctx.strokeStyle=sketchMode?'rgba(0,0,0,0.13)':'rgba(0,0,0,0.04)';
   ctx.lineWidth=1;
   if(ctx.setLineDash)ctx.setLineDash([2,4]);
   for(var ci=1;ci<GRID_COLS;ci++){
@@ -3312,18 +3478,37 @@ function redrawEd(){
     ctx.fillStyle='rgba(100,120,100,0.55)';
     ctx.font='700 '+(W*0.045)+'px sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('下のボタンで要素を追加してください',W/2,H/2);
+    if(sketchMode){
+      ctx.fillText('Canvas上にドラッグして領域を描いてください',W/2,H/2);
+    } else {
+      ctx.fillText('下のボタンで要素を追加してください',W/2,H/2);
+    }
     ctx.restore();
-    // Canvas操作ガイドも更新
+    // Canvas操作ガイドも更新（スケッチモード時は別テキスト）
     var tip=document.getElementById('cvs-op-tip');
-    if(tip){tip.textContent='下のボタンで要素を追加してください';tip.classList.remove('selected');}
+    if(tip){
+      if(sketchMode){
+        tip.textContent='Canvas上にドラッグして領域を描いてください';
+        tip.classList.add('selected');
+      } else {
+        tip.textContent='下のボタンで要素を追加してください';
+        tip.classList.remove('selected');
+      }
+    }
     return;
   }
 
   // Canvas操作ガイドを選択状態に応じて更新
   var tip2=document.getElementById('cvs-op-tip');
   if(tip2){
-    if(selGridEl){
+    if(sketchMode){
+      // スケッチモード中は専用ガイド
+      if(!sketchPendingRect){
+        tip2.textContent=ELS.length?'続けて領域を描くか、スケッチOFFで編集モードへ':'Canvas上にドラッグして領域を描いてください';
+        tip2.classList.add('selected');
+      }
+      // pendingRect中はedUpで既にupdateOpTip済み
+    } else if(selGridEl){
       tip2.textContent='ドラッグで移動 / 角をドラッグでリサイズ';
       tip2.classList.add('selected');
     } else {
@@ -3453,6 +3638,89 @@ function resetToSaved(){
   updateSelElPanel(null);buildElList();redrawEd();toast('編集前に戻しました');
 }
 function redrawAll(){redrawPrev();if(document.getElementById('panel-template').classList.contains('on'))redrawEd();}
+
+// ━━ スケッチモード ━━
+
+// Canvas操作ガイドテキストを更新するユーティリティ
+function updateOpTip(msg){
+  var tip=document.getElementById('cvs-op-tip');
+  if(!tip)return;
+  if(msg){
+    tip.textContent=msg;
+    tip.classList.add('selected');
+  } else {
+    // スケッチモードOFFは既存ロジックに任せる（redrawEdが更新する）
+    tip.classList.remove('selected');
+  }
+}
+
+// スケッチモードのON/OFF切替
+function toggleSketchMode(){
+  sketchMode=!sketchMode;
+  var btn=document.getElementById('sketch-toggle');
+  var cvs=document.getElementById('pop-canvas');
+  if(btn) btn.classList.toggle('on',sketchMode);
+  if(cvs) cvs.classList.toggle('sketch-mode',sketchMode);
+  if(sketchMode){
+    // スケッチモードON：選択解除してガイド表示
+    selGridEl=null;
+    updateSelElPanel(null);
+    buildElList();
+    updateOpTip(ELS.length?'Canvas上にドラッグして領域を描いてください（続けて追加可能）':'Canvas上にドラッグして領域を描いてください');
+    redrawEd();
+  } else {
+    // スケッチモードOFF：確定待ち状態をキャンセル
+    cancelSketch();
+    redrawEd();
+  }
+}
+
+// スケッチ役割割り当て
+function assignSketch(type){
+  if(!sketchPendingRect) return;
+  var r=sketchPendingRect;
+  var id,label,color,bold,elType,inputField,optional,text;
+  if(type==='name'){
+    id='name'; label='品名'; color='#2d5a1e'; bold=true; elType='text'; inputField=true; optional=false; text='';
+  } else if(type==='price'){
+    id='price'; label='税込価格'; color='#b45309'; bold=true; elType='price'; inputField=false; optional=false; text='';
+  } else if(type==='tax'){
+    id='tax'; label='税込文字'; color='#6b7280'; bold=false; elType='tax'; inputField=false; optional=false; text='';
+  } else {
+    id='custom_'+Date.now(); label='テキスト'; color='#6366f1'; bold=false; elType='custom'; inputField=false; optional=false; text='テキスト';
+  }
+  // name/price/taxは既存を削除して上書き（1つのみ存在）
+  if(type!=='custom'){
+    ELS=ELS.filter(function(el){return el.id!==id;});
+  }
+  ELS.push(normalizeEl({
+    id:id, type:elType, label:label,
+    col:r.col, row:r.row, colSpan:r.colSpan, rowSpan:r.rowSpan,
+    color:color, bold:bold, align:'center', valign:'middle', fontSize:'auto',
+    inputField:inputField, optional:optional, text:text
+  }));
+  sketchPendingRect=null;
+  var assignEl=document.getElementById('sketch-assign');
+  if(assignEl) assignEl.style.display='none';
+  buildElList();
+  redrawEd();
+  redrawPrev();
+  rebuildInpFields();
+  markEdited();
+  toast(label+' を配置しました');
+  // 次の領域を描けるようにガイド更新
+  updateOpTip('続けて領域を描くか、スケッチOFFで編集モードへ');
+}
+
+// スケッチキャンセル
+function cancelSketch(){
+  sketchPendingRect=null;
+  sketchRect=null;
+  sketchStart=null;
+  var assignEl=document.getElementById('sketch-assign');
+  if(assignEl) assignEl.style.display='none';
+  redrawEd();
+}
 
 // ━━ ELEMENT MANAGEMENT ━━
 function gEl(id){return ELS.find(function(e){return e.id===id;});}
