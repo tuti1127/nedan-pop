@@ -637,7 +637,22 @@ function onToyoakeFile(event) {
         });
       }
       renderPlantList('toyoake-plant-list', toyoakePlantData);
-      notify('豊明花き: '+toyoakePlantData.length+'件を読み込みました');
+      // 全商品を自動でPOPグリッドに一括追加
+      for (var j=0; j<toyoakePlantData.length; j++) {
+        var d = toyoakePlantData[j];
+        var placed = false;
+        for (var k=0; k<4; k++) {
+          if (!pages[currentPage][k]) { pages[currentPage][k]=d; placed=true; break; }
+        }
+        if (!placed) {
+          pages.push([d,null,null,null]);
+          currentPage = pages.length-1;
+        }
+      }
+      selectedCell = null;
+      renderGrid();
+      updatePageDots();
+      notify('豊明花き: '+toyoakePlantData.length+'件をPOPに追加しました');
     } catch(err) { notify('読み込み失敗: '+err.message); }
   };
   reader.onerror=function(){ notify('ファイルの読み込みに失敗しました'); };
