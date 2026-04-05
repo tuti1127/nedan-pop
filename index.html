@@ -522,7 +522,19 @@ function renderPlantList(containerId, data) {
 function onPlantClick(el, i) {
   document.querySelectorAll('#toyoake-plant-list .plant-item').forEach(function(e){ e.classList.remove('selected'); });
   el.classList.add('selected');
-  loadPlant(toyoakePlantData[i]);
+  var p = toyoakePlantData[i];
+  // フォームに入力
+  document.getElementById('fName').value      = p.name      ||'';
+  document.getElementById('fNameUpper').value = p.nameUpper ||'';
+  document.getElementById('fNameLower').value = p.nameLower ||'';
+  document.getElementById('fCategory').value  = p.category  ||'';
+  document.getElementById('fCatch').value      = p.catchcopy||'';
+  document.getElementById('fPoint').value      = p.point    ||'';
+  document.getElementById('fPrice').value      = p.price    ||'';
+  document.getElementById('fBand').value       = p.band     ||'';
+  calcTax();
+  // 直接グリッドに配置
+  addToGrid();
 }
 
 function printAllPages() {
