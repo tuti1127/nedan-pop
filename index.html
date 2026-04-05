@@ -5,231 +5,150 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ねだんPOP — Kitayama Nursery</title>
 <style>
-*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --green:#2d6a2d; --green-h:#1b5e20; --green-light:#4caf50; --green-pale:#e8f5e9;
-  --red:#c62828; --accent:#ff8f00; --bg:#f0f4f0; --card:#ffffff; --panel:#ffffff;
-  --text:#1a2e1a; --muted:#6a8a6a; --border:#c8e6c9; --border-dark:#a5c8a5;
-  --input-bg:#ffffff; --preview-bg:#dde8dd; --shadow:0 2px 8px rgba(0,0,0,0.10);
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --background:#fafafa;--card:#ffffff;--muted:#f4f4f5;
+  --foreground:#09090b;--muted-fg:#71717a;
+  --border:#e4e4e7;--input:#e4e4e7;--ring:#2d6a2d;
+  --primary:#2d6a2d;--primary-fg:#ffffff;--primary-hover:#1b5e20;
+  --destructive:#dc2626;--destructive-hover:#b91c1c;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+  --shadow:0 1px 3px rgba(0,0,0,0.10),0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.06);
+  --radius:8px;--radius-sm:6px;
 }
-html { font-size:15px; -webkit-text-size-adjust:100%; }
-body { font-family:system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+html{font-size:15px;-webkit-text-size-adjust:100%;}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--background);color:var(--foreground);min-height:100vh;}
 
-header {
-  background:var(--green); padding:0 20px; height:52px;
-  display:flex; align-items:center; justify-content:space-between;
-  box-shadow:var(--shadow); position:sticky; top:0; z-index:200;
-}
-.hdr-left { display:flex; align-items:center; gap:12px; }
-.hdr-logo {
-  width:36px; height:36px; background:rgba(255,255,255,0.2); border-radius:50%;
-  display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;
-}
-.hdr-title { color:#fff; font-size:17px; font-weight:900; letter-spacing:0.04em; }
-.hdr-sub   { color:#a5d6a7; font-size:11px; }
-.hdr-btn {
-  height:36px; padding:0 14px; border:none; border-radius:6px;
-  background:rgba(255,255,255,0.18); color:#fff; font-family:inherit;
-  font-size:13px; font-weight:700; cursor:pointer;
-  display:flex; align-items:center; gap:5px; transition:background 0.15s;
-}
-.hdr-btn:hover { background:rgba(255,255,255,0.28); }
+header{background:var(--card);border-bottom:1px solid var(--border);height:56px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:var(--shadow-sm);}
+.hdr-left{display:flex;align-items:center;gap:10px;}
+.hdr-logo{width:36px;height:36px;background:var(--muted);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid var(--border);}
+.hdr-title{font-size:16px;font-weight:700;color:var(--foreground);line-height:1.2;}
+.hdr-sub{font-size:11px;color:var(--muted-fg);}
+.hdr-btn{height:36px;padding:0 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);color:var(--foreground);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background 0.15s,border-color 0.15s;box-shadow:var(--shadow-sm);}
+.hdr-btn:hover{background:var(--muted);border-color:#d4d4d8;}
+.hdr-btn:active{transform:scale(0.98);}
 
-.app { display:grid; grid-template-columns:360px 1fr; min-height:calc(100vh - 52px); }
+.app{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 56px);}
+.left-panel{background:var(--card);border-right:1px solid var(--border);overflow-y:auto;height:calc(100vh - 56px);position:sticky;top:56px;}
+.panel-section{border-bottom:1px solid var(--border);padding:16px;}
+.panel-section h2{font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:12px;}
 
-.left-panel {
-  background:var(--panel); border-right:1px solid var(--border);
-  overflow-y:auto; height:calc(100vh - 52px); position:sticky; top:52px;
-}
-.panel-section { border-bottom:1px solid var(--border); padding:14px 16px; }
-.panel-section h2 {
-  font-size:10px; font-weight:700; color:var(--muted);
-  letter-spacing:0.12em; text-transform:uppercase; margin-bottom:10px;
-}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:var(--background);}
+.upload-zone:hover{border-color:var(--ring);background:#f0f7f0;}
+.upload-zone input{display:none;}
+.upload-zone .uz-icon{font-size:24px;margin-bottom:4px;}
+.upload-zone strong{color:var(--foreground);font-size:13px;font-weight:500;display:block;}
+.upload-zone p{font-size:11px;color:var(--muted-fg);margin-top:2px;}
 
-.upload-zone {
-  border:2px dashed var(--border-dark); border-radius:8px; padding:16px;
-  text-align:center; cursor:pointer; transition:all 0.2s; background:var(--green-pale);
-}
-.upload-zone:hover { border-color:var(--green-light); filter:brightness(0.96); }
-.upload-zone input { display:none; }
-.upload-zone .uz-icon { font-size:26px; margin-bottom:4px; }
-.upload-zone strong { color:var(--green); font-size:13px; display:block; }
-.upload-zone p { font-size:11px; color:var(--muted); margin-top:2px; }
+.plant-list{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto;margin-top:10px;}
+.plant-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;transition:background 0.12s,border-color 0.12s;font-size:12px;background:var(--card);}
+.plant-item:hover{background:#f0f7f0;border-color:#a7c9a7;}
+.plant-item.selected{background:var(--primary);color:var(--primary-fg);border-color:var(--primary);}
+.plant-item.selected .plant-price{color:#a5d6a7;}
+.plant-name{flex:1;font-weight:500;}
+.plant-price{font-size:11px;color:var(--muted-fg);white-space:nowrap;}
 
-.plant-list { display:flex; flex-direction:column; gap:4px; max-height:220px; overflow-y:auto; margin-top:10px; }
-.plant-item {
-  display:flex; align-items:center; gap:8px; padding:7px 10px;
-  border-radius:6px; border:1px solid var(--border); cursor:pointer;
-  transition:all 0.15s; font-size:12px; background:var(--card);
-}
-.plant-item:hover { background:var(--green-pale); border-color:var(--green-light); }
-.plant-item.selected { background:var(--green); color:#fff; border-color:var(--green); }
-.plant-item.selected .plant-price { color:#a5d6a7; }
-.plant-name  { flex:1; font-weight:700; }
-.plant-price { font-size:11px; color:var(--muted); white-space:nowrap; }
+.form-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.form-row:last-child{margin-bottom:0;}
+.form-row label{font-size:13px;font-weight:500;color:var(--foreground);}
+.form-row input,.form-row textarea,.form-row select{height:40px;border:1px solid var(--input);border-radius:var(--radius-sm);padding:0 12px;font-size:14px;font-family:inherit;color:var(--foreground);background:var(--card);transition:border-color 0.15s,box-shadow 0.15s;outline:none;}
+.form-row input::placeholder,.form-row textarea::placeholder{color:#a1a1aa;}
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus{border-color:var(--ring);box-shadow:0 0 0 2px var(--background),0 0 0 4px var(--ring);}
+.form-row textarea{height:auto;min-height:80px;padding:10px 12px;resize:vertical;line-height:1.5;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.price-display{font-size:14px;font-weight:700;color:var(--destructive);padding:0 12px;border:1px solid var(--input);border-radius:var(--radius-sm);background:#fef2f2;height:40px;display:flex;align-items:center;}
 
-.form-row { display:flex; flex-direction:column; gap:3px; margin-bottom:9px; }
-.form-row:last-child { margin-bottom:0; }
-.form-row label { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:0.05em; }
-.form-row input,.form-row textarea,.form-row select {
-  border:1px solid var(--border-dark); border-radius:6px; padding:7px 10px;
-  font-size:13px; font-family:inherit; color:var(--text); background:var(--input-bg);
-  transition:border-color 0.15s,box-shadow 0.15s; outline:none;
-}
-.form-row input:focus,.form-row textarea:focus,.form-row select:focus {
-  border-color:var(--green-light); box-shadow:0 0 0 2px rgba(76,175,80,0.2);
-}
-.form-row textarea { resize:vertical; min-height:52px; }
-.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.price-display {
-  font-size:13px; font-weight:700; color:var(--red);
-  padding:7px 10px; border:1px solid var(--border-dark);
-  border-radius:6px; background:var(--green-pale); min-height:34px;
-}
+.color-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.color-btn{padding:5px 14px;border-radius:20px;border:2px solid var(--chip-color);background:transparent;color:var(--chip-color);font-size:12px;font-weight:600;cursor:pointer;transition:background 0.15s,color 0.15s;font-family:inherit;}
+.color-btn:hover{background:var(--chip-color);color:#fff;opacity:0.85;}
+.color-btn.active{background:var(--chip-color);color:#fff;}
 
-.color-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
-.color-btn {
-  width:30px; height:30px; border-radius:50%; border:3px solid transparent;
-  cursor:pointer; transition:all 0.15s; position:relative;
-}
-.color-btn.active { border-color:var(--text); transform:scale(1.15); }
-.color-btn.active::after {
-  content:''; position:absolute; inset:4px;
-  border-radius:50%; background:rgba(255,255,255,0.35);
-}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--foreground);margin-top:10px;}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:12px;cursor:pointer;transition:background 0.2s;border:1px solid #d4d4d8;}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;background:white;border-radius:50%;transition:transform 0.2s;box-shadow:var(--shadow-sm);}
+.toggle input:checked + .toggle-slider{background:var(--primary);border-color:var(--primary);}
+.toggle input:checked + .toggle-slider::before{transform:translateX(20px);}
 
-.toggle-row { display:flex; align-items:center; justify-content:space-between; font-size:12px; margin-top:8px; }
-.toggle { position:relative; width:38px; height:21px; flex-shrink:0; }
-.toggle input { opacity:0; width:0; height:0; }
-.toggle-slider {
-  position:absolute; inset:0; background:var(--border-dark);
-  border-radius:21px; cursor:pointer; transition:0.2s;
-}
-.toggle-slider::before {
-  content:''; position:absolute; width:15px; height:15px;
-  left:3px; top:3px; background:white; border-radius:50%; transition:0.2s;
-}
-.toggle input:checked + .toggle-slider { background:var(--green); }
-.toggle input:checked + .toggle-slider::before { transform:translateX(17px); }
+.btn{height:40px;padding:0 16px;border-radius:var(--radius-sm);font-family:inherit;font-weight:500;font-size:14px;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid transparent;}
+.btn:active{transform:scale(0.97)!important;}
+.btn-secondary{background:var(--card);border-color:var(--border);color:var(--foreground);}
+.btn-secondary:hover{background:var(--muted);}
+.btn-primary{background:var(--primary);color:var(--primary-fg);width:100%;font-size:14px;border-color:var(--primary);}
+.btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);}
+.btn-danger{background:var(--destructive);color:#fff;border-color:var(--destructive);}
+.btn-danger:hover{background:var(--destructive-hover);border-color:var(--destructive-hover);}
+.btn-row{display:flex;gap:8px;}
+.btn-row .btn{flex:1;}
 
-.btn {
-  padding:9px 16px; border:none; border-radius:6px; font-family:inherit;
-  font-weight:700; font-size:13px; cursor:pointer; transition:all 0.15s;
-  display:inline-flex; align-items:center; justify-content:center; gap:5px;
-}
-.btn-primary   { background:var(--green); color:#fff; width:100%; font-size:14px; padding:11px; }
-.btn-primary:hover { background:var(--green-h); transform:translateY(-1px); }
-.btn-danger    { background:var(--red); color:#fff; }
-.btn-danger:hover  { background:#b71c1c; }
-.btn-secondary { background:var(--green-pale); color:var(--green); border:1px solid var(--border-dark); }
-.btn-secondary:hover { filter:brightness(0.95); }
-.btn:active    { transform:scale(0.97) !important; }
-.btn-row { display:flex; gap:8px; }
-.btn-row .btn { flex:1; }
+.right-panel{padding:20px 24px;display:flex;flex-direction:column;align-items:center;background:var(--muted);overflow-y:auto;min-height:calc(100vh - 56px);}
+.page-nav{display:flex;gap:6px;align-items:center;margin-bottom:14px;background:var(--card);padding:8px 12px;border-radius:var(--radius);box-shadow:var(--shadow);width:100%;max-width:740px;border:1px solid var(--border);}
+.page-nav .nav-label{font-size:12px;color:var(--muted-fg);font-weight:500;flex-shrink:0;}
+.page-dots{display:flex;gap:5px;flex:1;align-items:center;}
+.page-dot{width:8px;height:8px;border-radius:50%;background:#d4d4d8;cursor:pointer;transition:background 0.15s,transform 0.15s;}
+.page-dot:hover{background:#a1a1aa;transform:scale(1.2);}
+.page-dot.active{background:var(--primary);transform:scale(1.2);}
 
-.right-panel {
-  padding:20px 24px; display:flex; flex-direction:column; align-items:center;
-  background:var(--preview-bg); overflow-y:auto; min-height:calc(100vh - 52px);
-}
+.pop-canvas{background:var(--card);box-shadow:var(--shadow-md);border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);}
+.pop-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;width:720px;height:510px;}
+.pop-card{position:relative;border:1px solid #e0e0e0;display:flex;flex-direction:column;overflow:hidden;background:var(--card);cursor:pointer;transition:outline 0.12s;}
+.pop-card:hover{outline:2px solid var(--border);outline-offset:-2px;}
+.pop-card.active-card{outline:2px solid var(--primary);outline-offset:-2px;}
+.pop-card.empty{background:#fafafa;}
 
-.page-nav {
-  display:flex; gap:6px; align-items:center; margin-bottom:14px;
-  background:var(--card); padding:8px 12px; border-radius:8px;
-  box-shadow:var(--shadow); width:100%; max-width:740px;
-}
-.page-nav .nav-label { font-size:11px; color:var(--muted); font-weight:700; flex-shrink:0; }
-.page-dots { display:flex; gap:5px; flex:1; }
-.page-dot { width:10px; height:10px; border-radius:50%; background:var(--border-dark); cursor:pointer; transition:background 0.15s; }
-.page-dot.active { background:var(--green); }
+.pop-inner{width:100%;height:100%;position:relative;display:flex;flex-direction:column;}
+.pop-frame{position:absolute;inset:6px;border-radius:6px;pointer-events:none;z-index:1;}
+.pop-logo-area{position:absolute;top:10px;left:10px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;line-height:1;}
+.pop-logo-mark{font-size:16px;font-weight:900;}
+.pop-logo-text{font-size:6.5px;font-weight:700;letter-spacing:-0.01em;margin-top:1px;}
+.pop-band{position:absolute;top:10px;right:10px;z-index:3;background:#ff8f00;color:#fff;font-size:7.5px;font-weight:900;padding:3px 7px;border-radius:10px;line-height:1.3;text-align:center;}
+.pop-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:16px 14px 10px;z-index:2;}
+.pop-category{font-size:8.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;opacity:0.7;}
+.pop-name-upper{font-size:9.5px;font-weight:700;opacity:0.8;line-height:1.2;}
+.pop-name-main{font-weight:700;line-height:1.1;margin-bottom:2px;}
+.pop-name-lower{font-size:9.5px;opacity:0.75;margin-bottom:5px;}
+.pop-divider{height:2px;margin:5px 0;border-radius:1px;opacity:0.3;}
+.pop-catchcopy{font-size:9.5px;line-height:1.5;margin-bottom:4px;flex:1;}
+.pop-point{font-size:8px;opacity:0.6;line-height:1.4;}
+.pop-price-area{margin-top:6px;display:flex;align-items:baseline;gap:3px;}
+.pop-price-label{font-size:8.5px;font-weight:700;}
+.pop-price-num{font-weight:700;line-height:1;}
+.pop-price-tax{font-size:8.5px;opacity:0.7;}
+.pop-empty-hint{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#d4d4d8;font-size:11px;gap:6px;}
+.pop-empty-hint .plus{font-size:22px;color:#d4d4d8;}
+.pop-empty-hint span{font-size:11px;color:#a1a1aa;}
 
-.pop-canvas { background:#fff; box-shadow:0 4px 20px rgba(0,0,0,0.13); border-radius:4px; overflow:hidden; }
-.pop-grid { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; width:720px; height:510px; gap:0; }
+.theme-red{--tc:#c62828;} .theme-green{--tc:#2d6a2d;} .theme-blue{--tc:#1565c0;} .theme-orange{--tc:#e65100;}
+.pop-frame{border:5px solid var(--tc,#c62828);}
+.pop-logo-mark{color:var(--tc,#c62828);} .pop-logo-text{color:var(--tc,#c62828);}
+.pop-price-num{color:var(--tc,#c62828);} .pop-category{color:var(--tc,#c62828);}
+.pop-divider{background:var(--tc,#c62828);}
 
-.pop-card {
-  position:relative; border:1px solid #e0e0e0; display:flex;
-  flex-direction:column; overflow:hidden; background:#fff; cursor:pointer; transition:outline 0.12s;
-}
-.pop-card:hover { outline:2px dashed var(--green-light); }
-.pop-card.active-card { outline:3px solid var(--green); outline-offset:-1px; }
-.pop-card.empty { background:#fafafa; }
+.notif{position:fixed;bottom:20px;right:20px;background:var(--foreground);color:#fff;padding:10px 18px;border-radius:var(--radius);font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,0.2);transform:translateY(70px);opacity:0;transition:all 0.25s ease;z-index:999;pointer-events:none;}
+.notif.show{transform:translateY(0);opacity:1;}
 
-.pop-inner { width:100%; height:100%; position:relative; display:flex; flex-direction:column; }
-.pop-frame { position:absolute; inset:6px; border-radius:6px; pointer-events:none; z-index:1; }
-.pop-logo-area {
-  position:absolute; top:10px; left:10px; z-index:2;
-  display:flex; flex-direction:column; align-items:flex-start; line-height:1;
+@media(max-width:860px){
+  .app{grid-template-columns:1fr;}
+  .left-panel{position:static;height:auto;max-height:50vh;overflow-y:auto;border-right:none;border-bottom:1px solid var(--border);}
+  .right-panel{padding:16px 12px;}
+  .pop-grid{width:100%;max-width:520px;height:auto;aspect-ratio:1.414;}
+  .page-nav{max-width:520px;}
 }
-.pop-logo-mark { font-size:16px; font-weight:900; }
-.pop-logo-text { font-size:6.5px; font-weight:700; letter-spacing:-0.01em; margin-top:1px; }
-.pop-band {
-  position:absolute; top:10px; right:10px; z-index:3;
-  background:var(--accent); color:#fff; font-size:7.5px; font-weight:900;
-  padding:3px 7px; border-radius:10px; line-height:1.3; text-align:center;
-}
-.pop-content {
-  position:absolute; inset:0; display:flex; flex-direction:column;
-  justify-content:center; padding:16px 14px 10px; z-index:2;
-}
-.pop-category  { font-size:8.5px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:3px; opacity:0.7; }
-.pop-name-upper { font-size:9.5px; font-weight:700; opacity:0.8; line-height:1.2; }
-.pop-name-main  { font-weight:700; line-height:1.1; margin-bottom:2px; }
-.pop-name-lower { font-size:9.5px; opacity:0.75; margin-bottom:5px; }
-.pop-divider    { height:2px; margin:5px 0; border-radius:1px; opacity:0.3; }
-.pop-catchcopy  { font-size:9.5px; line-height:1.5; margin-bottom:4px; flex:1; }
-.pop-point      { font-size:8px; opacity:0.6; line-height:1.4; }
-.pop-price-area { margin-top:6px; display:flex; align-items:baseline; gap:3px; }
-.pop-price-label { font-size:8.5px; font-weight:700; }
-.pop-price-num  { font-weight:700; line-height:1; }
-.pop-price-tax  { font-size:8.5px; opacity:0.7; }
-.pop-empty-hint {
-  width:100%; height:100%; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; color:#bbb; font-size:11px; gap:5px;
-}
-.pop-empty-hint .plus { font-size:26px; }
-
-.theme-red    { --tc:#c62828; }
-.theme-green  { --tc:#2d6a2d; }
-.theme-blue   { --tc:#1565c0; }
-.theme-orange { --tc:#e65100; }
-.pop-frame     { border:5px solid var(--tc,#c62828); }
-.pop-logo-mark { color:var(--tc,#c62828); }
-.pop-logo-text { color:var(--tc,#c62828); }
-.pop-price-num { color:var(--tc,#c62828); }
-.pop-category  { color:var(--tc,#c62828); }
-.pop-divider   { background:var(--tc,#c62828); }
-
-.notif {
-  position:fixed; bottom:20px; right:20px; background:#2d6a2d; color:#fff;
-  padding:10px 18px; border-radius:8px; font-size:13px; font-weight:700;
-  box-shadow:0 4px 16px rgba(0,0,0,0.25); transform:translateY(70px); opacity:0;
-  transition:all 0.28s ease; z-index:999; pointer-events:none;
-}
-.notif.show { transform:translateY(0); opacity:1; }
-
-@media (max-width:860px) {
-  .app { grid-template-columns:1fr; }
-  .left-panel { position:static; height:auto; max-height:none; border-right:none; border-bottom:1px solid var(--border); }
-  .right-panel { padding:16px 12px; }
-  .pop-grid { width:100%; max-width:520px; height:auto; aspect-ratio:1.384; }
-  .page-nav { max-width:520px; }
-}
-@media (max-width:560px) {
-  .pop-grid { max-width:340px; }
-  .page-nav { max-width:340px; }
-}
-@media print {
-  @page { size:A4 landscape; margin:8mm; }
-  header,.left-panel,.page-nav,.right-panel > .btn-print-area { display:none !important; }
-  body,.app,.right-panel { background:white !important; padding:0 !important; margin:0 !important; }
-  .app { display:block; }
-  .right-panel { display:block !important; overflow:visible !important; padding:0 !important; align-items:flex-start !important; }
-  .pop-canvas { box-shadow:none !important; border-radius:0 !important; }
-  .pop-grid { width:277mm !important; height:190mm !important; }
-  .pop-card { border:1px solid #ccc !important; }
-  .notif { display:none !important; }
-  .print-all-pages .pop-canvas { page-break-after:always; }
-  .print-all-pages .pop-canvas:last-child { page-break-after:avoid; }
+@media(max-width:560px){.pop-grid{max-width:340px;}.page-nav{max-width:340px;}}
+@media print{
+  @page{size:A4 landscape;margin:8mm;}
+  header,.left-panel,.page-nav,.right-panel>.btn-print-area{display:none!important;}
+  body,.app,.right-panel{background:white!important;padding:0!important;margin:0!important;}
+  .app{display:block;}
+  .right-panel{display:block!important;overflow:visible!important;padding:0!important;align-items:flex-start!important;}
+  .pop-canvas{box-shadow:none!important;border-radius:0!important;border:none!important;}
+  .pop-grid{width:277mm!important;height:190mm!important;}
+  .pop-card{border:1px solid #ccc!important;}
+  .notif{display:none!important;}
+  .print-all-pages .pop-canvas{page-break-after:always;}
+  .print-all-pages .pop-canvas:last-child{page-break-after:avoid;}
 }
 </style>
 </head>
@@ -240,7 +159,7 @@ header {
     <div class="hdr-logo">🌿</div>
     <div>
       <div class="hdr-title">ねだんPOP</div>
-      <div class="hdr-sub">Kitayama Nursery — A4横・4面印刷対応</div>
+      <div class="hdr-sub">Kitayama Nursery</div>
     </div>
   </div>
   <button class="hdr-btn" onclick="printAllPages()">🖨 印刷（A4横）</button>
@@ -286,11 +205,11 @@ header {
       </div>
       <div class="form-row">
         <label>ポイント（小文字説明）</label>
-        <textarea id="fPoint" placeholder="例：花：４〜５月　丈：10〜15cm" oninput="updatePreview()" style="min-height:44px"></textarea>
+        <textarea id="fPoint" placeholder="例：花：４〜５月　丈：10〜15cm" oninput="updatePreview()" style="min-height:52px;"></textarea>
       </div>
       <div class="form-row">
         <label>税抜き価格（円）</label>
-        <input type="number" id="fPrice" placeholder="480" oninput="calcTax()" style="font-size:16px;font-weight:900;color:var(--red);">
+        <input type="number" id="fPrice" placeholder="480" oninput="calcTax()" style="font-size:16px;font-weight:700;color:var(--destructive);">
       </div>
       <div class="form-grid">
         <div class="form-row">
@@ -309,10 +228,10 @@ header {
       <div class="form-row">
         <label>枠カラー</label>
         <div class="color-row">
-          <div class="color-btn active" style="background:#c62828" onclick="setTheme('red',this)"    title="赤"></div>
-          <div class="color-btn"        style="background:#2d6a2d" onclick="setTheme('green',this)"  title="緑"></div>
-          <div class="color-btn"        style="background:#1565c0" onclick="setTheme('blue',this)"   title="青"></div>
-          <div class="color-btn"        style="background:#e65100" onclick="setTheme('orange',this)" title="オレンジ"></div>
+          <button class="color-btn active" style="--chip-color:#c62828" onclick="setTheme('red',this)">赤</button>
+          <button class="color-btn"        style="--chip-color:#2d6a2d" onclick="setTheme('green',this)">緑</button>
+          <button class="color-btn"        style="--chip-color:#1565c0" onclick="setTheme('blue',this)">青</button>
+          <button class="color-btn"        style="--chip-color:#e65100" onclick="setTheme('orange',this)">橙</button>
         </div>
       </div>
       <div class="toggle-row">
@@ -344,9 +263,9 @@ header {
     <div class="page-nav">
       <span class="nav-label">ページ</span>
       <div class="page-dots" id="pageDots"></div>
-      <button class="btn btn-secondary" onclick="addPage()"  style="padding:5px 10px;font-size:12px;flex-shrink:0;">＋ ページ追加</button>
-      <button class="btn btn-secondary" onclick="prevPage()" style="padding:5px 8px;font-size:12px;flex-shrink:0;">◀</button>
-      <button class="btn btn-secondary" onclick="nextPage()" style="padding:5px 8px;font-size:12px;flex-shrink:0;">▶</button>
+      <button class="btn btn-secondary" onclick="addPage()"  style="height:32px;padding:0 10px;font-size:12px;flex-shrink:0;">＋ ページ追加</button>
+      <button class="btn btn-secondary" onclick="prevPage()" style="height:32px;padding:0 10px;font-size:12px;flex-shrink:0;">◀</button>
+      <button class="btn btn-secondary" onclick="nextPage()" style="height:32px;padding:0 10px;font-size:12px;flex-shrink:0;">▶</button>
     </div>
     <div class="pop-canvas" id="popCanvas">
       <div class="pop-grid" id="popGrid"></div>
@@ -358,304 +277,173 @@ header {
 
 <script>
 'use strict';
+var currentTheme='red',pages=[[null,null,null,null]],currentPage=0,selectedCell=null,toyoakePlantData=[];
+renderGrid(); updatePageDots();
 
-var currentTheme     = 'red';
-var pages            = [[null,null,null,null]];
-var currentPage      = 0;
-var selectedCell     = null;
-var toyoakePlantData = [];
+function calcTax(){var p=parseInt(document.getElementById('fPrice').value),el=document.getElementById('fPriceTax');el.textContent=(!isNaN(p)&&p>0)?Math.floor(p*1.1).toLocaleString()+' 円（税込）':'—';updatePreview();}
+function setTheme(theme,el){currentTheme=theme;document.querySelectorAll('.color-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');renderGrid();}
+function updatePageDots(){document.getElementById('pageDots').innerHTML=pages.map(function(_,i){return '<div class="page-dot'+(i===currentPage?' active':'')+'" onclick="goPage('+i+')"></div>';}).join('');}
+function goPage(i){currentPage=i;selectedCell=null;renderGrid();updatePageDots();}
+function prevPage(){if(currentPage>0)goPage(currentPage-1);}
+function nextPage(){if(currentPage<pages.length-1)goPage(currentPage+1);}
+function addPage(){pages.push([null,null,null,null]);goPage(pages.length-1);notify('ページを追加しました');}
 
-renderGrid();
-updatePageDots();
-
-function calcTax() {
-  var p = parseInt(document.getElementById('fPrice').value);
-  var el = document.getElementById('fPriceTax');
-  el.textContent = (!isNaN(p) && p > 0) ? Math.floor(p*1.1).toLocaleString()+' 円（税込）' : '—';
-  updatePreview();
-}
-
-function setTheme(theme, el) {
-  currentTheme = theme;
-  document.querySelectorAll('.color-btn').forEach(function(b){ b.classList.remove('active'); });
-  el.classList.add('active');
-  renderGrid();
-}
-
-function updatePageDots() {
-  document.getElementById('pageDots').innerHTML = pages.map(function(_,i){
-    return '<div class="page-dot'+(i===currentPage?' active':'')+'" onclick="goPage('+i+')"></div>';
-  }).join('');
-}
-function goPage(i) { currentPage=i; selectedCell=null; renderGrid(); updatePageDots(); }
-function prevPage() { if(currentPage>0) goPage(currentPage-1); }
-function nextPage() { if(currentPage<pages.length-1) goPage(currentPage+1); }
-function addPage()  { pages.push([null,null,null,null]); goPage(pages.length-1); notify('ページを追加しました'); }
-
-function renderGrid() {
-  var grid = document.getElementById('popGrid');
-  grid.innerHTML = '';
+function renderGrid(){
+  var grid=document.getElementById('popGrid'); grid.innerHTML='';
   pages[currentPage].forEach(function(data,idx){
-    var cell = document.createElement('div');
-    cell.className = 'pop-card'+(data?' theme-'+(data.theme||currentTheme):' empty')+(selectedCell===idx?' active-card':'');
-    cell.onclick   = (function(i){ return function(){ selectCell(i); }; })(idx);
-    cell.innerHTML = data
-      ? buildPopHTML(data)
-      : '<div class="pop-empty-hint"><div class="plus">＋</div><div>クリックして選択</div></div>';
+    var cell=document.createElement('div');
+    cell.className='pop-card'+(data?' theme-'+(data.theme||currentTheme):' empty')+(selectedCell===idx?' active-card':'');
+    cell.onclick=(function(i){return function(){selectCell(i);};})(idx);
+    cell.innerHTML=data?buildPopHTML(data):'<div class="pop-empty-hint"><div class="plus">＋</div><span>クリックして選択</span></div>';
     grid.appendChild(cell);
   });
 }
 
-function buildPopHTML(d) {
-  var showLogo  = document.getElementById('showLogo').checked;
-  var showCat   = document.getElementById('showCat').checked;
-  var showPoint = document.getElementById('showPoint').checked;
-  var price = d.price ? parseInt(d.price) : null;
-  var tax   = price ? Math.floor(price*1.1) : null;
-  var nlen  = (d.name||'').length;
-  var nfs   = nlen>6 ? '17px' : nlen>4 ? '21px' : '25px';
-  var h = '<div class="pop-inner"><div class="pop-frame"></div>';
-  if (showLogo) h += '<div class="pop-logo-area"><div class="pop-logo-mark">🌿</div><div class="pop-logo-text">Kitayama Nursery</div></div>';
-  if (d.band)   h += '<div class="pop-band">'+esc(d.band)+'</div>';
-  h += '<div class="pop-content">';
-  if (showCat && d.category) h += '<div class="pop-category">'+esc(d.category)+'</div>';
-  if (d.nameUpper) h += '<div class="pop-name-upper">'+esc(d.nameUpper)+'</div>';
-  h += '<div class="pop-name-main" style="font-size:'+nfs+'">'+esc(d.name||'商品名')+'</div>';
-  if (d.nameLower) h += '<div class="pop-name-lower">'+esc(d.nameLower)+'</div>';
-  h += '<div class="pop-divider"></div>';
-  if (d.catchcopy) h += '<div class="pop-catchcopy">'+esc(d.catchcopy)+'</div>';
-  if (showPoint && d.point) h += '<div class="pop-point">'+esc(d.point)+'</div>';
-  if (tax) h += '<div class="pop-price-area"><div class="pop-price-label">税込</div><div class="pop-price-num" style="font-size:'+(tax>=1000?'27px':'31px')+'">'+tax.toLocaleString()+'</div><div class="pop-price-tax">円</div></div>';
+function buildPopHTML(d){
+  var showLogo=document.getElementById('showLogo').checked,showCat=document.getElementById('showCat').checked,showPoint=document.getElementById('showPoint').checked;
+  var price=d.price?parseInt(d.price):null,tax=price?Math.floor(price*1.1):null;
+  var nlen=(d.name||'').length,nfs=nlen>6?'17px':nlen>4?'21px':'25px';
+  var h='<div class="pop-inner"><div class="pop-frame"></div>';
+  if(showLogo) h+='<div class="pop-logo-area"><div class="pop-logo-mark">🌿</div><div class="pop-logo-text">Kitayama Nursery</div></div>';
+  if(d.band) h+='<div class="pop-band">'+esc(d.band)+'</div>';
+  h+='<div class="pop-content">';
+  if(showCat&&d.category) h+='<div class="pop-category">'+esc(d.category)+'</div>';
+  if(d.nameUpper) h+='<div class="pop-name-upper">'+esc(d.nameUpper)+'</div>';
+  h+='<div class="pop-name-main" style="font-size:'+nfs+'">'+esc(d.name||'商品名')+'</div>';
+  if(d.nameLower) h+='<div class="pop-name-lower">'+esc(d.nameLower)+'</div>';
+  h+='<div class="pop-divider"></div>';
+  if(d.catchcopy) h+='<div class="pop-catchcopy">'+esc(d.catchcopy)+'</div>';
+  if(showPoint&&d.point) h+='<div class="pop-point">'+esc(d.point)+'</div>';
+  if(tax) h+='<div class="pop-price-area"><div class="pop-price-label">税込</div><div class="pop-price-num" style="font-size:'+(tax>=1000?'27px':'31px')+'">'+tax.toLocaleString()+'</div><div class="pop-price-tax">円</div></div>';
   return h+'</div></div>';
 }
 
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-function selectCell(idx) {
-  selectedCell = idx;
-  var d = pages[currentPage][idx];
-  if (d) {
-    document.getElementById('fName').value      = d.name      ||'';
-    document.getElementById('fNameUpper').value = d.nameUpper ||'';
-    document.getElementById('fNameLower').value = d.nameLower ||'';
-    document.getElementById('fCategory').value  = d.category  ||'';
-    document.getElementById('fCatch').value      = d.catchcopy||'';
-    document.getElementById('fPoint').value      = d.point    ||'';
-    document.getElementById('fPrice').value      = d.price    ||'';
-    document.getElementById('fBand').value       = d.band     ||'';
-    calcTax();
+function selectCell(idx){
+  selectedCell=idx;
+  var d=pages[currentPage][idx];
+  if(d){
+    document.getElementById('fName').value=d.name||'';document.getElementById('fNameUpper').value=d.nameUpper||'';
+    document.getElementById('fNameLower').value=d.nameLower||'';document.getElementById('fCategory').value=d.category||'';
+    document.getElementById('fCatch').value=d.catchcopy||'';document.getElementById('fPoint').value=d.point||'';
+    document.getElementById('fPrice').value=d.price||'';document.getElementById('fBand').value=d.band||'';calcTax();
   }
   renderGrid();
 }
+function updatePreview(){if(selectedCell===null)return;pages[currentPage][selectedCell]=getFormData();renderGrid();}
+function getFormData(){return{name:document.getElementById('fName').value,nameUpper:document.getElementById('fNameUpper').value,nameLower:document.getElementById('fNameLower').value,category:document.getElementById('fCategory').value,catchcopy:document.getElementById('fCatch').value,point:document.getElementById('fPoint').value,price:document.getElementById('fPrice').value,band:document.getElementById('fBand').value,theme:currentTheme};}
 
-function updatePreview() {
-  if (selectedCell===null) return;
-  pages[currentPage][selectedCell] = getFormData();
+function addToGrid(){
+  var data=getFormData();if(!data.name){notify('商品名を入力してください');return;}
+  var placed=false;
+  for(var i=0;i<4;i++){if(!pages[currentPage][i]){pages[currentPage][i]=data;selectedCell=i;placed=true;break;}}
+  if(!placed){pages.push([data,null,null,null]);currentPage=pages.length-1;selectedCell=0;updatePageDots();notify('新しいページに追加しました');}
+  else notify('POPを追加しました');
   renderGrid();
 }
-function getFormData() {
-  return {
-    name:      document.getElementById('fName').value,
-    nameUpper: document.getElementById('fNameUpper').value,
-    nameLower: document.getElementById('fNameLower').value,
-    category:  document.getElementById('fCategory').value,
-    catchcopy: document.getElementById('fCatch').value,
-    point:     document.getElementById('fPoint').value,
-    price:     document.getElementById('fPrice').value,
-    band:      document.getElementById('fBand').value,
-    theme:     currentTheme,
-  };
-}
+function clearSelected(){if(selectedCell===null){notify('セルを選択してください');return;}pages[currentPage][selectedCell]=null;selectedCell=null;renderGrid();notify('削除しました');}
+function clearAll(){if(!confirm('全POPをクリアしますか？'))return;pages=[[null,null,null,null]];currentPage=0;selectedCell=null;renderGrid();updatePageDots();notify('全クリアしました');}
 
-function addToGrid() {
-  var data = getFormData();
-  if (!data.name) { notify('商品名を入力してください'); return; }
-  var placed = false;
-  for (var i=0;i<4;i++) {
-    if (!pages[currentPage][i]) { pages[currentPage][i]=data; selectedCell=i; placed=true; break; }
-  }
-  if (!placed) {
-    pages.push([data,null,null,null]); currentPage=pages.length-1; selectedCell=0;
-    updatePageDots(); notify('新しいページに追加しました');
-  } else { notify('POPを追加しました'); }
-  renderGrid();
-}
-
-function clearSelected() {
-  if (selectedCell===null) { notify('セルを選択してください'); return; }
-  pages[currentPage][selectedCell]=null; selectedCell=null; renderGrid(); notify('削除しました');
-}
-function clearAll() {
-  if (!confirm('全POPをクリアしますか？')) return;
-  pages=[[null,null,null,null]]; currentPage=0; selectedCell=null;
-  renderGrid(); updatePageDots(); notify('全クリアしました');
-}
-
-function loadPlant(p) {
-  document.getElementById('fName').value      = p.name      ||'';
-  document.getElementById('fNameUpper').value = p.nameUpper ||'';
-  document.getElementById('fNameLower').value = p.nameLower ||'';
-  document.getElementById('fCategory').value  = p.category  ||'';
-  document.getElementById('fCatch').value      = p.catchcopy||'';
-  document.getElementById('fPoint').value      = p.point    ||'';
-  document.getElementById('fPrice').value      = p.price    ||'';
-  document.getElementById('fBand').value       = p.band     ||'';
-  calcTax();
-  if (selectedCell===null) {
-    for (var i=0;i<4;i++) { if (!pages[currentPage][i]) { selectedCell=i; break; } }
-  }
+function loadPlant(p){
+  document.getElementById('fName').value=p.name||'';document.getElementById('fNameUpper').value=p.nameUpper||'';
+  document.getElementById('fNameLower').value=p.nameLower||'';document.getElementById('fCategory').value=p.category||'';
+  document.getElementById('fCatch').value=p.catchcopy||'';document.getElementById('fPoint').value=p.point||'';
+  document.getElementById('fPrice').value=p.price||'';document.getElementById('fBand').value=p.band||'';calcTax();
+  if(selectedCell===null){for(var i=0;i<4;i++){if(!pages[currentPage][i]){selectedCell=i;break;}}}
   updatePreview();
 }
-
-function renderPlantList(containerId, data) {
-  var list = document.getElementById(containerId);
-  if (!data.length) { list.style.display='none'; return; }
-  list.style.display = 'flex';
-  list.innerHTML = data.map(function(p,i){
-    return '<div class="plant-item" onclick="onPlantClick(this,'+i+')">' +
-      '<span class="plant-name">'+esc(p.name)+'</span>' +
-      '<span class="plant-price">'+(p.price?'¥'+parseInt(p.price).toLocaleString():'—')+'</span></div>';
-  }).join('');
+function renderPlantList(containerId,data){
+  var list=document.getElementById(containerId);
+  if(!data.length){list.style.display='none';return;}
+  list.style.display='flex';
+  list.innerHTML=data.map(function(p,i){return '<div class="plant-item" onclick="onPlantClick(this,'+i+')">'+'<span class="plant-name">'+esc(p.name)+'</span>'+'<span class="plant-price">'+(p.price?'¥'+parseInt(p.price).toLocaleString():'—')+'</span></div>';}).join('');
 }
-function onPlantClick(el, i) {
-  document.querySelectorAll('#toyoake-plant-list .plant-item').forEach(function(e){ e.classList.remove('selected'); });
+function onPlantClick(el,i){
+  document.querySelectorAll('#toyoake-plant-list .plant-item').forEach(function(e){e.classList.remove('selected');});
   el.classList.add('selected');
-  var p = toyoakePlantData[i];
-  // フォームに入力
-  document.getElementById('fName').value      = p.name      ||'';
-  document.getElementById('fNameUpper').value = p.nameUpper ||'';
-  document.getElementById('fNameLower').value = p.nameLower ||'';
-  document.getElementById('fCategory').value  = p.category  ||'';
-  document.getElementById('fCatch').value      = p.catchcopy||'';
-  document.getElementById('fPoint').value      = p.point    ||'';
-  document.getElementById('fPrice').value      = p.price    ||'';
-  document.getElementById('fBand').value       = p.band     ||'';
-  calcTax();
-  // 直接グリッドに配置
+  var p=toyoakePlantData[i];
+  document.getElementById('fName').value=p.name||'';document.getElementById('fNameUpper').value=p.nameUpper||'';
+  document.getElementById('fNameLower').value=p.nameLower||'';document.getElementById('fCategory').value=p.category||'';
+  document.getElementById('fCatch').value=p.catchcopy||'';document.getElementById('fPoint').value=p.point||'';
+  document.getElementById('fPrice').value=p.price||'';document.getElementById('fBand').value=p.band||'';calcTax();
   addToGrid();
 }
 
-function printAllPages() {
-  if (pages.length===1) { window.print(); return; }
-  var overlay = document.createElement('div');
-  overlay.id  = 'print-overlay-all';
-  overlay.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;overflow:auto;';
-  var style = document.createElement('style');
-  style.id   = 'print-all-style';
-  style.textContent = '@page{size:A4 landscape;margin:8mm;}@media print{body>*:not(#print-overlay-all){display:none!important;}#print-overlay-all{position:static!important;overflow:visible!important;background:none!important;}.print-page{page-break-after:always;page-break-inside:avoid;}.print-page:last-child{page-break-after:avoid;}.print-page .pop-grid{width:277mm!important;height:190mm!important;}}';
+function printAllPages(){
+  if(pages.length===1){window.print();return;}
+  var overlay=document.createElement('div');overlay.id='print-overlay-all';overlay.style.cssText='position:fixed;inset:0;background:#fff;z-index:9999;overflow:auto;';
+  var style=document.createElement('style');style.id='print-all-style';
+  style.textContent='@page{size:A4 landscape;margin:8mm;}@media print{body>*:not(#print-overlay-all){display:none!important;}#print-overlay-all{position:static!important;overflow:visible!important;background:none!important;}.print-page{page-break-after:always;page-break-inside:avoid;}.print-page:last-child{page-break-after:avoid;}.print-page .pop-grid{width:277mm!important;height:190mm!important;}}';
   document.head.appendChild(style);
-  for (var pg=0;pg<pages.length;pg++) {
-    var wrapper=document.createElement('div'); wrapper.className='print-page'; wrapper.style.background='#fff';
-    var canvas=document.createElement('div');  canvas.className='pop-canvas';  canvas.style.cssText='box-shadow:none;margin-bottom:4px;';
-    var grid=document.createElement('div');    grid.className='pop-grid';
+  for(var pg=0;pg<pages.length;pg++){
+    var wrapper=document.createElement('div');wrapper.className='print-page';wrapper.style.background='#fff';
+    var canvas=document.createElement('div');canvas.className='pop-canvas';canvas.style.cssText='box-shadow:none;margin-bottom:4px;';
+    var grid=document.createElement('div');grid.className='pop-grid';
     pages[pg].forEach(function(data){
       var cell=document.createElement('div');
       cell.className='pop-card'+(data?' theme-'+(data.theme||currentTheme):' empty');
       cell.innerHTML=data?buildPopHTML(data):'<div class="pop-empty-hint" style="pointer-events:none;"><div class="plus" style="color:#ddd">＋</div></div>';
       grid.appendChild(cell);
     });
-    canvas.appendChild(grid); wrapper.appendChild(canvas); overlay.appendChild(wrapper);
+    canvas.appendChild(grid);wrapper.appendChild(canvas);overlay.appendChild(wrapper);
   }
   document.body.appendChild(overlay);
-  setTimeout(function(){
-    window.print();
-    setTimeout(function(){ overlay.remove(); var s=document.getElementById('print-all-style'); if(s)s.remove(); },800);
-  },200);
+  setTimeout(function(){window.print();setTimeout(function(){overlay.remove();var s=document.getElementById('print-all-style');if(s)s.remove();},800);},200);
 }
 
-function notify(msg) {
-  var el=document.getElementById('notif');
-  el.textContent=msg; el.classList.add('show');
-  clearTimeout(notify._t);
-  notify._t=setTimeout(function(){ el.classList.remove('show'); },2400);
-}
+function notify(msg){var el=document.getElementById('notif');el.textContent=msg;el.classList.add('show');clearTimeout(notify._t);notify._t=setTimeout(function(){el.classList.remove('show');},2400);}
 
 // 豊明花きCSV 読み込み
-
-function hanToZen(str) {
-  if (!str) return str;
-  var map={
-    'ｶﾞ':'ガ','ｷﾞ':'ギ','ｸﾞ':'グ','ｹﾞ':'ゲ','ｺﾞ':'ゴ','ｻﾞ':'ザ','ｼﾞ':'ジ','ｽﾞ':'ズ','ｾﾞ':'ゼ','ｿﾞ':'ゾ',
-    'ﾀﾞ':'ダ','ﾁﾞ':'ヂ','ﾂﾞ':'ヅ','ﾃﾞ':'デ','ﾄﾞ':'ド','ﾊﾞ':'バ','ﾋﾞ':'ビ','ﾌﾞ':'ブ','ﾍﾞ':'ベ','ﾎﾞ':'ボ',
-    'ﾊﾟ':'パ','ﾋﾟ':'ピ','ﾌﾟ':'プ','ﾍﾟ':'ペ','ﾎﾟ':'ポ','ｳﾞ':'ヴ',
-    'ｱ':'ア','ｲ':'イ','ｳ':'ウ','ｴ':'エ','ｵ':'オ','ｶ':'カ','ｷ':'キ','ｸ':'ク','ｹ':'ケ','ｺ':'コ',
-    'ｻ':'サ','ｼ':'シ','ｽ':'ス','ｾ':'セ','ｿ':'ソ','ﾀ':'タ','ﾁ':'チ','ﾂ':'ツ','ﾃ':'テ','ﾄ':'ト',
-    'ﾅ':'ナ','ﾆ':'ニ','ﾇ':'ヌ','ﾈ':'ネ','ﾉ':'ノ','ﾊ':'ハ','ﾋ':'ヒ','ﾌ':'フ','ﾍ':'ヘ','ﾎ':'ホ',
-    'ﾏ':'マ','ﾐ':'ミ','ﾑ':'ム','ﾒ':'メ','ﾓ':'モ','ﾔ':'ヤ','ﾕ':'ユ','ﾖ':'ヨ',
-    'ﾗ':'ラ','ﾘ':'リ','ﾙ':'ル','ﾚ':'レ','ﾛ':'ロ','ﾜ':'ワ','ﾝ':'ン','ｦ':'ヲ',
-    'ｧ':'ァ','ｨ':'ィ','ｩ':'ゥ','ｪ':'ェ','ｫ':'ォ','ｯ':'ッ','ｬ':'ャ','ｭ':'ュ','ｮ':'ョ',
-    'ｰ':'ー','ﾞ':'゛','ﾟ':'゜','･':'・','｡':'。','｢':'「','｣':'」','､':'、'
-  };
+function hanToZen(str){
+  if(!str)return str;
+  var map={'ｶﾞ':'ガ','ｷﾞ':'ギ','ｸﾞ':'グ','ｹﾞ':'ゲ','ｺﾞ':'ゴ','ｻﾞ':'ザ','ｼﾞ':'ジ','ｽﾞ':'ズ','ｾﾞ':'ゼ','ｿﾞ':'ゾ','ﾀﾞ':'ダ','ﾁﾞ':'ヂ','ﾂﾞ':'ヅ','ﾃﾞ':'デ','ﾄﾞ':'ド','ﾊﾞ':'バ','ﾋﾞ':'ビ','ﾌﾞ':'ブ','ﾍﾞ':'ベ','ﾎﾞ':'ボ','ﾊﾟ':'パ','ﾋﾟ':'ピ','ﾌﾟ':'プ','ﾍﾟ':'ペ','ﾎﾟ':'ポ','ｳﾞ':'ヴ','ｱ':'ア','ｲ':'イ','ｳ':'ウ','ｴ':'エ','ｵ':'オ','ｶ':'カ','ｷ':'キ','ｸ':'ク','ｹ':'ケ','ｺ':'コ','ｻ':'サ','ｼ':'シ','ｽ':'ス','ｾ':'セ','ｿ':'ソ','ﾀ':'タ','ﾁ':'チ','ﾂ':'ツ','ﾃ':'テ','ﾄ':'ト','ﾅ':'ナ','ﾆ':'ニ','ﾇ':'ヌ','ﾈ':'ネ','ﾉ':'ノ','ﾊ':'ハ','ﾋ':'ヒ','ﾌ':'フ','ﾍ':'ヘ','ﾎ':'ホ','ﾏ':'マ','ﾐ':'ミ','ﾑ':'ム','ﾒ':'メ','ﾓ':'モ','ﾔ':'ヤ','ﾕ':'ユ','ﾖ':'ヨ','ﾗ':'ラ','ﾘ':'リ','ﾙ':'ル','ﾚ':'レ','ﾛ':'ロ','ﾜ':'ワ','ﾝ':'ン','ｦ':'ヲ','ｧ':'ァ','ｨ':'ィ','ｩ':'ゥ','ｪ':'ェ','ｫ':'ォ','ｯ':'ッ','ｬ':'ャ','ｭ':'ュ','ｮ':'ョ','ｰ':'ー','ﾞ':'゛','ﾟ':'゜','･':'・','｡':'。','｢':'「','｣':'」','､':'、'};
   var result=str;
-  Object.keys(map).sort(function(a,b){return b.length-a.length;}).forEach(function(k){ result=result.split(k).join(map[k]); });
+  Object.keys(map).sort(function(a,b){return b.length-a.length;}).forEach(function(k){result=result.split(k).join(map[k]);});
   return result;
 }
-
-function parseCSVText(text) {
-  if (text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+function parseCSVText(text){
+  if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
   var rows=[],row=[],cur='',inQ=false;
-  for (var i=0;i<text.length;i++) {
+  for(var i=0;i<text.length;i++){
     var c=text[i],n=text[i+1];
-    if (inQ) {
-      if (c==='"'&&n==='"'){ cur+='"'; i++; } else if(c==='"'){ inQ=false; } else cur+=c;
-    } else {
-      if      (c==='"')             { inQ=true; }
-      else if (c===','||c==='\t')   { row.push(cur); cur=''; }
-      else if (c==='\r'&&n==='\n')  { rows.push(row); row=[]; cur=''; i++; }
-      else if (c==='\r'||c==='\n')  { rows.push(row); row=[]; cur=''; }
-      else cur+=c;
-    }
+    if(inQ){if(c==='"'&&n==='"'){cur+='"';i++;}else if(c==='"'){inQ=false;}else cur+=c;}
+    else{if(c==='"'){inQ=true;}else if(c===','||c==='\t'){row.push(cur);cur='';}else if(c==='\r'&&n==='\n'){rows.push(row);row=[];cur='';i++;}else if(c==='\r'||c==='\n'){rows.push(row);row=[];cur='';}else cur+=c;}
   }
-  row.push(cur); rows.push(row);
-  return rows.filter(function(r){ return r.some(function(c){ return c!==''; }); });
+  row.push(cur);rows.push(row);
+  return rows.filter(function(r){return r.some(function(c){return c!=='';});});
 }
-
-function onToyoakeFile(event) {
-  var file=event.target.files[0]; if (!file) return;
-  event.target.value='';
+function onToyoakeFile(event){
+  var file=event.target.files[0];if(!file)return;event.target.value='';
   var reader=new FileReader();
   reader.onload=function(e){
-    try {
+    try{
       var text=new TextDecoder('shift-jis').decode(e.target.result);
       var rows=parseCSVText(text);
-      if (!rows||rows.length<2) { notify('データがありません'); return; }
-      var hdr=rows[0].map(function(h){ return String(h).trim(); });
-      var nameIdx  = hdr.indexOf('品名');     if (nameIdx<0)  nameIdx=9;
-      var priceIdx = hdr.indexOf('ケース単価'); if (priceIdx<0) priceIdx=18;
-      var catIdx   = hdr.indexOf('中分類名称');
+      if(!rows||rows.length<2){notify('データがありません');return;}
+      var hdr=rows[0].map(function(h){return String(h).trim();});
+      var nameIdx=hdr.indexOf('品名');if(nameIdx<0)nameIdx=9;
+      var priceIdx=hdr.indexOf('ケース単価');if(priceIdx<0)priceIdx=18;
+      var catIdx=hdr.indexOf('中分類名称');
       toyoakePlantData=[];
-      for (var i=1;i<rows.length;i++) {
-        var r=rows[i]; if (r.length<5) continue;
-        var name =hanToZen(String(r[nameIdx] ||'').trim());
+      for(var i=1;i<rows.length;i++){
+        var r=rows[i];if(r.length<5)continue;
+        var name=hanToZen(String(r[nameIdx]||'').trim());
         var price=parseInt(String(r[priceIdx]||'').replace(/[^\d]/g,''))||0;
-        if (name&&price) toyoakePlantData.push({
-          name:name, nameUpper:'', nameLower:'',
-          category:hanToZen(String(r[catIdx]||'').trim()),
-          catchcopy:'', point:'', price:String(price), band:'', theme:currentTheme
-        });
+        if(name&&price)toyoakePlantData.push({name:name,nameUpper:'',nameLower:'',category:hanToZen(String(r[catIdx]||'').trim()),catchcopy:'',point:'',price:String(price),band:'',theme:currentTheme});
       }
-      renderPlantList('toyoake-plant-list', toyoakePlantData);
+      renderPlantList('toyoake-plant-list',toyoakePlantData);
       // 全商品を自動でPOPグリッドに一括追加
-      for (var j=0; j<toyoakePlantData.length; j++) {
-        var d = toyoakePlantData[j];
-        var placed = false;
-        for (var k=0; k<4; k++) {
-          if (!pages[currentPage][k]) { pages[currentPage][k]=d; placed=true; break; }
-        }
-        if (!placed) {
-          pages.push([d,null,null,null]);
-          currentPage = pages.length-1;
-        }
+      for(var j=0;j<toyoakePlantData.length;j++){
+        var d=toyoakePlantData[j];var placed=false;
+        for(var k=0;k<4;k++){if(!pages[currentPage][k]){pages[currentPage][k]=d;placed=true;break;}}
+        if(!placed){pages.push([d,null,null,null]);currentPage=pages.length-1;}
       }
-      selectedCell = null;
-      renderGrid();
-      updatePageDots();
+      selectedCell=null;renderGrid();updatePageDots();
       notify('豊明花き: '+toyoakePlantData.length+'件をPOPに追加しました');
-    } catch(err) { notify('読み込み失敗: '+err.message); }
+    }catch(err){notify('読み込み失敗: '+err.message);}
   };
-  reader.onerror=function(){ notify('ファイルの読み込みに失敗しました'); };
+  reader.onerror=function(){notify('ファイルの読み込みに失敗しました');};
   reader.readAsArrayBuffer(file);
 }
 </script>
