@@ -1,691 +1,240 @@
 <!DOCTYPE html>
-<html lang="ja" data-theme="light">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ねだんPOP — Kitayama Nursery</title>
-<script>
-/* テーマ初期化（フラッシュ防止） */
-(function(){
-  var s=localStorage.getItem('pp-theme');
-  if(s) document.documentElement.setAttribute('data-theme',s);
-  else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches)
-    document.documentElement.setAttribute('data-theme','dark');
-})();
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-/* ===== RESET ===== */
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-/* ===== LIGHT THEME ===== */
 :root {
-  --green:        #2d6a2d;
-  --green-h:      #1b5e20;
-  --green-light:  #4caf50;
-  --green-pale:   #e8f5e9;
-  --red:          #c62828;
-  --accent:       #ff8f00;
-  --bg:           #f0f4f0;
-  --card:         #ffffff;
-  --panel:        #ffffff;
-  --text:         #1a2e1a;
-  --muted:        #6a8a6a;
-  --border:       #c8e6c9;
-  --border-dark:  #a5c8a5;
-  --input-bg:     #ffffff;
-  --preview-bg:   #dde8dd;
-  --shadow:       0 2px 8px rgba(0,0,0,0.10);
-  --shadow-card:  0 4px 20px rgba(0,0,0,0.13);
-  --notif-bg:     #2d6a2d;
+  --green:#2d6a2d; --green-h:#1b5e20; --green-light:#4caf50; --green-pale:#e8f5e9;
+  --red:#c62828; --accent:#ff8f00; --bg:#f0f4f0; --card:#ffffff; --panel:#ffffff;
+  --text:#1a2e1a; --muted:#6a8a6a; --border:#c8e6c9; --border-dark:#a5c8a5;
+  --input-bg:#ffffff; --preview-bg:#dde8dd; --shadow:0 2px 8px rgba(0,0,0,0.10);
 }
+html { font-size:15px; -webkit-text-size-adjust:100%; }
+body { font-family:system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
 
-/* ===== DARK THEME ===== */
-[data-theme="dark"] {
-  --green:        #66bb6a;
-  --green-h:      #81c784;
-  --green-light:  #a5d6a7;
-  --green-pale:   #1b3a1b;
-  --red:          #ef9a9a;
-  --accent:       #ffcc02;
-  --bg:           #121a12;
-  --card:         #1e2a1e;
-  --panel:        #1e2a1e;
-  --text:         #e8f5e9;
-  --muted:        #7aaa7a;
-  --border:       #2d4a2d;
-  --border-dark:  #3a5a3a;
-  --input-bg:     #162016;
-  --preview-bg:   #162016;
-  --shadow:       0 2px 8px rgba(0,0,0,0.40);
-  --shadow-card:  0 4px 20px rgba(0,0,0,0.50);
-  --notif-bg:     #2d5a2d;
-}
-
-/* ===== BASE ===== */
-html { font-size: 15px; -webkit-text-size-adjust: 100%; }
-body {
-  font-family: 'Noto Sans JP', 'Hiragino Sans', 'Meiryo', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 3px; }
-
-/* ===== HEADER ===== */
 header {
-  background: var(--green);
-  padding: 0 20px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: var(--shadow);
-  position: sticky;
-  top: 0;
-  z-index: 200;
+  background:var(--green); padding:0 20px; height:52px;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow:var(--shadow); position:sticky; top:0; z-index:200;
 }
-.hdr-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+.hdr-left { display:flex; align-items:center; gap:12px; }
 .hdr-logo {
-  width: 36px; height: 36px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
+  width:36px; height:36px; background:rgba(255,255,255,0.2); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;
 }
-.hdr-title { color: #fff; font-size: 17px; font-weight: 900; letter-spacing: 0.04em; }
-.hdr-sub { color: #a5d6a7; font-size: 11px; }
-.hdr-btns { display: flex; gap: 8px; align-items: center; }
+.hdr-title { color:#fff; font-size:17px; font-weight:900; letter-spacing:0.04em; }
+.hdr-sub   { color:#a5d6a7; font-size:11px; }
 .hdr-btn {
-  height: 36px; padding: 0 14px;
-  border: none; border-radius: 6px;
-  background: rgba(255,255,255,0.18);
-  color: #fff;
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 13px; font-weight: 700;
-  cursor: pointer;
-  display: flex; align-items: center; gap: 5px;
-  transition: background 0.15s;
+  height:36px; padding:0 14px; border:none; border-radius:6px;
+  background:rgba(255,255,255,0.18); color:#fff; font-family:inherit;
+  font-size:13px; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; gap:5px; transition:background 0.15s;
 }
-.hdr-btn:hover { background: rgba(255,255,255,0.28); }
-.hdr-btn.dark-btn {
-  width: 36px; padding: 0;
-  justify-content: center;
-}
+.hdr-btn:hover { background:rgba(255,255,255,0.28); }
 
-/* ===== LAYOUT ===== */
-.app {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  min-height: calc(100vh - 52px);
-}
+.app { display:grid; grid-template-columns:360px 1fr; min-height:calc(100vh - 52px); }
 
-/* ===== LEFT PANEL ===== */
 .left-panel {
-  background: var(--panel);
-  border-right: 1px solid var(--border);
-  overflow-y: auto;
-  height: calc(100vh - 52px);
-  position: sticky;
-  top: 52px;
+  background:var(--panel); border-right:1px solid var(--border);
+  overflow-y:auto; height:calc(100vh - 52px); position:sticky; top:52px;
 }
-
-.panel-section {
-  border-bottom: 1px solid var(--border);
-  padding: 14px 16px;
-}
+.panel-section { border-bottom:1px solid var(--border); padding:14px 16px; }
 .panel-section h2 {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--muted);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
+  font-size:10px; font-weight:700; color:var(--muted);
+  letter-spacing:0.12em; text-transform:uppercase; margin-bottom:10px;
 }
 
-/* ===== UPLOAD ZONE ===== */
 .upload-zone {
-  border: 2px dashed var(--border-dark);
-  border-radius: 8px;
-  padding: 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: var(--green-pale);
+  border:2px dashed var(--border-dark); border-radius:8px; padding:16px;
+  text-align:center; cursor:pointer; transition:all 0.2s; background:var(--green-pale);
 }
-.upload-zone:hover { border-color: var(--green-light); background: var(--green-pale); filter: brightness(0.96); }
-.upload-zone input { display: none; }
-.upload-zone .uz-icon { font-size: 26px; margin-bottom: 4px; }
-.upload-zone strong { color: var(--green); font-size: 13px; display: block; }
-.upload-zone p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.upload-zone:hover { border-color:var(--green-light); filter:brightness(0.96); }
+.upload-zone input { display:none; }
+.upload-zone .uz-icon { font-size:26px; margin-bottom:4px; }
+.upload-zone strong { color:var(--green); font-size:13px; display:block; }
+.upload-zone p { font-size:11px; color:var(--muted); margin-top:2px; }
 
-/* ===== PLANT LIST ===== */
-.plant-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 220px;
-  overflow-y: auto;
-  margin-top: 10px;
-}
+.plant-list { display:flex; flex-direction:column; gap:4px; max-height:220px; overflow-y:auto; margin-top:10px; }
 .plant-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: all 0.15s;
-  font-size: 12px;
-  background: var(--card);
+  display:flex; align-items:center; gap:8px; padding:7px 10px;
+  border-radius:6px; border:1px solid var(--border); cursor:pointer;
+  transition:all 0.15s; font-size:12px; background:var(--card);
 }
-.plant-item:hover { background: var(--green-pale); border-color: var(--green-light); }
-.plant-item.selected { background: var(--green); color: #fff; border-color: var(--green); }
-.plant-item.selected .plant-price { color: #a5d6a7; }
-.plant-name { flex: 1; font-weight: 700; }
-.plant-price { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.plant-item:hover { background:var(--green-pale); border-color:var(--green-light); }
+.plant-item.selected { background:var(--green); color:#fff; border-color:var(--green); }
+.plant-item.selected .plant-price { color:#a5d6a7; }
+.plant-name  { flex:1; font-weight:700; }
+.plant-price { font-size:11px; color:var(--muted); white-space:nowrap; }
 
-/* ===== FORM ===== */
-.form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  margin-bottom: 9px;
+.form-row { display:flex; flex-direction:column; gap:3px; margin-bottom:9px; }
+.form-row:last-child { margin-bottom:0; }
+.form-row label { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:0.05em; }
+.form-row input,.form-row textarea,.form-row select {
+  border:1px solid var(--border-dark); border-radius:6px; padding:7px 10px;
+  font-size:13px; font-family:inherit; color:var(--text); background:var(--input-bg);
+  transition:border-color 0.15s,box-shadow 0.15s; outline:none;
 }
-.form-row:last-child { margin-bottom: 0; }
-.form-row label {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--muted);
-  letter-spacing: 0.05em;
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus {
+  border-color:var(--green-light); box-shadow:0 0 0 2px rgba(76,175,80,0.2);
 }
-.form-row input,
-.form-row textarea,
-.form-row select {
-  border: 1px solid var(--border-dark);
-  border-radius: 6px;
-  padding: 7px 10px;
-  font-size: 13px;
-  font-family: 'Noto Sans JP', sans-serif;
-  color: var(--text);
-  background: var(--input-bg);
-  transition: border-color 0.15s, box-shadow 0.15s;
-  outline: none;
-}
-.form-row input:focus,
-.form-row textarea:focus,
-.form-row select:focus {
-  border-color: var(--green-light);
-  box-shadow: 0 0 0 2px rgba(76,175,80,0.2);
-}
-.form-row textarea { resize: vertical; min-height: 52px; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.form-row textarea { resize:vertical; min-height:52px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 .price-display {
-  font-size: 13px; font-weight: 700; color: var(--red);
-  padding: 7px 10px;
-  border: 1px solid var(--border-dark);
-  border-radius: 6px;
-  background: var(--green-pale);
-  min-height: 34px;
+  font-size:13px; font-weight:700; color:var(--red);
+  padding:7px 10px; border:1px solid var(--border-dark);
+  border-radius:6px; background:var(--green-pale); min-height:34px;
 }
 
-/* ===== COLOR ROW ===== */
-.color-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
+.color-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
 .color-btn {
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  cursor: pointer;
-  transition: all 0.15s;
-  position: relative;
+  width:30px; height:30px; border-radius:50%; border:3px solid transparent;
+  cursor:pointer; transition:all 0.15s; position:relative;
 }
-.color-btn.active {
-  border-color: var(--text);
-  transform: scale(1.15);
-}
+.color-btn.active { border-color:var(--text); transform:scale(1.15); }
 .color-btn.active::after {
-  content: '';
-  position: absolute;
-  inset: 4px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.35);
+  content:''; position:absolute; inset:4px;
+  border-radius:50%; background:rgba(255,255,255,0.35);
 }
 
-/* ===== TOGGLE ===== */
-.toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  margin-top: 8px;
-}
-.toggle { position: relative; width: 38px; height: 21px; flex-shrink: 0; }
-.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-row { display:flex; align-items:center; justify-content:space-between; font-size:12px; margin-top:8px; }
+.toggle { position:relative; width:38px; height:21px; flex-shrink:0; }
+.toggle input { opacity:0; width:0; height:0; }
 .toggle-slider {
-  position: absolute; inset: 0;
-  background: var(--border-dark);
-  border-radius: 21px;
-  cursor: pointer;
-  transition: 0.2s;
+  position:absolute; inset:0; background:var(--border-dark);
+  border-radius:21px; cursor:pointer; transition:0.2s;
 }
 .toggle-slider::before {
-  content: '';
-  position: absolute;
-  width: 15px; height: 15px;
-  left: 3px; top: 3px;
-  background: white;
-  border-radius: 50%;
-  transition: 0.2s;
+  content:''; position:absolute; width:15px; height:15px;
+  left:3px; top:3px; background:white; border-radius:50%; transition:0.2s;
 }
-.toggle input:checked + .toggle-slider { background: var(--green); }
-.toggle input:checked + .toggle-slider::before { transform: translateX(17px); }
+.toggle input:checked + .toggle-slider { background:var(--green); }
+.toggle input:checked + .toggle-slider::before { transform:translateX(17px); }
 
-/* ===== BUTTONS ===== */
 .btn {
-  padding: 9px 16px;
-  border: none;
-  border-radius: 6px;
-  font-family: 'Noto Sans JP', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.15s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
+  padding:9px 16px; border:none; border-radius:6px; font-family:inherit;
+  font-weight:700; font-size:13px; cursor:pointer; transition:all 0.15s;
+  display:inline-flex; align-items:center; justify-content:center; gap:5px;
 }
-.btn-primary {
-  background: var(--green);
-  color: #fff;
-  width: 100%;
-  font-size: 14px;
-  padding: 11px;
-}
-.btn-primary:hover { background: var(--green-h); transform: translateY(-1px); }
-.btn-danger { background: var(--red); color: #fff; }
-.btn-danger:hover { background: #b71c1c; }
-.btn-secondary {
-  background: var(--green-pale);
-  color: var(--green);
-  border: 1px solid var(--border-dark);
-}
-.btn-secondary:hover { filter: brightness(0.95); }
-.btn-accent { background: var(--accent); color: #fff; }
-.btn-accent:hover { filter: brightness(0.92); }
-.btn:active { transform: scale(0.97) !important; }
-.btn-row { display: flex; gap: 8px; }
-.btn-row .btn { flex: 1; }
+.btn-primary   { background:var(--green); color:#fff; width:100%; font-size:14px; padding:11px; }
+.btn-primary:hover { background:var(--green-h); transform:translateY(-1px); }
+.btn-danger    { background:var(--red); color:#fff; }
+.btn-danger:hover  { background:#b71c1c; }
+.btn-secondary { background:var(--green-pale); color:var(--green); border:1px solid var(--border-dark); }
+.btn-secondary:hover { filter:brightness(0.95); }
+.btn:active    { transform:scale(0.97) !important; }
+.btn-row { display:flex; gap:8px; }
+.btn-row .btn { flex:1; }
 
-/* ===== Square Excel エリア ===== */
-.sq-area {
-  background: var(--green-pale);
-  border-radius: 8px;
-  padding: 12px;
-}
-.sq-area p { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
-.sq-status {
-  font-size: 11px;
-  color: var(--green);
-  font-weight: 700;
-  margin-top: 6px;
-  min-height: 16px;
-}
-.sq-status.error { color: var(--red); }
-.sq-settings {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-.sq-settings select {
-  border: 1px solid var(--border-dark);
-  border-radius: 5px;
-  padding: 5px 8px;
-  font-size: 11px;
-  font-family: 'Noto Sans JP', sans-serif;
-  color: var(--text);
-  background: var(--input-bg);
-  outline: none;
-  width: 100%;
-}
-.sq-settings label {
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--muted);
-  letter-spacing: 0.05em;
-  display: block;
-  margin-bottom: 2px;
-}
-
-/* ===== RIGHT PANEL ===== */
 .right-panel {
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--preview-bg);
-  overflow-y: auto;
-  min-height: calc(100vh - 52px);
+  padding:20px 24px; display:flex; flex-direction:column; align-items:center;
+  background:var(--preview-bg); overflow-y:auto; min-height:calc(100vh - 52px);
 }
 
-/* ===== PAGE NAV ===== */
 .page-nav {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  margin-bottom: 14px;
-  background: var(--card);
-  padding: 8px 12px;
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-  width: 100%;
-  max-width: 740px;
+  display:flex; gap:6px; align-items:center; margin-bottom:14px;
+  background:var(--card); padding:8px 12px; border-radius:8px;
+  box-shadow:var(--shadow); width:100%; max-width:740px;
 }
-.page-nav .nav-label {
-  font-size: 11px;
-  color: var(--muted);
-  font-weight: 700;
-  flex-shrink: 0;
-}
-.page-dots { display: flex; gap: 5px; flex: 1; }
-.page-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--border-dark);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.page-dot.active { background: var(--green); }
+.page-nav .nav-label { font-size:11px; color:var(--muted); font-weight:700; flex-shrink:0; }
+.page-dots { display:flex; gap:5px; flex:1; }
+.page-dot { width:10px; height:10px; border-radius:50%; background:var(--border-dark); cursor:pointer; transition:background 0.15s; }
+.page-dot.active { background:var(--green); }
 
-/* ===== POP CANVAS ===== */
-.pop-canvas {
-  background: #fff;
-  box-shadow: var(--shadow-card);
-  border-radius: 4px;
-  overflow: hidden;
-}
-[data-theme="dark"] .pop-canvas { background: #f8f8f8; }
+.pop-canvas { background:#fff; box-shadow:0 4px 20px rgba(0,0,0,0.13); border-radius:4px; overflow:hidden; }
+.pop-grid { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; width:720px; height:510px; gap:0; }
 
-/* A4横4面：各面は約A6横サイズ */
-.pop-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  width: 720px;
-  height: 510px;
-  gap: 0;
-}
-
-/* ===== POP CARD ===== */
 .pop-card {
-  position: relative;
-  border: 1px solid #e0e0e0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: #fff;
-  cursor: pointer;
-  transition: outline 0.12s;
+  position:relative; border:1px solid #e0e0e0; display:flex;
+  flex-direction:column; overflow:hidden; background:#fff; cursor:pointer; transition:outline 0.12s;
 }
-.pop-card:hover { outline: 2px dashed var(--green-light); }
-.pop-card.active-card { outline: 3px solid var(--green); outline-offset: -1px; }
-.pop-card.empty { background: #fafafa; }
+.pop-card:hover { outline:2px dashed var(--green-light); }
+.pop-card.active-card { outline:3px solid var(--green); outline-offset:-1px; }
+.pop-card.empty { background:#fafafa; }
 
-/* POP内部 */
-.pop-inner {
-  width: 100%; height: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-.pop-frame {
-  position: absolute;
-  inset: 6px;
-  border-radius: 6px;
-  pointer-events: none;
-  z-index: 1;
-}
+.pop-inner { width:100%; height:100%; position:relative; display:flex; flex-direction:column; }
+.pop-frame { position:absolute; inset:6px; border-radius:6px; pointer-events:none; z-index:1; }
 .pop-logo-area {
-  position: absolute;
-  top: 10px; left: 10px;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  line-height: 1;
+  position:absolute; top:10px; left:10px; z-index:2;
+  display:flex; flex-direction:column; align-items:flex-start; line-height:1;
 }
-.pop-logo-mark { font-size: 16px; font-weight: 900; }
-.pop-logo-text { font-size: 6.5px; font-weight: 700; letter-spacing: -0.01em; margin-top: 1px; }
-
+.pop-logo-mark { font-size:16px; font-weight:900; }
+.pop-logo-text { font-size:6.5px; font-weight:700; letter-spacing:-0.01em; margin-top:1px; }
 .pop-band {
-  position: absolute;
-  top: 10px; right: 10px;
-  z-index: 3;
-  background: var(--accent);
-  color: #fff;
-  font-size: 7.5px;
-  font-weight: 900;
-  padding: 3px 7px;
-  border-radius: 10px;
-  line-height: 1.3;
-  text-align: center;
+  position:absolute; top:10px; right:10px; z-index:3;
+  background:var(--accent); color:#fff; font-size:7.5px; font-weight:900;
+  padding:3px 7px; border-radius:10px; line-height:1.3; text-align:center;
 }
-
 .pop-content {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 16px 14px 10px;
-  z-index: 2;
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  justify-content:center; padding:16px 14px 10px; z-index:2;
 }
-.pop-category {
-  font-size: 8.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 3px;
-  opacity: 0.7;
-}
-.pop-name-upper {
-  font-size: 9.5px;
-  font-weight: 700;
-  opacity: 0.8;
-  line-height: 1.2;
-}
-.pop-name-main {
-  font-family: 'Noto Serif JP', serif;
-  font-weight: 700;
-  line-height: 1.1;
-  margin-bottom: 2px;
-}
-.pop-name-lower {
-  font-size: 9.5px;
-  opacity: 0.75;
-  margin-bottom: 5px;
-}
-.pop-divider {
-  height: 2px;
-  margin: 5px 0;
-  border-radius: 1px;
-  opacity: 0.3;
-}
-.pop-catchcopy {
-  font-size: 9.5px;
-  line-height: 1.5;
-  margin-bottom: 4px;
-  flex: 1;
-}
-.pop-point {
-  font-size: 8px;
-  opacity: 0.6;
-  line-height: 1.4;
-}
-.pop-price-area {
-  margin-top: 6px;
-  display: flex;
-  align-items: baseline;
-  gap: 3px;
-}
-.pop-price-label { font-size: 8.5px; font-weight: 700; }
-.pop-price-num {
-  font-family: 'Noto Serif JP', serif;
-  font-weight: 700;
-  line-height: 1;
-}
-.pop-price-tax { font-size: 8.5px; opacity: 0.7; }
+.pop-category  { font-size:8.5px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:3px; opacity:0.7; }
+.pop-name-upper { font-size:9.5px; font-weight:700; opacity:0.8; line-height:1.2; }
+.pop-name-main  { font-weight:700; line-height:1.1; margin-bottom:2px; }
+.pop-name-lower { font-size:9.5px; opacity:0.75; margin-bottom:5px; }
+.pop-divider    { height:2px; margin:5px 0; border-radius:1px; opacity:0.3; }
+.pop-catchcopy  { font-size:9.5px; line-height:1.5; margin-bottom:4px; flex:1; }
+.pop-point      { font-size:8px; opacity:0.6; line-height:1.4; }
+.pop-price-area { margin-top:6px; display:flex; align-items:baseline; gap:3px; }
+.pop-price-label { font-size:8.5px; font-weight:700; }
+.pop-price-num  { font-weight:700; line-height:1; }
+.pop-price-tax  { font-size:8.5px; opacity:0.7; }
 .pop-empty-hint {
-  width: 100%; height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #bbb;
-  font-size: 11px;
-  gap: 5px;
+  width:100%; height:100%; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; color:#bbb; font-size:11px; gap:5px;
 }
-.pop-empty-hint .plus { font-size: 26px; }
+.pop-empty-hint .plus { font-size:26px; }
 
-/* ===== THEMES ===== */
-.theme-red .pop-frame     { border: 5px solid #c62828; }
-.theme-red .pop-logo-mark { color: #c62828; }
-.theme-red .pop-logo-text { color: #c62828; }
-.theme-red .pop-price-num { color: #c62828; }
-.theme-red .pop-category  { color: #c62828; }
-.theme-red .pop-divider   { background: #c62828; }
+.theme-red    { --tc:#c62828; }
+.theme-green  { --tc:#2d6a2d; }
+.theme-blue   { --tc:#1565c0; }
+.theme-orange { --tc:#e65100; }
+.pop-frame     { border:5px solid var(--tc,#c62828); }
+.pop-logo-mark { color:var(--tc,#c62828); }
+.pop-logo-text { color:var(--tc,#c62828); }
+.pop-price-num { color:var(--tc,#c62828); }
+.pop-category  { color:var(--tc,#c62828); }
+.pop-divider   { background:var(--tc,#c62828); }
 
-.theme-green .pop-frame     { border: 5px solid #2d6a2d; }
-.theme-green .pop-logo-mark { color: #2d6a2d; }
-.theme-green .pop-logo-text { color: #2d6a2d; }
-.theme-green .pop-price-num { color: #2d6a2d; }
-.theme-green .pop-category  { color: #2d6a2d; }
-.theme-green .pop-divider   { background: #2d6a2d; }
-
-.theme-blue .pop-frame     { border: 5px solid #1565c0; }
-.theme-blue .pop-logo-mark { color: #1565c0; }
-.theme-blue .pop-logo-text { color: #1565c0; }
-.theme-blue .pop-price-num { color: #1565c0; }
-.theme-blue .pop-category  { color: #1565c0; }
-.theme-blue .pop-divider   { background: #1565c0; }
-
-.theme-orange .pop-frame     { border: 5px solid #e65100; }
-.theme-orange .pop-logo-mark { color: #e65100; }
-.theme-orange .pop-logo-text { color: #e65100; }
-.theme-orange .pop-price-num { color: #e65100; }
-.theme-orange .pop-category  { color: #e65100; }
-.theme-orange .pop-divider   { background: #e65100; }
-
-/* ===== NOTIFICATION ===== */
 .notif {
-  position: fixed;
-  bottom: 20px; right: 20px;
-  background: var(--notif-bg);
-  color: #fff;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-  transform: translateY(70px);
-  opacity: 0;
-  transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1);
-  z-index: 999;
-  pointer-events: none;
+  position:fixed; bottom:20px; right:20px; background:#2d6a2d; color:#fff;
+  padding:10px 18px; border-radius:8px; font-size:13px; font-weight:700;
+  box-shadow:0 4px 16px rgba(0,0,0,0.25); transform:translateY(70px); opacity:0;
+  transition:all 0.28s ease; z-index:999; pointer-events:none;
 }
-.notif.show { transform: translateY(0); opacity: 1; }
+.notif.show { transform:translateY(0); opacity:1; }
 
-/* ===== RESPONSIVE (スマホ) ===== */
-@media (max-width: 860px) {
-  .app {
-    grid-template-columns: 1fr;
-  }
-  .left-panel {
-    position: static;
-    height: auto;
-    max-height: none;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-  .right-panel {
-    padding: 16px 12px;
-  }
-  .pop-grid {
-    width: 100%;
-    max-width: 520px;
-    height: auto;
-    aspect-ratio: 1.384;
-  }
-  .page-nav { max-width: 520px; }
+@media (max-width:860px) {
+  .app { grid-template-columns:1fr; }
+  .left-panel { position:static; height:auto; max-height:none; border-right:none; border-bottom:1px solid var(--border); }
+  .right-panel { padding:16px 12px; }
+  .pop-grid { width:100%; max-width:520px; height:auto; aspect-ratio:1.384; }
+  .page-nav { max-width:520px; }
 }
-@media (max-width: 560px) {
-  .pop-grid {
-    max-width: 340px;
-  }
-  .page-nav { max-width: 340px; }
+@media (max-width:560px) {
+  .pop-grid { max-width:340px; }
+  .page-nav { max-width:340px; }
 }
-
-/* ===== PRINT ===== */
 @media print {
-  @page { size: A4 landscape; margin: 8mm; }
-  header,
-  .left-panel,
-  .page-nav,
-  .right-panel > .btn-print-area { display: none !important; }
-  body, .app, .right-panel {
-    background: white !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  .app { display: block; }
-  .right-panel {
-    display: block !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    align-items: flex-start !important;
-  }
-  .pop-canvas {
-    box-shadow: none !important;
-    border-radius: 0 !important;
-  }
-  .pop-grid {
-    width: 277mm !important;
-    height: 190mm !important;
-  }
-  .pop-card { border: 1px solid #ccc !important; }
-  .notif { display: none !important; }
-  /* 印刷時は全ページを連続出力 */
-  .print-all-pages .pop-canvas {
-    page-break-after: always;
-  }
-  .print-all-pages .pop-canvas:last-child {
-    page-break-after: avoid;
-  }
+  @page { size:A4 landscape; margin:8mm; }
+  header,.left-panel,.page-nav,.right-panel > .btn-print-area { display:none !important; }
+  body,.app,.right-panel { background:white !important; padding:0 !important; margin:0 !important; }
+  .app { display:block; }
+  .right-panel { display:block !important; overflow:visible !important; padding:0 !important; align-items:flex-start !important; }
+  .pop-canvas { box-shadow:none !important; border-radius:0 !important; }
+  .pop-grid { width:277mm !important; height:190mm !important; }
+  .pop-card { border:1px solid #ccc !important; }
+  .notif { display:none !important; }
+  .print-all-pages .pop-canvas { page-break-after:always; }
+  .print-all-pages .pop-canvas:last-child { page-break-after:avoid; }
 }
 </style>
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
 <header>
   <div class="hdr-left">
     <div class="hdr-logo">🌿</div>
@@ -694,70 +243,23 @@ header {
       <div class="hdr-sub">Kitayama Nursery — A4横・4面印刷対応</div>
     </div>
   </div>
-  <div class="hdr-btns">
-    <button class="hdr-btn dark-btn" onclick="toggleTheme()" title="ダークモード切替">
-      <span class="theme-icon-light">🌙</span>
-      <span class="theme-icon-dark" style="display:none">☀️</span>
-    </button>
-    <button class="hdr-btn" onclick="printAllPages()">🖨 印刷（A4横）</button>
-  </div>
+  <button class="hdr-btn" onclick="printAllPages()">🖨 印刷（A4横）</button>
 </header>
 
 <div class="app">
-
-  <!-- ===== LEFT PANEL ===== -->
   <div class="left-panel">
 
-    <!-- 豊明CSV読み込み -->
     <div class="panel-section">
       <h2>豊明花きCSV 読み込み</h2>
       <div class="upload-zone" onclick="document.getElementById('toyoake-file').click()">
         <input type="file" id="toyoake-file" accept=".csv,.txt" onchange="onToyoakeFile(event)">
         <div class="uz-icon">📦</div>
         <strong>豊明花きCSV（Shift-JIS）</strong>
-        <p>読み込み → 商品リスト表示 + Square Excel自動生成</p>
-      </div>
-      <div id="toyoake-result" style="display:none; margin-top:10px;">
-        <div class="sq-area">
-          <p id="toyoake-info" style="color:var(--green); font-weight:700; margin-bottom:8px;"></p>
-          <div class="sq-settings">
-            <div>
-              <label>価格モード</label>
-              <select id="sq-priceMode">
-                <option value="case">ケース単価</option>
-                <option value="per_unit">1本あたり</option>
-              </select>
-            </div>
-            <div>
-              <label>商品タイプ</label>
-              <select id="sq-productType">
-                <option value="有形商品">有形商品</option>
-                <option value="サービス">サービス</option>
-              </select>
-            </div>
-          </div>
-          <button class="btn btn-accent" style="width:100%; font-size:13px;" onclick="downloadSquareExcel()">
-            ↓ Square Excel ダウンロード
-          </button>
-          <div id="sq-status" class="sq-status"></div>
-        </div>
+        <p>読み込み → 商品リスト表示</p>
       </div>
       <div id="toyoake-plant-list" class="plant-list" style="display:none;"></div>
     </div>
 
-    <!-- POP用CSV読み込み -->
-    <div class="panel-section">
-      <h2>POP用CSV 読み込み</h2>
-      <div class="upload-zone" onclick="document.getElementById('pop-csv-file').click()">
-        <input type="file" id="pop-csv-file" accept=".csv,.txt" onchange="onPopCsvFile(event)">
-        <div class="uz-icon">📊</div>
-        <strong>POP用CSVファイルを選択</strong>
-        <p>値段POP用CSV（品名/価格/キャッチコピー等）</p>
-      </div>
-      <div id="pop-plant-list" class="plant-list" style="display:none;"></div>
-    </div>
-
-    <!-- 手動入力 -->
     <div class="panel-section">
       <h2>POP内容入力</h2>
       <div class="form-row">
@@ -784,11 +286,11 @@ header {
       </div>
       <div class="form-row">
         <label>ポイント（小文字説明）</label>
-        <textarea id="fPoint" placeholder="例：花：４～５月　丈：10～15cm" oninput="updatePreview()" style="min-height:44px"></textarea>
+        <textarea id="fPoint" placeholder="例：花：４〜５月　丈：10〜15cm" oninput="updatePreview()" style="min-height:44px"></textarea>
       </div>
       <div class="form-row">
         <label>税抜き価格（円）</label>
-        <input type="number" id="fPrice" placeholder="480" oninput="calcTax()" style="font-size:16px; font-weight:900; color:var(--red);">
+        <input type="number" id="fPrice" placeholder="480" oninput="calcTax()" style="font-size:16px;font-weight:900;color:var(--red);">
       </div>
       <div class="form-grid">
         <div class="form-row">
@@ -802,16 +304,15 @@ header {
       </div>
     </div>
 
-    <!-- デザイン設定 -->
     <div class="panel-section">
       <h2>デザイン設定</h2>
       <div class="form-row">
         <label>枠カラー</label>
         <div class="color-row">
-          <div class="color-btn active" style="background:#c62828" data-color="red"   onclick="setTheme('red',this)"    title="赤"></div>
-          <div class="color-btn"        style="background:#2d6a2d" data-color="green" onclick="setTheme('green',this)"  title="緑"></div>
-          <div class="color-btn"        style="background:#1565c0" data-color="blue"  onclick="setTheme('blue',this)"   title="青"></div>
-          <div class="color-btn"        style="background:#e65100" data-color="orange" onclick="setTheme('orange',this)" title="オレンジ"></div>
+          <div class="color-btn active" style="background:#c62828" onclick="setTheme('red',this)"    title="赤"></div>
+          <div class="color-btn"        style="background:#2d6a2d" onclick="setTheme('green',this)"  title="緑"></div>
+          <div class="color-btn"        style="background:#1565c0" onclick="setTheme('blue',this)"   title="青"></div>
+          <div class="color-btn"        style="background:#e65100" onclick="setTheme('orange',this)" title="オレンジ"></div>
         </div>
       </div>
       <div class="toggle-row">
@@ -828,220 +329,132 @@ header {
       </div>
     </div>
 
-    <!-- 操作 -->
     <div class="panel-section">
       <h2>操作</h2>
       <div class="btn-row" style="margin-bottom:8px;">
         <button class="btn btn-secondary" onclick="addToGrid()">＋ POPを追加</button>
         <button class="btn btn-danger"    onclick="clearSelected()">🗑 削除</button>
       </div>
-      <button class="btn btn-secondary" style="width:100%; margin-bottom:8px;" onclick="clearAll()">🗑 全クリア</button>
+      <button class="btn btn-secondary" style="width:100%;" onclick="clearAll()">🗑 全クリア</button>
     </div>
 
-  </div><!-- /left-panel -->
+  </div>
 
-  <!-- ===== RIGHT PANEL ===== -->
   <div class="right-panel">
-
-    <!-- ページナビ -->
     <div class="page-nav">
       <span class="nav-label">ページ</span>
       <div class="page-dots" id="pageDots"></div>
-      <button class="btn btn-secondary" onclick="addPage()" style="padding:5px 10px; font-size:12px; flex-shrink:0;">＋ ページ追加</button>
-      <button class="btn btn-secondary" onclick="prevPage()" style="padding:5px 8px; font-size:12px; flex-shrink:0;">◀</button>
-      <button class="btn btn-secondary" onclick="nextPage()" style="padding:5px 8px; font-size:12px; flex-shrink:0;">▶</button>
+      <button class="btn btn-secondary" onclick="addPage()"  style="padding:5px 10px;font-size:12px;flex-shrink:0;">＋ ページ追加</button>
+      <button class="btn btn-secondary" onclick="prevPage()" style="padding:5px 8px;font-size:12px;flex-shrink:0;">◀</button>
+      <button class="btn btn-secondary" onclick="nextPage()" style="padding:5px 8px;font-size:12px;flex-shrink:0;">▶</button>
     </div>
-
-    <!-- POP グリッド -->
     <div class="pop-canvas" id="popCanvas">
       <div class="pop-grid" id="popGrid"></div>
     </div>
-
-  </div><!-- /right-panel -->
-
-</div><!-- /app -->
+  </div>
+</div>
 
 <div class="notif" id="notif"></div>
 
 <script>
 'use strict';
 
-// ===== STATE =====
-var currentTheme = 'red';
-var pages = [[ null, null, null, null ]];
-var currentPage = 0;
-var selectedCell = null;
-var plantData = []; // 現在表示中の商品リスト
+var currentTheme     = 'red';
+var pages            = [[null,null,null,null]];
+var currentPage      = 0;
+var selectedCell     = null;
+var toyoakePlantData = [];
 
-// ===== 起動 =====
 renderGrid();
 updatePageDots();
-initThemeIcon();
 
-// ===== ダークモード =====
-function toggleTheme() {
-  var html = document.documentElement;
-  var dark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', dark ? 'light' : 'dark');
-  localStorage.setItem('pp-theme', dark ? 'light' : 'dark');
-  initThemeIcon();
-}
-function initThemeIcon() {
-  var dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  var light = document.querySelector('.theme-icon-light');
-  var darkIcon = document.querySelector('.theme-icon-dark');
-  if (light)    light.style.display    = dark ? 'none' : 'inline';
-  if (darkIcon) darkIcon.style.display = dark ? 'inline' : 'none';
-}
-
-// ===== 税計算 =====
 function calcTax() {
   var p = parseInt(document.getElementById('fPrice').value);
   var el = document.getElementById('fPriceTax');
-  if (!isNaN(p) && p > 0) {
-    var tax = Math.floor(p * 1.1);
-    el.textContent = tax.toLocaleString() + ' 円（税込）';
-  } else {
-    el.textContent = '—';
-  }
+  el.textContent = (!isNaN(p) && p > 0) ? Math.floor(p*1.1).toLocaleString()+' 円（税込）' : '—';
   updatePreview();
 }
 
-// ===== カラーテーマ =====
 function setTheme(theme, el) {
   currentTheme = theme;
-  document.querySelectorAll('.color-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.color-btn').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
   renderGrid();
 }
 
-// ===== ページナビ =====
 function updatePageDots() {
-  var dots = document.getElementById('pageDots');
-  dots.innerHTML = pages.map(function(_, i) {
-    return '<div class="page-dot ' + (i === currentPage ? 'active' : '') + '" onclick="goPage(' + i + ')"></div>';
+  document.getElementById('pageDots').innerHTML = pages.map(function(_,i){
+    return '<div class="page-dot'+(i===currentPage?' active':'')+'" onclick="goPage('+i+')"></div>';
   }).join('');
 }
+function goPage(i) { currentPage=i; selectedCell=null; renderGrid(); updatePageDots(); }
+function prevPage() { if(currentPage>0) goPage(currentPage-1); }
+function nextPage() { if(currentPage<pages.length-1) goPage(currentPage+1); }
+function addPage()  { pages.push([null,null,null,null]); goPage(pages.length-1); notify('ページを追加しました'); }
 
-function goPage(i) {
-  currentPage = i;
-  selectedCell = null;
-  renderGrid();
-  updatePageDots();
-}
-function prevPage() { if (currentPage > 0) goPage(currentPage - 1); }
-function nextPage() { if (currentPage < pages.length - 1) goPage(currentPage + 1); }
-function addPage() {
-  pages.push([null, null, null, null]);
-  goPage(pages.length - 1);
-  notify('ページを追加しました');
-}
-
-// ===== グリッド描画 =====
 function renderGrid() {
   var grid = document.getElementById('popGrid');
   grid.innerHTML = '';
-  var page = pages[currentPage];
-  page.forEach(function(data, idx) {
+  pages[currentPage].forEach(function(data,idx){
     var cell = document.createElement('div');
-    var cls = 'pop-card';
-    if (data) cls += ' theme-' + (data.theme || currentTheme);
-    else       cls += ' empty';
-    if (selectedCell === idx) cls += ' active-card';
-    cell.className = cls;
-    cell.onclick = (function(i) { return function() { selectCell(i); }; })(idx);
-    if (data) {
-      cell.innerHTML = buildPopHTML(data);
-    } else {
-      cell.innerHTML = '<div class="pop-empty-hint"><div class="plus">＋</div><div>クリックして選択</div></div>';
-    }
+    cell.className = 'pop-card'+(data?' theme-'+(data.theme||currentTheme):' empty')+(selectedCell===idx?' active-card':'');
+    cell.onclick   = (function(i){ return function(){ selectCell(i); }; })(idx);
+    cell.innerHTML = data
+      ? buildPopHTML(data)
+      : '<div class="pop-empty-hint"><div class="plus">＋</div><div>クリックして選択</div></div>';
     grid.appendChild(cell);
   });
 }
 
-// ===== POPカード HTML生成 =====
 function buildPopHTML(d) {
   var showLogo  = document.getElementById('showLogo').checked;
   var showCat   = document.getElementById('showCat').checked;
   var showPoint = document.getElementById('showPoint').checked;
   var price = d.price ? parseInt(d.price) : null;
-  var taxPrice = price ? Math.floor(price * 1.1) : null;
-  var nameLen = (d.name || '').length;
-  var nameFontSize = nameLen > 6 ? '17px' : nameLen > 4 ? '21px' : '25px';
-
-  var html = '<div class="pop-inner"><div class="pop-frame"></div>';
-
-  if (showLogo) {
-    html += '<div class="pop-logo-area">' +
-      '<div class="pop-logo-mark">🌿</div>' +
-      '<div class="pop-logo-text">Kitayama Nursery</div>' +
-      '</div>';
-  }
-  if (d.band) {
-    html += '<div class="pop-band">' + esc(d.band) + '</div>';
-  }
-  html += '<div class="pop-content">';
-  if (showCat && d.category) {
-    html += '<div class="pop-category">' + esc(d.category) + '</div>';
-  }
-  if (d.nameUpper) {
-    html += '<div class="pop-name-upper">' + esc(d.nameUpper) + '</div>';
-  }
-  html += '<div class="pop-name-main" style="font-size:' + nameFontSize + '">' + esc(d.name || '商品名') + '</div>';
-  if (d.nameLower) {
-    html += '<div class="pop-name-lower">' + esc(d.nameLower) + '</div>';
-  }
-  html += '<div class="pop-divider"></div>';
-  if (d.catchcopy) {
-    html += '<div class="pop-catchcopy">' + esc(d.catchcopy) + '</div>';
-  }
-  if (showPoint && d.point) {
-    html += '<div class="pop-point">' + esc(d.point) + '</div>';
-  }
-  if (taxPrice) {
-    html += '<div class="pop-price-area">' +
-      '<div class="pop-price-label">税込</div>' +
-      '<div class="pop-price-num" style="font-size:' + (taxPrice >= 1000 ? '27px' : '31px') + '">' + taxPrice.toLocaleString() + '</div>' +
-      '<div class="pop-price-tax">円</div>' +
-      '</div>';
-  }
-  html += '</div></div>';
-  return html;
+  var tax   = price ? Math.floor(price*1.1) : null;
+  var nlen  = (d.name||'').length;
+  var nfs   = nlen>6 ? '17px' : nlen>4 ? '21px' : '25px';
+  var h = '<div class="pop-inner"><div class="pop-frame"></div>';
+  if (showLogo) h += '<div class="pop-logo-area"><div class="pop-logo-mark">🌿</div><div class="pop-logo-text">Kitayama Nursery</div></div>';
+  if (d.band)   h += '<div class="pop-band">'+esc(d.band)+'</div>';
+  h += '<div class="pop-content">';
+  if (showCat && d.category) h += '<div class="pop-category">'+esc(d.category)+'</div>';
+  if (d.nameUpper) h += '<div class="pop-name-upper">'+esc(d.nameUpper)+'</div>';
+  h += '<div class="pop-name-main" style="font-size:'+nfs+'">'+esc(d.name||'商品名')+'</div>';
+  if (d.nameLower) h += '<div class="pop-name-lower">'+esc(d.nameLower)+'</div>';
+  h += '<div class="pop-divider"></div>';
+  if (d.catchcopy) h += '<div class="pop-catchcopy">'+esc(d.catchcopy)+'</div>';
+  if (showPoint && d.point) h += '<div class="pop-point">'+esc(d.point)+'</div>';
+  if (tax) h += '<div class="pop-price-area"><div class="pop-price-label">税込</div><div class="pop-price-num" style="font-size:'+(tax>=1000?'27px':'31px')+'">'+tax.toLocaleString()+'</div><div class="pop-price-tax">円</div></div>';
+  return h+'</div></div>';
 }
 
 function esc(s) {
-  return String(s || '')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ===== セル選択 =====
 function selectCell(idx) {
   selectedCell = idx;
-  var data = pages[currentPage][idx];
-  if (data) {
-    document.getElementById('fName').value      = data.name      || '';
-    document.getElementById('fNameUpper').value = data.nameUpper || '';
-    document.getElementById('fNameLower').value = data.nameLower || '';
-    document.getElementById('fCategory').value  = data.category  || '';
-    document.getElementById('fCatch').value      = data.catchcopy || '';
-    document.getElementById('fPoint').value      = data.point     || '';
-    document.getElementById('fPrice').value      = data.price     || '';
-    document.getElementById('fBand').value       = data.band      || '';
+  var d = pages[currentPage][idx];
+  if (d) {
+    document.getElementById('fName').value      = d.name      ||'';
+    document.getElementById('fNameUpper').value = d.nameUpper ||'';
+    document.getElementById('fNameLower').value = d.nameLower ||'';
+    document.getElementById('fCategory').value  = d.category  ||'';
+    document.getElementById('fCatch').value      = d.catchcopy||'';
+    document.getElementById('fPoint').value      = d.point    ||'';
+    document.getElementById('fPrice').value      = d.price    ||'';
+    document.getElementById('fBand').value       = d.band     ||'';
     calcTax();
   }
   renderGrid();
 }
 
-// ===== プレビュー更新 =====
 function updatePreview() {
-  if (selectedCell === null) return;
+  if (selectedCell===null) return;
   pages[currentPage][selectedCell] = getFormData();
   renderGrid();
 }
-
 function getFormData() {
   return {
     name:      document.getElementById('fName').value,
@@ -1056,488 +469,168 @@ function getFormData() {
   };
 }
 
-// ===== グリッドに追加 =====
 function addToGrid() {
   var data = getFormData();
   if (!data.name) { notify('商品名を入力してください'); return; }
   var placed = false;
-  for (var i = 0; i < 4; i++) {
-    if (!pages[currentPage][i]) {
-      pages[currentPage][i] = data;
-      selectedCell = i;
-      placed = true;
-      break;
-    }
+  for (var i=0;i<4;i++) {
+    if (!pages[currentPage][i]) { pages[currentPage][i]=data; selectedCell=i; placed=true; break; }
   }
   if (!placed) {
-    pages.push([data, null, null, null]);
-    currentPage = pages.length - 1;
-    selectedCell = 0;
-    updatePageDots();
-    notify('新しいページに追加しました');
-  } else {
-    notify('POPを追加しました');
-  }
+    pages.push([data,null,null,null]); currentPage=pages.length-1; selectedCell=0;
+    updatePageDots(); notify('新しいページに追加しました');
+  } else { notify('POPを追加しました'); }
   renderGrid();
 }
 
-// ===== 削除 =====
 function clearSelected() {
-  if (selectedCell === null) { notify('セルを選択してください'); return; }
-  pages[currentPage][selectedCell] = null;
-  selectedCell = null;
-  renderGrid();
-  notify('削除しました');
+  if (selectedCell===null) { notify('セルを選択してください'); return; }
+  pages[currentPage][selectedCell]=null; selectedCell=null; renderGrid(); notify('削除しました');
 }
 function clearAll() {
   if (!confirm('全POPをクリアしますか？')) return;
-  pages = [[null, null, null, null]];
-  currentPage = 0;
-  selectedCell = null;
-  renderGrid();
-  updatePageDots();
-  notify('全クリアしました');
+  pages=[[null,null,null,null]]; currentPage=0; selectedCell=null;
+  renderGrid(); updatePageDots(); notify('全クリアしました');
 }
 
-// ===== フォームに商品をロード =====
 function loadPlant(p) {
-  document.getElementById('fName').value      = p.name      || '';
-  document.getElementById('fNameUpper').value = p.nameUpper || '';
-  document.getElementById('fNameLower').value = p.nameLower || '';
-  document.getElementById('fCategory').value  = p.category  || '';
-  document.getElementById('fCatch').value      = p.catchcopy || '';
-  document.getElementById('fPoint').value      = p.point     || '';
-  document.getElementById('fPrice').value      = p.price     || '';
-  document.getElementById('fBand').value       = p.band      || '';
+  document.getElementById('fName').value      = p.name      ||'';
+  document.getElementById('fNameUpper').value = p.nameUpper ||'';
+  document.getElementById('fNameLower').value = p.nameLower ||'';
+  document.getElementById('fCategory').value  = p.category  ||'';
+  document.getElementById('fCatch').value      = p.catchcopy||'';
+  document.getElementById('fPoint').value      = p.point    ||'';
+  document.getElementById('fPrice').value      = p.price    ||'';
+  document.getElementById('fBand').value       = p.band     ||'';
   calcTax();
-  if (selectedCell === null) {
-    // 空きセルを探して選択
-    for (var i = 0; i < 4; i++) {
-      if (!pages[currentPage][i]) {
-        selectedCell = i;
-        break;
-      }
-    }
+  if (selectedCell===null) {
+    for (var i=0;i<4;i++) { if (!pages[currentPage][i]) { selectedCell=i; break; } }
   }
   updatePreview();
 }
 
-// ===== 商品リスト描画 =====
 function renderPlantList(containerId, data) {
   var list = document.getElementById(containerId);
-  if (!data.length) { list.style.display = 'none'; return; }
+  if (!data.length) { list.style.display='none'; return; }
   list.style.display = 'flex';
-  list.innerHTML = data.map(function(p, i) {
-    return '<div class="plant-item" onclick="onPlantClick(this,' + i + ',\'' + containerId + '\')">' +
-      '<span class="plant-name">' + esc(p.name) + '</span>' +
-      '<span class="plant-price">' + (p.price ? '¥' + parseInt(p.price).toLocaleString() : '—') + '</span>' +
-      '</div>';
+  list.innerHTML = data.map(function(p,i){
+    return '<div class="plant-item" onclick="onPlantClick(this,'+i+')">' +
+      '<span class="plant-name">'+esc(p.name)+'</span>' +
+      '<span class="plant-price">'+(p.price?'¥'+parseInt(p.price).toLocaleString():'—')+'</span></div>';
   }).join('');
 }
-
-function onPlantClick(el, i, containerId) {
-  document.querySelectorAll('#' + containerId + ' .plant-item').forEach(function(e) {
-    e.classList.remove('selected');
-  });
+function onPlantClick(el, i) {
+  document.querySelectorAll('#toyoake-plant-list .plant-item').forEach(function(e){ e.classList.remove('selected'); });
   el.classList.add('selected');
-  // どのデータソースか判定して取得
-  var p = (containerId === 'toyoake-plant-list') ? toyoakePlantData[i] : popCsvPlantData[i];
-  loadPlant(p);
+  loadPlant(toyoakePlantData[i]);
 }
 
-// ===== 印刷 =====
 function printAllPages() {
-  // 全ページ印刷用：全ページのcanvasを連続生成してprintする
-  var currentSave = currentPage;
-  var pageCount = pages.length;
-
-  if (pageCount === 1) {
-    // 1ページのみ：そのまま印刷
-    window.print();
-    return;
-  }
-
-  // 複数ページ：印刷用一時エリアを作成
+  if (pages.length===1) { window.print(); return; }
   var overlay = document.createElement('div');
-  overlay.id = 'print-overlay-all';
+  overlay.id  = 'print-overlay-all';
   overlay.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;overflow:auto;';
-
   var style = document.createElement('style');
-  style.id = 'print-all-style';
-  style.textContent = [
-    '@page{size:A4 landscape;margin:8mm;}',
-    '@media print{',
-    ' body>*:not(#print-overlay-all){display:none!important;}',
-    ' #print-overlay-all{position:static!important;overflow:visible!important;background:none!important;}',
-    ' .print-page{page-break-after:always;page-break-inside:avoid;}',
-    ' .print-page:last-child{page-break-after:avoid;}',
-    ' .print-page .pop-grid{width:277mm!important;height:190mm!important;}',
-    '}'
-  ].join('');
+  style.id   = 'print-all-style';
+  style.textContent = '@page{size:A4 landscape;margin:8mm;}@media print{body>*:not(#print-overlay-all){display:none!important;}#print-overlay-all{position:static!important;overflow:visible!important;background:none!important;}.print-page{page-break-after:always;page-break-inside:avoid;}.print-page:last-child{page-break-after:avoid;}.print-page .pop-grid{width:277mm!important;height:190mm!important;}}';
   document.head.appendChild(style);
-
-  for (var pg = 0; pg < pageCount; pg++) {
-    var wrapper = document.createElement('div');
-    wrapper.className = 'print-page';
-    wrapper.style.cssText = 'background:#fff;';
-
-    var canvas = document.createElement('div');
-    canvas.className = 'pop-canvas';
-    canvas.style.cssText = 'box-shadow:none;margin-bottom:4px;';
-
-    var grid = document.createElement('div');
-    grid.className = 'pop-grid';
-
-    var savedPage = currentPage;
-    currentPage = pg;
-    var pageData = pages[pg];
-    pageData.forEach(function(data, idx) {
-      var cell = document.createElement('div');
-      var cls = 'pop-card';
-      if (data) cls += ' theme-' + (data.theme || currentTheme);
-      else       cls += ' empty';
-      cell.className = cls;
-      if (data) {
-        cell.innerHTML = buildPopHTML(data);
-      } else {
-        cell.innerHTML = '<div class="pop-empty-hint" style="pointer-events:none;"><div class="plus" style="color:#ddd">＋</div></div>';
-      }
+  for (var pg=0;pg<pages.length;pg++) {
+    var wrapper=document.createElement('div'); wrapper.className='print-page'; wrapper.style.background='#fff';
+    var canvas=document.createElement('div');  canvas.className='pop-canvas';  canvas.style.cssText='box-shadow:none;margin-bottom:4px;';
+    var grid=document.createElement('div');    grid.className='pop-grid';
+    pages[pg].forEach(function(data){
+      var cell=document.createElement('div');
+      cell.className='pop-card'+(data?' theme-'+(data.theme||currentTheme):' empty');
+      cell.innerHTML=data?buildPopHTML(data):'<div class="pop-empty-hint" style="pointer-events:none;"><div class="plus" style="color:#ddd">＋</div></div>';
       grid.appendChild(cell);
     });
-    currentPage = savedPage;
-
-    canvas.appendChild(grid);
-    wrapper.appendChild(canvas);
-    overlay.appendChild(wrapper);
+    canvas.appendChild(grid); wrapper.appendChild(canvas); overlay.appendChild(wrapper);
   }
-
   document.body.appendChild(overlay);
-  setTimeout(function() {
+  setTimeout(function(){
     window.print();
-    setTimeout(function() {
-      overlay.remove();
-      var s = document.getElementById('print-all-style');
-      if (s) s.remove();
-    }, 800);
-  }, 200);
+    setTimeout(function(){ overlay.remove(); var s=document.getElementById('print-all-style'); if(s)s.remove(); },800);
+  },200);
 }
 
-// ===== 通知 =====
 function notify(msg) {
-  var el = document.getElementById('notif');
-  el.textContent = msg;
-  el.classList.add('show');
+  var el=document.getElementById('notif');
+  el.textContent=msg; el.classList.add('show');
   clearTimeout(notify._t);
-  notify._t = setTimeout(function() { el.classList.remove('show'); }, 2400);
+  notify._t=setTimeout(function(){ el.classList.remove('show'); },2400);
 }
 
+// 豊明花きCSV 読み込み
 
-// ======================================================
-// ===== 豊明花きCSV 読み込み & Square Excel生成 =====
-// ======================================================
-
-var toyoakeParsedData = null; // Square変換用
-var toyoakePlantData  = [];   // 商品リスト用
-
-/* 半角カナ→全角カナ変換 */
 function hanToZen(str) {
   if (!str) return str;
-  var map = {
-    'ｶﾞ':'ガ','ｷﾞ':'ギ','ｸﾞ':'グ','ｹﾞ':'ゲ','ｺﾞ':'ゴ',
-    'ｻﾞ':'ザ','ｼﾞ':'ジ','ｽﾞ':'ズ','ｾﾞ':'ゼ','ｿﾞ':'ゾ',
-    'ﾀﾞ':'ダ','ﾁﾞ':'ヂ','ﾂﾞ':'ヅ','ﾃﾞ':'デ','ﾄﾞ':'ド',
-    'ﾊﾞ':'バ','ﾋﾞ':'ビ','ﾌﾞ':'ブ','ﾍﾞ':'ベ','ﾎﾞ':'ボ',
-    'ﾊﾟ':'パ','ﾋﾟ':'ピ','ﾌﾟ':'プ','ﾍﾟ':'ペ','ﾎﾟ':'ポ',
-    'ｳﾞ':'ヴ',
-    'ｱ':'ア','ｲ':'イ','ｳ':'ウ','ｴ':'エ','ｵ':'オ',
-    'ｶ':'カ','ｷ':'キ','ｸ':'ク','ｹ':'ケ','ｺ':'コ',
-    'ｻ':'サ','ｼ':'シ','ｽ':'ス','ｾ':'セ','ｿ':'ソ',
-    'ﾀ':'タ','ﾁ':'チ','ﾂ':'ツ','ﾃ':'テ','ﾄ':'ト',
-    'ﾅ':'ナ','ﾆ':'ニ','ﾇ':'ヌ','ﾈ':'ネ','ﾉ':'ノ',
-    'ﾊ':'ハ','ﾋ':'ヒ','ﾌ':'フ','ﾍ':'ヘ','ﾎ':'ホ',
-    'ﾏ':'マ','ﾐ':'ミ','ﾑ':'ム','ﾒ':'メ','ﾓ':'モ',
-    'ﾔ':'ヤ','ﾕ':'ユ','ﾖ':'ヨ',
-    'ﾗ':'ラ','ﾘ':'リ','ﾙ':'ル','ﾚ':'レ','ﾛ':'ロ',
-    'ﾜ':'ワ','ﾝ':'ン','ｦ':'ヲ',
-    'ｧ':'ァ','ｨ':'ィ','ｩ':'ゥ','ｪ':'ェ','ｫ':'ォ',
-    'ｯ':'ッ','ｬ':'ャ','ｭ':'ュ','ｮ':'ョ',
+  var map={
+    'ｶﾞ':'ガ','ｷﾞ':'ギ','ｸﾞ':'グ','ｹﾞ':'ゲ','ｺﾞ':'ゴ','ｻﾞ':'ザ','ｼﾞ':'ジ','ｽﾞ':'ズ','ｾﾞ':'ゼ','ｿﾞ':'ゾ',
+    'ﾀﾞ':'ダ','ﾁﾞ':'ヂ','ﾂﾞ':'ヅ','ﾃﾞ':'デ','ﾄﾞ':'ド','ﾊﾞ':'バ','ﾋﾞ':'ビ','ﾌﾞ':'ブ','ﾍﾞ':'ベ','ﾎﾞ':'ボ',
+    'ﾊﾟ':'パ','ﾋﾟ':'ピ','ﾌﾟ':'プ','ﾍﾟ':'ペ','ﾎﾟ':'ポ','ｳﾞ':'ヴ',
+    'ｱ':'ア','ｲ':'イ','ｳ':'ウ','ｴ':'エ','ｵ':'オ','ｶ':'カ','ｷ':'キ','ｸ':'ク','ｹ':'ケ','ｺ':'コ',
+    'ｻ':'サ','ｼ':'シ','ｽ':'ス','ｾ':'セ','ｿ':'ソ','ﾀ':'タ','ﾁ':'チ','ﾂ':'ツ','ﾃ':'テ','ﾄ':'ト',
+    'ﾅ':'ナ','ﾆ':'ニ','ﾇ':'ヌ','ﾈ':'ネ','ﾉ':'ノ','ﾊ':'ハ','ﾋ':'ヒ','ﾌ':'フ','ﾍ':'ヘ','ﾎ':'ホ',
+    'ﾏ':'マ','ﾐ':'ミ','ﾑ':'ム','ﾒ':'メ','ﾓ':'モ','ﾔ':'ヤ','ﾕ':'ユ','ﾖ':'ヨ',
+    'ﾗ':'ラ','ﾘ':'リ','ﾙ':'ル','ﾚ':'レ','ﾛ':'ロ','ﾜ':'ワ','ﾝ':'ン','ｦ':'ヲ',
+    'ｧ':'ァ','ｨ':'ィ','ｩ':'ゥ','ｪ':'ェ','ｫ':'ォ','ｯ':'ッ','ｬ':'ャ','ｭ':'ュ','ｮ':'ョ',
     'ｰ':'ー','ﾞ':'゛','ﾟ':'゜','･':'・','｡':'。','｢':'「','｣':'」','､':'、'
   };
-  var result = str;
-  // 2文字組み合わせを先に処理
-  var keys = Object.keys(map).sort(function(a,b) { return b.length - a.length; });
-  keys.forEach(function(k) { result = result.split(k).join(map[k]); });
+  var result=str;
+  Object.keys(map).sort(function(a,b){return b.length-a.length;}).forEach(function(k){ result=result.split(k).join(map[k]); });
   return result;
 }
 
-/* CSVパース（タブ区切り/カンマ区切り兼用） */
 function parseCSVText(text) {
-  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-  var rows = [], row = [], cur = '', inQ = false;
-  for (var i = 0; i < text.length; i++) {
-    var c = text[i], n = text[i+1];
+  if (text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+  var rows=[],row=[],cur='',inQ=false;
+  for (var i=0;i<text.length;i++) {
+    var c=text[i],n=text[i+1];
     if (inQ) {
-      if (c==='"' && n==='"') { cur += '"'; i++; }
-      else if (c==='"') { inQ = false; }
-      else cur += c;
+      if (c==='"'&&n==='"'){ cur+='"'; i++; } else if(c==='"'){ inQ=false; } else cur+=c;
     } else {
-      if (c==='"') { inQ = true; }
-      else if (c===',' || c==='\t') { row.push(cur); cur = ''; }
-      else if (c==='\r' && n==='\n') { rows.push(row); row = []; cur = ''; i++; }
-      else if (c==='\r' || c==='\n') { rows.push(row); row = []; cur = ''; }
-      else cur += c;
+      if      (c==='"')             { inQ=true; }
+      else if (c===','||c==='\t')   { row.push(cur); cur=''; }
+      else if (c==='\r'&&n==='\n')  { rows.push(row); row=[]; cur=''; i++; }
+      else if (c==='\r'||c==='\n')  { rows.push(row); row=[]; cur=''; }
+      else cur+=c;
     }
   }
-  row.push(cur);
-  rows.push(row);
-  return rows.filter(function(r) { return r.some(function(c) { return c !== ''; }); });
+  row.push(cur); rows.push(row);
+  return rows.filter(function(r){ return r.some(function(c){ return c!==''; }); });
 }
 
-/* 豊明CSVファイル読み込みハンドラ */
 function onToyoakeFile(event) {
-  var file = event.target.files[0];
-  if (!file) return;
-  event.target.value = '';
-  var reader = new FileReader();
-  reader.onload = function(e) {
+  var file=event.target.files[0]; if (!file) return;
+  event.target.value='';
+  var reader=new FileReader();
+  reader.onload=function(e){
     try {
-      var text = new TextDecoder('shift-jis').decode(e.target.result);
-      var rows = parseCSVText(text);
-      if (!rows || rows.length < 2) { notify('データがありません'); return; }
-
-      var hdr = rows[0].map(function(h) { return String(h).trim(); });
-      var nameIdx  = hdr.indexOf('品名');   if (nameIdx < 0)  nameIdx = 9;
-      var priceIdx = hdr.indexOf('ケース単価'); if (priceIdx < 0) priceIdx = 18;
-
-      // テキスト系列（半角→全角変換対象）
-      var textCols = ['品名','大分類名称','中分類名称','小分類名称','仕立略称','鉢素材名称','荷主名称','記事１','記事２','備考'];
-      var sqRows = [];
-      toyoakePlantData = [];
-
-      for (var i = 1; i < rows.length; i++) {
-        var r = rows[i];
-        if (r.length < 5) continue;
-        var obj = {};
-        hdr.forEach(function(h, idx) {
-          var v = (r[idx] || '').toString().trim();
-          if (textCols.indexOf(h) >= 0) v = hanToZen(v);
-          obj[h] = v;
+      var text=new TextDecoder('shift-jis').decode(e.target.result);
+      var rows=parseCSVText(text);
+      if (!rows||rows.length<2) { notify('データがありません'); return; }
+      var hdr=rows[0].map(function(h){ return String(h).trim(); });
+      var nameIdx  = hdr.indexOf('品名');     if (nameIdx<0)  nameIdx=9;
+      var priceIdx = hdr.indexOf('ケース単価'); if (priceIdx<0) priceIdx=18;
+      var catIdx   = hdr.indexOf('中分類名称');
+      toyoakePlantData=[];
+      for (var i=1;i<rows.length;i++) {
+        var r=rows[i]; if (r.length<5) continue;
+        var name =hanToZen(String(r[nameIdx] ||'').trim());
+        var price=parseInt(String(r[priceIdx]||'').replace(/[^\d]/g,''))||0;
+        if (name&&price) toyoakePlantData.push({
+          name:name, nameUpper:'', nameLower:'',
+          category:hanToZen(String(r[catIdx]||'').trim()),
+          catchcopy:'', point:'', price:String(price), band:'', theme:currentTheme
         });
-        sqRows.push(obj);
-
-        // POPリスト用
-        var name = hanToZen(String(r[nameIdx] || '').trim());
-        var price = parseInt(String(r[priceIdx] || '').replace(/[^\d]/g,'')) || 0;
-        if (name && price) {
-          toyoakePlantData.push({
-            name: name,
-            nameUpper: '',
-            nameLower: '',
-            category: hanToZen(String(r[hdr.indexOf('中分類名称')] || '').trim()),
-            catchcopy: '',
-            point: '',
-            price: String(price),
-            band: '',
-            theme: currentTheme,
-          });
-        }
       }
-
-      toyoakeParsedData = { headers: hdr, rows: sqRows };
-
-      // 結果エリア表示
-      var resultEl = document.getElementById('toyoake-result');
-      resultEl.style.display = 'block';
-      var infoEl = document.getElementById('toyoake-info');
-      var date = sqRows[0] ? (sqRows[0]['売立日'] || '') : '';
-      if (date.length === 8) date = date.slice(0,4) + '/' + date.slice(4,6) + '/' + date.slice(6,8);
-      infoEl.textContent = sqRows.length + '件 読み込み完了' + (date ? '（' + date + '）' : '');
-
-      // 商品リスト表示
       renderPlantList('toyoake-plant-list', toyoakePlantData);
-      notify('豊明花き: ' + toyoakePlantData.length + '件を読み込みました');
-
-    } catch(err) {
-      notify('読み込み失敗: ' + err.message);
-    }
+      notify('豊明花き: '+toyoakePlantData.length+'件を読み込みました');
+    } catch(err) { notify('読み込み失敗: '+err.message); }
   };
-  reader.onerror = function() { notify('ファイルの読み込みに失敗しました'); };
+  reader.onerror=function(){ notify('ファイルの読み込みに失敗しました'); };
   reader.readAsArrayBuffer(file);
 }
-
-/* Square Excel ダウンロード */
-function downloadSquareExcel() {
-  if (!toyoakeParsedData || !toyoakeParsedData.rows.length) {
-    notify('先に豊明CSVを読み込んでください'); return;
-  }
-  if (typeof XLSX === 'undefined') {
-    notify('XLSXライブラリが読み込まれていません'); return;
-  }
-  var store  = '北山ナーセリー';
-  var tax    = 'Y';
-  var pmode  = document.getElementById('sq-priceMode').value;
-  var ptype  = document.getElementById('sq-productType').value;
-
-  try {
-    var wb = sqBuildXLSX(toyoakeParsedData.rows, store, tax, pmode, ptype);
-    var date = (toyoakeParsedData.rows[0] ? (toyoakeParsedData.rows[0]['売立日'] || '') : '').slice(0,8)
-      || new Date().toISOString().slice(0,10).replace(/-/g,'');
-    var fn = 'square_import_' + date + '.xlsx';
-    XLSX.writeFile(wb, fn);
-    var statusEl = document.getElementById('sq-status');
-    statusEl.textContent = fn + ' をダウンロードしました';
-    statusEl.className = 'sq-status';
-    notify(fn + ' をダウンロードしました');
-  } catch(e) {
-    var statusEl = document.getElementById('sq-status');
-    statusEl.textContent = 'Excel生成失敗: ' + e.message;
-    statusEl.className = 'sq-status error';
-    notify('Excel生成失敗: ' + e.message);
-  }
-}
-
-/* Square XLSX生成 */
-function sqBuildXLSX(rows, store, tax, priceMode, ptype) {
-  var heads = sqHeaders(store);
-  var data  = sqConvertRows(rows, store, tax, priceMode, ptype);
-  var all   = [['指示・説明'],['各行に商品名が含まれていること、カテゴリ・説明が一致していること。'],[],heads].concat(data);
-  var ws = XLSX.utils.aoa_to_sheet(all);
-  ws['!cols'] = heads.map(function(_,i) { return { wch: i < 9 ? 22 : 16 }; });
-  var wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, '商品');
-  return wb;
-}
-
-function sqHeaders(store) {
-  return ['参照ハンドル','トークン','商品名','お客さま向けの名称','フリガナ','バリエーション名','商品番号（SKU）','説明','カテゴリ','レポートカテゴリ','SEOタイトル','SEOの説明','パーマリンク','GTIN','Square オンラインビジネスの商品の表示/非表示','商品タイプ','重量(キログラム)','ソーシャルメディアのリンクのタイトル','ソーシャルメディアのリンクの説明','配送有効化済み','セルフオーダー有効化済み','デリバリー有効化済み','受け取り有効化済み','価格','オンラインセール価格','アーカイブ済み','販売可能','アルコールを含む','在庫保有可能','POSレジで詳細画面をスキップする','オプション名1','オプション値1','オプション名2','オプション値2','既定の単位原価','既定の取引先名','既定の取引先コード','現在の数量 '+store,'新規の数量 '+store,'在庫アラート有効（'+store+'）','在庫アラート基準値（'+store+'）','税金 - 消費税内税10％ (10%)'];
-}
-
-function sqPn(v) {
-  var n = parseInt((v||'').replace(/,/g,'').trim(), 10);
-  return isNaN(n) ? 0 : n;
-}
-
-function sqConvertRows(rows, store, tax, priceMode, ptype) {
-  var skuCount = {};
-  return rows.map(function(r) {
-    var t = function(v) { return (v||'').trim(); };
-    var refHandle = t(r['品名コード']) || t(r['JFコード']);
-    var hinmei    = hanToZen(t(r['品名']));
-    var baseKey   = t(r['売立日']) + '-' + t(r['荷受番号']);
-    skuCount[baseKey] = (skuCount[baseKey] || 0) + 1;
-    var sku    = skuCount[baseKey] === 1 ? baseKey : baseKey + '-' + skuCount[baseKey];
-    var cat    = [hanToZen(t(r['中分類名称'])), hanToZen(t(r['小分類名称']))].filter(Boolean).join(' > ');
-    var daib   = hanToZen(t(r['大分類名称']));
-    var shit   = hanToZen(t(r['仕立略称']));
-    var hachi  = t(r['鉢サイズ']);
-    var vari   = [shit, hachi].filter(Boolean).join(' ') || '標準';
-    var casePr = sqPn(r['ケース単価']); var nyu = sqPn(r['入数']) || 1;
-    var price  = priceMode === 'per_unit' ? Math.round(casePr / nyu) : casePr;
-    var kostRaw= sqPn(r['鉢単価']); var cost = kostRaw > 0 ? Math.round(kostRaw / 100) : '';
-    var kuchi  = sqPn(r['口数']) || 1; var stockQty = nyu * kuchi;
-    var aname  = t(r['荷主名称']); var acode = t(r['荷主コード']);
-    var desc   = [t(r['記事１']), t(r['記事２'])].filter(Boolean).join('　');
-    return [refHandle,'',hinmei,hinmei,'',vari,sku,desc,cat,daib,'','','','','',ptype,'','','','','','','',price,'','N','Y','N','Y','N',shit?'仕立':'',shit,hachi?'サイズ':'',hachi,cost,aname,acode,'',stockQty,'','',tax];
-  });
-}
-
-
-// ======================================================
-// ===== POP用CSV 読み込み =====
-// ======================================================
-
-var popCsvPlantData = [];
-
-function onPopCsvFile(event) {
-  var file = event.target.files[0];
-  if (!file) return;
-  event.target.value = '';
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      // まずShift-JISで試み、失敗したらUTF-8
-      var text;
-      try {
-        text = new TextDecoder('shift-jis').decode(e.target.result);
-      } catch(_) {
-        text = new TextDecoder('utf-8').decode(e.target.result);
-      }
-      var rows = parseCSVText(text);
-      if (!rows || rows.length < 2) { notify('データがありません'); return; }
-
-      var hdr = rows[0].map(function(h) { return String(h).trim(); });
-      popCsvPlantData = [];
-
-      var get = function(names, row) {
-        for (var ni = 0; ni < names.length; ni++) {
-          var n = names[ni];
-          var idx = hdr.findIndex(function(h) { return h && h.includes(n); });
-          if (idx >= 0 && row[idx] && String(row[idx]).trim()) return String(row[idx]).trim();
-        }
-        return '';
-      };
-
-      for (var i = 1; i < rows.length; i++) {
-        var r = rows[i];
-        if (r.length < 3) continue;
-        var name = get(['ＰＯＰ品名','商品名','品名'], r);
-        if (!name) continue;
-        var price = get(['税抜き価格','税抜','本体価格','価格'], r).replace(/[^\d]/g,'')
-          || get(['４月１日','３月','２月','１月'], r).replace(/[^\d]/g,'');
-        popCsvPlantData.push({
-          name:      name,
-          nameUpper: get(['品名上段'], r),
-          nameLower: get(['品名下段'], r),
-          category:  get(['分類','宿根','区分'], r),
-          catchcopy: get(['キャッチ','キャチコピー'], r),
-          point:     get(['ポイント'], r),
-          price:     price,
-          band:      '',
-          theme:     currentTheme,
-        });
-      }
-      renderPlantList('pop-plant-list', popCsvPlantData);
-      notify(popCsvPlantData.length + '件の商品を読み込みました');
-    } catch(err) {
-      notify('読み込み失敗: ' + err.message);
-    }
-  };
-  reader.onerror = function() { notify('ファイルの読み込みに失敗しました'); };
-  reader.readAsArrayBuffer(file);
-}
-
-// Array.prototype.findIndex polyfill
-if (!Array.prototype.findIndex) {
-  Array.prototype.findIndex = function(pred) {
-    for (var i = 0; i < this.length; i++) {
-      if (pred(this[i], i, this)) return i;
-    }
-    return -1;
-  };
-}
-
-
-// ======================================================
-// ===== サンプルデータ初期表示 =====
-// ======================================================
-(function() {
-  var samples = [
-    { name: 'ラナンキュラス', nameUpper: '', nameLower: '', category: '球根植物',
-      catchcopy: 'まるでバラのような花！球根植物で毎年楽しめます。',
-      point: '日当たり水はけのよいところで栽培してください。', price: '480', band: '', theme: 'red' },
-    { name: 'カーネーション', nameUpper: '', nameLower: '', category: '多年草',
-      catchcopy: '鮮やかで人気！母の日のギフトにも。',
-      point: '日当たり水はけの良いところで。', price: '1500', band: '', theme: 'red' },
-    { name: 'アジサイ', nameUpper: '春よ恋', nameLower: 'ガクアジサイ', category: '落葉低木',
-      catchcopy: 'ピンク色の可愛らしい花！',
-      point: '', price: '1500', band: '3本 ¥4,000', theme: 'red' },
-    { name: 'ベルフラワー', nameUpper: '', nameLower: '', category: '宿根草',
-      catchcopy: 'キキョウのようなかわいい花で人気！',
-      point: '花：４〜５月　丈：10〜15cm', price: '680', band: '', theme: 'red' },
-  ];
-  samples.forEach(function(s, i) { pages[0][i] = s; });
-  renderGrid();
-})();
 </script>
 </body>
 </html>
