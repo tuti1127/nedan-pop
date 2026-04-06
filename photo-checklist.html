@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品写真撮影チェックリスト — Kitayama Nursery</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --background:#f6faf6;
+  --card:#ffffff;
+  --muted:#edf5ed;
+  --foreground:#0f1f0f;
+  --muted-fg:#5a7a5a;
+  --border:#c8dfc8;
+  --input:#c8dfc8;
+  --ring:#2d6a2d;
+  --primary:#2d6a2d;
+  --primary-fg:#ffffff;
+  --primary-hover:#1b5e20;
+  --accent:#4caf50;
+  --accent-light:#e8f5e9;
+  --danger:#c62828;
+  --danger-light:#ffebee;
+  --warning:#f57f17;
+  --warning-light:#fff8e1;
+  --success:#2d6a2d;
+  --success-light:#e8f5e9;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+  --shadow:0 1px 3px rgba(0,0,0,0.10),0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.06);
+  --radius:8px;--radius-sm:6px;
+}
+html{font-size:15px;-webkit-text-size-adjust:100%;}
+body{
+  font-family:system-ui,-apple-system,sans-serif;
+  background:var(--background);
+  color:var(--foreground);
+  min-height:100vh;
+}
+
+/* ヘッダー */
+header{
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  height:56px;padding:0 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:200;
+  box-shadow:var(--shadow-sm);
+}
+.hdr-left{display:flex;align-items:center;gap:10px;}
+.hdr-logo{
+  width:36px;height:36px;
+  background:var(--accent-light);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+  border:1px solid var(--border);
+}
+.hdr-title{font-size:15px;font-weight:700;color:var(--foreground);line-height:1.2;}
+.hdr-sub{font-size:11px;color:var(--muted-fg);}
+
+/* メインコンテンツ */
+.app{max-width:600px;margin:0 auto;padding:16px;}
+
+/* セクション */
+.section{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  margin-bottom:16px;
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+}
+.section-header{
+  padding:14px 16px;
+  background:var(--muted);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.section-icon{font-size:20px;}
+.section-title{font-size:15px;font-weight:700;color:var(--foreground);}
+.section-badge{
+  margin-left:auto;
+  font-size:12px;font-weight:600;
+  padding:2px 8px;border-radius:999px;
+  background:var(--card);color:var(--muted-fg);
+  border:1px solid var(--border);
+  white-space:nowrap;
+}
+.section-badge.done{
+  background:var(--success-light);
+  color:var(--success);
+  border-color:#a5d6a7;
+}
+
+/* チェックリストアイテム */
+.checklist{padding:8px 0;}
+.check-item{
+  padding:10px 16px;
+  display:flex;align-items:flex-start;gap:12px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:background 0.1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.check-item:last-child{border-bottom:none;}
+.check-item:hover{background:var(--muted);}
+.check-item:active{background:var(--accent-light);}
+
+/* カスタムチェックボックス */
+.check-item input[type="checkbox"]{display:none;}
+.checkbox-visual{
+  width:22px;height:22px;min-width:22px;
+  border:2px solid var(--border);
+  border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:1px;
+  transition:all 0.15s;
+  background:var(--card);
+}
+.check-item:has(input:checked) .checkbox-visual{
+  background:var(--primary);
+  border-color:var(--primary);
+}
+.checkbox-visual::after{
+  content:"";
+  width:6px;height:10px;
+  border-right:2px solid white;
+  border-bottom:2px solid white;
+  transform:rotate(45deg) translateY(-1px);
+  opacity:0;
+  transition:opacity 0.1s;
+}
+.check-item:has(input:checked) .checkbox-visual::after{opacity:1;}
+
+/* チェックアイテム本文 */
+.check-body{flex:1;}
+.check-label{
+  font-size:14px;font-weight:500;color:var(--foreground);
+  line-height:1.5;
+}
+.check-item:has(input:checked) .check-label{
+  color:var(--muted-fg);
+  text-decoration:line-through;
+}
+.check-desc{
+  font-size:12px;color:var(--muted-fg);
+  margin-top:2px;line-height:1.5;
+}
+.check-item:has(input:checked) .check-desc{color:#b0bfb0;}
+
+/* 重要度バッジ */
+.badge{
+  display:inline-block;
+  font-size:10px;font-weight:700;
+  padding:1px 6px;border-radius:3px;
+  margin-left:6px;vertical-align:middle;
+}
+.badge-critical{background:var(--danger-light);color:var(--danger);}
+.badge-warn{background:var(--warning-light);color:var(--warning);}
+
+/* 撮影パターン選択 */
+.pattern-section{padding:12px 16px;border-bottom:1px solid var(--border);}
+.pattern-title{font-size:13px;font-weight:600;color:var(--muted-fg);margin-bottom:8px;}
+.pattern-cards{display:flex;flex-direction:column;gap:8px;}
+.pattern-card{
+  border:2px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:12px 14px;
+  cursor:pointer;
+  transition:all 0.15s;
+  display:flex;align-items:flex-start;gap:10px;
+  -webkit-tap-highlight-color:transparent;
+}
+.pattern-card:hover{border-color:#a7c9a7;background:var(--muted);}
+.pattern-card.selected{
+  border-color:var(--primary);
+  background:var(--accent-light);
+}
+.pattern-radio{
+  width:18px;height:18px;min-width:18px;
+  border:2px solid var(--border);
+  border-radius:50%;
+  margin-top:2px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;
+}
+.pattern-card.selected .pattern-radio{
+  border-color:var(--primary);
+  background:var(--primary);
+}
+.pattern-radio::after{
+  content:"";
+  width:6px;height:6px;
+  border-radius:50%;
+  background:white;
+  opacity:0;
+  transition:opacity 0.1s;
+}
+.pattern-card.selected .pattern-radio::after{opacity:1;}
+.pattern-name{font-size:13px;font-weight:700;color:var(--foreground);}
+.pattern-desc{font-size:12px;color:var(--muted-fg);margin-top:2px;line-height:1.5;}
+
+/* NGアラート（植物状態が悪い場合） */
+.alert{
+  margin:12px 16px 16px;
+  padding:12px 14px;
+  border-radius:var(--radius-sm);
+  font-size:13px;
+  line-height:1.6;
+  display:none;
+}
+.alert-danger{
+  background:var(--danger-light);
+  border:1px solid #ef9a9a;
+  color:var(--danger);
+}
+.alert-warning{
+  background:var(--warning-light);
+  border:1px solid #ffcc02;
+  color:var(--warning);
+}
+.alert-icon{font-size:16px;margin-right:6px;}
+.alert strong{font-weight:700;}
+
+/* 進捗バー */
+.progress-section{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow-sm);
+  position:sticky;
+  top:56px;
+  z-index:100;
+}
+.progress-label{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:13px;font-weight:600;color:var(--foreground);
+  margin-bottom:8px;
+}
+.progress-count{color:var(--muted-fg);font-weight:400;}
+.progress-bar-bg{
+  height:8px;background:var(--muted);border-radius:999px;overflow:hidden;
+}
+.progress-bar-fill{
+  height:100%;background:var(--primary);border-radius:999px;
+  transition:width 0.3s ease;width:0%;
+}
+
+/* 結果バナー */
+.result-banner{
+  padding:20px;
+  border-radius:var(--radius);
+  text-align:center;
+  margin-bottom:16px;
+  display:none;
+  box-shadow:var(--shadow-md);
+}
+.result-banner.show{display:block;}
+.result-banner.success{
+  background:var(--success-light);
+  border:2px solid #66bb6a;
+  color:var(--success);
+}
+.result-banner.warning{
+  background:var(--warning-light);
+  border:2px solid #ffca28;
+  color:var(--warning);
+}
+.result-banner.danger{
+  background:var(--danger-light);
+  border:2px solid #ef5350;
+  color:var(--danger);
+}
+.result-emoji{font-size:40px;margin-bottom:8px;display:block;}
+.result-title{font-size:18px;font-weight:700;margin-bottom:6px;}
+.result-body{font-size:13px;line-height:1.7;}
+.result-list{
+  text-align:left;
+  margin-top:10px;
+  padding:10px 14px;
+  background:rgba(255,255,255,0.6);
+  border-radius:var(--radius-sm);
+  font-size:13px;
+  line-height:1.8;
+}
+
+/* リセットボタン */
+.btn{
+  height:44px;padding:0 20px;border-radius:var(--radius-sm);
+  font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;
+  transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:1px solid transparent;width:100%;margin-top:8px;
+}
+.btn:active{transform:scale(0.97);}
+.btn-secondary{background:var(--card);border-color:var(--border);color:var(--foreground);}
+.btn-secondary:hover{background:var(--muted);}
+.btn-primary{background:var(--primary);color:var(--primary-fg);border-color:var(--primary);}
+.btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);}
+
+/* フッター */
+footer{
+  text-align:center;padding:20px;
+  font-size:12px;color:var(--muted-fg);
+}
+
+/* スマホ最適化 */
+@media(max-width:480px){
+  .app{padding:12px;}
+  .section-header{padding:12px 14px;}
+  .check-item{padding:10px 14px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-left">
+    <div class="hdr-logo">📷</div>
+    <div>
+      <div class="hdr-title">撮影チェックリスト</div>
+      <div class="hdr-sub">Kitayama Nursery — 出品写真品質管理</div>
+    </div>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- 進捗バー -->
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>チェック進捗</span>
+      <span class="progress-count" id="progressCount">0 / 0 完了</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- 結果バナー（全チェック後に表示） -->
+  <div class="result-banner" id="resultBanner">
+    <span class="result-emoji" id="resultEmoji"></span>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-body" id="resultBody"></div>
+    <div class="result-list" id="resultList" style="display:none;"></div>
+    <button class="btn btn-secondary" onclick="resetAll()">最初からやり直す</button>
+  </div>
+
+  <!-- セクション1: 植物状態チェック（撮影前） -->
+  <div class="section" id="section1">
+    <div class="section-header">
+      <span class="section-icon">🌿</span>
+      <span class="section-title">植物の状態確認</span>
+      <span class="section-badge" id="badge1">0/5</span>
+    </div>
+
+    <div id="plant-ng-alert" class="alert alert-danger">
+      <span class="alert-icon">🚫</span>
+      <strong>撮影延期を推奨します</strong><br>
+      輸送ダメージや状態不良の植物を出品写真に使うと、購入後のクレームや評価低下につながります。植物が回復してから撮影してください。通常は水やり後2〜3日で回復します。
+    </div>
+
+    <div class="checklist" id="section1-list">
+      <label class="check-item" id="ci-leaf-color">
+        <input type="checkbox" class="check-input" data-section="1" data-ng-trigger="plant-ng-alert">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">葉の色が鮮やか・本来の色をしている<span class="badge badge-critical">重要</span></div>
+          <div class="check-desc">黄変・褐変・白化がないか確認。輸送後は特に注意。</div>
+        </div>
+      </label>
+      <label class="check-item" id="ci-leaf-tension">
+        <input type="checkbox" class="check-input" data-section="1" data-ng-trigger="plant-ng-alert">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">葉にハリ・ツヤがある<span class="badge badge-critical">重要</span></div>
+          <div class="check-desc">しおれ・下垂きがないか確認。水切れの場合は給水後に再確認。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="1">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">傷・折れ・欠けがない</div>
+          <div class="check-desc">輸送中の物理的ダメージがないか全体を確認する。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="1">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">病害虫の痕跡がない</div>
+          <div class="check-desc">葉裏・茎元を確認。白い粉・斑点・虫の付着がないか。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="1">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">鉢・土の状態が清潔</div>
+          <div class="check-desc">表土にカビ・コケがないか。鉢に汚れがあれば拭き取る。</div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <!-- セクション2: 撮影環境チェック -->
+  <div class="section" id="section2">
+    <div class="section-header">
+      <span class="section-icon">💡</span>
+      <span class="section-title">撮影環境の準備</span>
+      <span class="section-badge" id="badge2">0/5</span>
+    </div>
+
+    <!-- 撮影パターン選択 -->
+    <div class="pattern-section">
+      <div class="pattern-title">撮影パターンを選択（コンテンツ担当推奨）</div>
+      <div class="pattern-cards">
+        <div class="pattern-card" id="patternA" onclick="selectPattern('A')">
+          <div class="pattern-radio"></div>
+          <div>
+            <div class="pattern-name">パターンA — 植物を持って窓際</div>
+            <div class="pattern-desc">手で鉢を持ち、自然光が入る窓を背景にして撮影。植物の存在感と生活感が伝わる。午前中の柔らかい光が最適。</div>
+          </div>
+        </div>
+        <div class="pattern-card" id="patternB" onclick="selectPattern('B')">
+          <div class="pattern-radio"></div>
+          <div>
+            <div class="pattern-name">パターンB — 棚・窓辺の俯瞰</div>
+            <div class="pattern-desc">棚や台に置いた植物を真上または斜め上から撮影。インテリア感が出てオシャレな印象に。背景の整理が重要。</div>
+          </div>
+        </div>
+        <div class="pattern-card" id="patternC" onclick="selectPattern('C')">
+          <div class="pattern-radio"></div>
+          <div>
+            <div class="pattern-name">パターンC — 手のアップ</div>
+            <div class="pattern-desc">植物の葉や花に手を添えてアップで撮影。スケール感が伝わり、細部の美しさを強調できる。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="checklist">
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="2">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">自然光を使用（フラッシュOFF）<span class="badge badge-critical">重要</span></div>
+          <div class="check-desc">晴天〜曇天の午前10時〜午後2時が理想。スマホのフラッシュは必ずOFFにする。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="2">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">背景がシンプル・清潔</div>
+          <div class="check-desc">生活感のある小物・段ボール・衣類などが写り込んでいない。白壁・木目・グリーンが映える。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="2">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">選択したパターンのセットが完了している</div>
+          <div class="check-desc">上で選んだ撮影パターンに合わせた配置・構図が準備できた。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="2">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">ピントが植物に合っている（試し撮り確認）</div>
+          <div class="check-desc">1枚試し撮りして、ぼけ・ブレがないかズームして確認する。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="2">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">画面の明るさ・露出が適切</div>
+          <div class="check-desc">暗すぎ・白飛びがないか確認。スマホの露出補正機能で調整する。</div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <!-- セクション3: 出品写真チェック -->
+  <div class="section" id="section3">
+    <div class="section-header">
+      <span class="section-icon">📱</span>
+      <span class="section-title">メルカリShops出品写真の確認</span>
+      <span class="section-badge" id="badge3">0/5</span>
+    </div>
+
+    <div class="checklist">
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="3">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">写真が最低3枚以上ある<span class="badge badge-warn">推奨</span></div>
+          <div class="check-desc">全体・アップ・鉢底（根の状態）の3枚が基本セット。最大10枚まで登録可能。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="3">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">ロゴ・ブランド表示が写り込んでいない<span class="badge badge-critical">重要</span></div>
+          <div class="check-desc">他社ブランドのロゴや商標が入った小物が写っていないか確認。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="3">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">テキスト・値段・文字の過剰な入力がない</div>
+          <div class="check-desc">写真への文字入れは最小限に。価格や大きすぎるテキストはNG扱いになることがある。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="3">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">実物と異なるイメージ写真は「イメージ写真」と明記</div>
+          <div class="check-desc">商品と異なる写真（イメージ・参考例）を使う場合は説明文に「イメージ写真」と必ず記載する。</div>
+        </div>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="check-input" data-section="3">
+        <div class="checkbox-visual"></div>
+        <div class="check-body">
+          <div class="check-label">1枚目の写真が最も印象的・商品が明確に見える</div>
+          <div class="check-desc">サムネイルになる1枚目が売上に直結する。全体像がはっきり見える写真を選ぶ。</div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <!-- フッター -->
+  <footer>Kitayama Nursery — 植物を通じて、人の暮らしと心を豊かにする</footer>
+
+</div><!-- /.app -->
+
+<script>
+// ---- 状態管理 ----
+const SECTIONS = {
+  1: { total: 5, checked: 0 },
+  2: { total: 5, checked: 0 },
+  3: { total: 5, checked: 0 },
+};
+const TOTAL_ITEMS = 15;
+
+// 植物状態NGトリガー項目（最初の2つがNG判定対象）
+const NG_ITEMS = ['ci-leaf-color', 'ci-leaf-tension'];
+
+// 選択中の撮影パターン
+let selectedPattern = null;
+
+// ---- 初期化 ----
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.check-input').forEach(cb => {
+    cb.addEventListener('change', onCheckChange);
+  });
+  updateProgress();
+});
+
+// ---- チェック変更ハンドラ ----
+function onCheckChange(e) {
+  const cb = e.target;
+  const section = parseInt(cb.dataset.section);
+
+  // セクション別カウント再計算
+  const sectionItems = document.querySelectorAll(`.check-input[data-section="${section}"]`);
+  let count = 0;
+  sectionItems.forEach(item => { if (item.checked) count++; });
+  SECTIONS[section].checked = count;
+
+  // セクションバッジ更新
+  updateSectionBadge(section);
+
+  // 植物NG判定
+  checkPlantNG();
+
+  // 全体進捗更新
+  updateProgress();
+
+  // 結果バナー更新
+  updateResultBanner();
+}
+
+// ---- 植物NGアラート ----
+function checkPlantNG() {
+  // 最初の2項目（葉の色・ハリ）が両方チェックOKかどうか確認
+  // NGアラートは「チェックされていない状態かつ他の項目がチェックされ始めたとき」に表示
+  const leafColor = document.getElementById('ci-leaf-color').querySelector('.check-input');
+  const leafTension = document.getElementById('ci-leaf-tension').querySelector('.check-input');
+  const alert = document.getElementById('plant-ng-alert');
+
+  // セクション1の他の項目が1つでもチェックされていて、葉の色orハリがチェックされていない場合
+  const section1Items = document.querySelectorAll('.check-input[data-section="1"]');
+  let anyOtherChecked = false;
+  section1Items.forEach((item, idx) => {
+    if (idx >= 2 && item.checked) anyOtherChecked = true;
+  });
+
+  const plantNG = (!leafColor.checked || !leafTension.checked) && anyOtherChecked;
+  alert.style.display = plantNG ? 'block' : 'none';
+}
+
+// ---- セクションバッジ更新 ----
+function updateSectionBadge(section) {
+  const badge = document.getElementById(`badge${section}`);
+  const { total, checked } = SECTIONS[section];
+  badge.textContent = `${checked}/${total}`;
+  if (checked === total) {
+    badge.classList.add('done');
+  } else {
+    badge.classList.remove('done');
+  }
+}
+
+// ---- 全体進捗 ----
+function updateProgress() {
+  let totalChecked = 0;
+  Object.values(SECTIONS).forEach(s => { totalChecked += s.checked; });
+
+  const pct = Math.round((totalChecked / TOTAL_ITEMS) * 100);
+  document.getElementById('progressFill').style.width = `${pct}%`;
+  document.getElementById('progressCount').textContent = `${totalChecked} / ${TOTAL_ITEMS} 完了`;
+}
+
+// ---- 結果バナー ----
+function updateResultBanner() {
+  let totalChecked = 0;
+  Object.values(SECTIONS).forEach(s => { totalChecked += s.checked; });
+
+  const banner = document.getElementById('resultBanner');
+  const emoji = document.getElementById('resultEmoji');
+  const title = document.getElementById('resultTitle');
+  const body = document.getElementById('resultBody');
+  const list = document.getElementById('resultList');
+
+  // 葉の色・ハリが未チェックかどうか
+  const leafColor = document.getElementById('ci-leaf-color').querySelector('.check-input');
+  const leafTension = document.getElementById('ci-leaf-tension').querySelector('.check-input');
+  const plantNG = !leafColor.checked || !leafTension.checked;
+
+  // 全チェック完了
+  if (totalChecked === TOTAL_ITEMS) {
+    banner.className = 'result-banner show success';
+    emoji.textContent = '🌿';
+    title.textContent = '撮影GO！';
+    body.textContent = '全項目クリアです。自信を持って撮影してください。素晴らしい写真が撮れますように。';
+    list.style.display = 'none';
+    banner.style.display = 'block';
+    return;
+  }
+
+  // 未完了項目あり（ある程度進んだら表示）
+  if (totalChecked >= 5) {
+    const unchecked = collectUnchecked();
+
+    if (plantNG && totalChecked >= 3) {
+      banner.className = 'result-banner show danger';
+      emoji.textContent = '🚫';
+      title.textContent = '撮影は待ってください';
+      body.textContent = '植物の状態確認が不完全です。葉の色・ハリをまず確認してください。元気のない植物の写真は出品に使わないでください。';
+    } else {
+      banner.className = 'result-banner show warning';
+      emoji.textContent = '📋';
+      title.textContent = '以下の項目を確認してから撮影してください';
+      body.textContent = '';
+    }
+
+    if (unchecked.length > 0) {
+      list.innerHTML = unchecked.map(t => `• ${t}`).join('<br>');
+      list.style.display = 'block';
+    } else {
+      list.style.display = 'none';
+    }
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ---- 未チェック項目を収集 ----
+function collectUnchecked() {
+  const result = [];
+  document.querySelectorAll('.check-input').forEach(cb => {
+    if (!cb.checked) {
+      const label = cb.closest('.check-item').querySelector('.check-label');
+      // バッジテキストを除いたラベルテキストを取得
+      const clone = label.cloneNode(true);
+      clone.querySelectorAll('.badge').forEach(b => b.remove());
+      result.push(clone.textContent.trim());
+    }
+  });
+  return result;
+}
+
+// ---- 撮影パターン選択 ----
+function selectPattern(pattern) {
+  selectedPattern = pattern;
+  ['A', 'B', 'C'].forEach(p => {
+    const card = document.getElementById(`pattern${p}`);
+    if (p === pattern) {
+      card.classList.add('selected');
+    } else {
+      card.classList.remove('selected');
+    }
+  });
+}
+
+// ---- リセット ----
+function resetAll() {
+  document.querySelectorAll('.check-input').forEach(cb => {
+    cb.checked = false;
+  });
+  Object.keys(SECTIONS).forEach(k => { SECTIONS[k].checked = 0; });
+  [1, 2, 3].forEach(s => updateSectionBadge(s));
+  document.getElementById('plant-ng-alert').style.display = 'none';
+  document.getElementById('resultBanner').style.display = 'none';
+  selectedPattern = null;
+  ['A', 'B', 'C'].forEach(p => {
+    document.getElementById(`pattern${p}`).classList.remove('selected');
+  });
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
