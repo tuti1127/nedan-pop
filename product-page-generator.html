@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>メルカリShops 商品ページジェネレーター</title>
+<style>
+  /* ===== リセット・基本 ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #2d7d32;
+    --primary-dark: #1b5e20;
+    --primary-light: #4caf50;
+    --accent: #a5d6a7;
+    --bg: #f1f8e9;
+    --surface: #ffffff;
+    --border: #c8e6c9;
+    --text: #1a2e1a;
+    --text-sub: #5a7a5a;
+    --radius: 10px;
+    --shadow: 0 2px 8px rgba(45,125,50,0.12);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* ===== ヘッダー ===== */
+  header {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
+    color: white;
+    padding: 20px 16px 16px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 4px;
+  }
+  header p {
+    font-size: 0.8rem;
+    opacity: 0.85;
+  }
+
+  /* ===== レイアウト ===== */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* ===== カード ===== */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .card-header {
+    background: var(--primary);
+    color: white;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ===== フォーム部品 ===== */
+  .field-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 480px) {
+    .field-group { grid-template-columns: 1fr; }
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .field.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  label .required {
+    color: #e53935;
+    font-size: 0.7rem;
+  }
+  label .optional {
+    color: var(--text-sub);
+    font-size: 0.68rem;
+    font-weight: 400;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--text);
+    background: #fafffe;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%232d7d32' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(45,125,50,0.12);
+  }
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+
+  /* チェックボックス */
+  .checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #f0faf0;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .checkbox-field input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .checkbox-field span {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+  }
+
+  /* ===== プリセットボタン ===== */
+  .preset-section .card-body {
+    padding: 12px 16px;
+  }
+  .preset-label {
+    font-size: 0.78rem;
+    color: var(--text-sub);
+    margin-bottom: 2px;
+    font-weight: 600;
+  }
+  .preset-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .btn-preset {
+    padding: 7px 13px;
+    border: 1.5px solid var(--primary);
+    border-radius: 20px;
+    background: white;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .btn-preset:hover, .btn-preset:active {
+    background: var(--primary);
+    color: white;
+  }
+
+  /* ===== 生成ボタン ===== */
+  .btn-generate {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    box-shadow: 0 3px 10px rgba(45,125,50,0.3);
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-generate:hover { opacity: 0.92; }
+  .btn-generate:active { transform: scale(0.98); }
+
+  /* ===== 出力エリア ===== */
+  .output-section { display: none; }
+  .output-section.visible { display: block; }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--primary);
+    color: white;
+  }
+  .output-header span {
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .char-counter {
+    font-size: 0.78rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.2);
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+  .char-counter.over { background: #e53935; }
+  .char-counter.warning { background: #f57c00; }
+
+  .output-text {
+    width: 100%;
+    min-height: 260px;
+    padding: 14px;
+    border: none;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    font-family: inherit;
+    line-height: 1.7;
+    color: var(--text);
+    resize: vertical;
+    outline: none;
+    background: #fafffe;
+  }
+
+  .output-actions {
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-copy {
+    flex: 1;
+    padding: 10px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-copy:hover { opacity: 0.88; }
+  .btn-copy.copied {
+    background: var(--primary-dark);
+  }
+
+  .btn-reset {
+    padding: 10px 18px;
+    background: white;
+    color: var(--text-sub);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .btn-reset:hover { border-color: var(--primary); color: var(--primary); }
+
+  /* ===== 注意書き ===== */
+  .note {
+    font-size: 0.75rem;
+    color: var(--text-sub);
+    background: #f0faf0;
+    border-left: 3px solid var(--accent);
+    padding: 8px 12px;
+    border-radius: 0 6px 6px 0;
+  }
+
+  /* ===== フッター ===== */
+  footer {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-sub);
+    margin-top: 8px;
+    padding: 0 12px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>メルカリShops 商品ページジェネレーター</h1>
+  <p>植物の基本情報を入力 → 商品説明文を自動生成</p>
+</header>
+
+<div class="container">
+
+  <!-- プリセット -->
+  <div class="card preset-section">
+    <div class="card-header">クイックプリセット</div>
+    <div class="card-body">
+      <div class="preset-label">よく使う植物からワンクリックで入力</div>
+      <div class="preset-buttons">
+        <button class="btn-preset" onclick="applyPreset('succulent')">多肉植物小鉢</button>
+        <button class="btn-preset" onclick="applyPreset('hydrangea')">ハイドランジア母の日</button>
+        <button class="btn-preset" onclick="applyPreset('pothos')">ポトス観葉植物</button>
+        <button class="btn-preset" onclick="applyPreset('carnation')">カーネーション母の日</button>
+        <button class="btn-preset" onclick="applyPreset('herb')">ハーブセット</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 基本情報 -->
+  <div class="card">
+    <div class="card-header">基本情報</div>
+    <div class="card-body">
+      <div class="field-group">
+        <div class="field">
+          <label>植物名 <span class="required">必須</span></label>
+          <input type="text" id="plantName" placeholder="例: ポトス エンジョイ" maxlength="40">
+        </div>
+        <div class="field">
+          <label>カテゴリ <span class="required">必須</span></label>
+          <select id="category">
+            <option value="観葉植物">観葉植物</option>
+            <option value="多肉植物・サボテン">多肉植物・サボテン</option>
+            <option value="ハーブ">ハーブ</option>
+            <option value="花鉢">花鉢</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>サイズ <span class="required">必須</span></label>
+          <select id="size">
+            <option value="S（3号鉢以下）">S（3号鉢以下）</option>
+            <option value="M（4〜5号鉢）">M（4〜5号鉢）</option>
+            <option value="L（6〜7号鉢）">L（6〜7号鉢）</option>
+            <option value="XL（8号鉢以上）">XL（8号鉢以上）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>販売価格 <span class="required">必須</span></label>
+          <input type="number" id="price" placeholder="例: 1500" min="1" max="99999">
+        </div>
+        <div class="field">
+          <label>送料設定 <span class="required">必須</span></label>
+          <select id="shipping">
+            <option value="送料込み（出品者負担）">送料込み（出品者負担）</option>
+            <option value="着払い（購入者負担）">着払い（購入者負担）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>商品の状態 <span class="required">必須</span></label>
+          <select id="condition">
+            <option value="新品、未使用">新品、未使用</option>
+            <option value="未使用に近い">未使用に近い</option>
+            <option value="目立った傷や汚れなし">目立った傷や汚れなし</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>ポット径 <span class="optional">任意</span></label>
+          <input type="text" id="potDiameter" placeholder="例: 9cm">
+        </div>
+        <div class="field">
+          <label>草丈・高さ <span class="optional">任意</span></label>
+          <input type="text" id="height" placeholder="例: 約25cm">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ケア情報 -->
+  <div class="card">
+    <div class="card-header">ケア情報</div>
+    <div class="card-body">
+      <div class="field-group">
+        <div class="field">
+          <label>水やり頻度 <span class="required">必須</span></label>
+          <select id="watering">
+            <option value="毎日">毎日</option>
+            <option value="2〜3日に1回">2〜3日に1回</option>
+            <option value="週1〜2回">週1〜2回</option>
+            <option value="週1回">週1回</option>
+            <option value="月2〜3回">月2〜3回</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>日光の好み <span class="required">必須</span></label>
+          <select id="sunlight">
+            <option value="直射日光好き">直射日光好き</option>
+            <option value="明るい日陰">明るい日陰</option>
+            <option value="日陰でもOK">日陰でもOK</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>育てやすさ</label>
+          <select id="difficulty">
+            <option value="初心者向け ★">初心者向け ★</option>
+            <option value="普通 ★★">普通 ★★</option>
+            <option value="上級者向け ★★★">上級者向け ★★★</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- アピール・文体 -->
+  <div class="card">
+    <div class="card-header">アピールポイント・文体設定</div>
+    <div class="card-body">
+      <div class="field">
+        <label>特徴・アピールポイント <span class="optional">任意（入力すると文に反映）</span></label>
+        <textarea id="appeal" placeholder="例: 葉色が美しく、室内でも元気に育ちます。プレゼントにも人気の品種です。" maxlength="200"></textarea>
+      </div>
+      <div class="field-group">
+        <div class="field">
+          <label>文体</label>
+          <select id="tone">
+            <option value="polite">丁寧語（です・ます調）</option>
+            <option value="friendly">フレンドリー（やわらかい）</option>
+          </select>
+        </div>
+      </div>
+      <label class="checkbox-field">
+        <input type="checkbox" id="mothersDay">
+        <span>母の日ギフト訴求を追加する（5月の販売に）</span>
+      </label>
+    </div>
+  </div>
+
+  <button class="btn-generate" onclick="generate()">説明文を生成する</button>
+
+  <!-- 出力 -->
+  <div class="card output-section" id="outputSection">
+    <div class="output-header">
+      <span>生成された説明文</span>
+      <span class="char-counter" id="charCounter">0 / 1000文字</span>
+    </div>
+    <textarea class="output-text" id="outputText" readonly oninput="updateCounter()"></textarea>
+    <div class="output-actions">
+      <button class="btn-copy" id="copyBtn" onclick="copyText()">コピーする</button>
+      <button class="btn-reset" onclick="resetOutput()">リセット</button>
+    </div>
+  </div>
+
+  <p class="note">
+    ※ メルカリShopsの商品説明は最大1000文字です。生成後に自由に編集できます。<br>
+    ※ 生き物の販売規約に従い、返品不可の旨を必ず記載しています。
+  </p>
+
+  <footer>メルカリShops 商品ページジェネレーター - 植物事業サポートツール</footer>
+
+</div>
+
+<script>
+/* ===== プリセットデータ ===== */
+const PRESETS = {
+  succulent: {
+    plantName: '多肉植物 寄せ植え',
+    category: '多肉植物・サボテン',
+    size: 'S（3号鉢以下）',
+    price: '980',
+    shipping: '送料込み（出品者負担）',
+    condition: '新品、未使用',
+    potDiameter: '9cm',
+    height: '約10〜15cm',
+    watering: '月2〜3回',
+    sunlight: '直射日光好き',
+    difficulty: '初心者向け ★',
+    tone: 'polite',
+    appeal: 'ぷっくりとした葉が可愛らしい多肉植物の寄せ植えです。水やりが少なくて済むので、お忙しい方にも育てやすい品種を厳選しています。',
+    mothersDay: false
+  },
+  hydrangea: {
+    plantName: 'アジサイ（ハイドランジア）',
+    category: '花鉢',
+    size: 'M（4〜5号鉢）',
+    price: '2800',
+    shipping: '送料込み（出品者負担）',
+    condition: '新品、未使用',
+    potDiameter: '12cm',
+    height: '約30〜35cm',
+    watering: '毎日',
+    sunlight: '明るい日陰',
+    difficulty: '普通 ★★',
+    tone: 'polite',
+    appeal: '母の日の定番ギフト・アジサイです。ボリューム満点の花房が美しく、色鮮やかな品種をお届けします。',
+    mothersDay: true
+  },
+  pothos: {
+    plantName: 'ポトス',
+    category: '観葉植物',
+    size: 'M（4〜5号鉢）',
+    price: '1200',
+    shipping: '送料込み（出品者負担）',
+    condition: '目立った傷や汚れなし',
+    potDiameter: '10.5cm',
+    height: '約20〜30cm',
+    watering: '週1〜2回',
+    sunlight: '日陰でもOK',
+    difficulty: '初心者向け ★',
+    tone: 'friendly',
+    appeal: '丈夫で育てやすく、はじめての観葉植物にも最適です。インテリアとしても人気で、ハンギングにしても映えます。',
+    mothersDay: false
+  },
+  carnation: {
+    plantName: 'カーネーション',
+    category: '花鉢',
+    size: 'S（3号鉢以下）',
+    price: '1500',
+    shipping: '送料込み（出品者負担）',
+    condition: '新品、未使用',
+    potDiameter: '9cm',
+    height: '約20〜25cm',
+    watering: '2〜3日に1回',
+    sunlight: '直射日光好き',
+    difficulty: '普通 ★★',
+    tone: 'polite',
+    appeal: '母の日の定番・カーネーションです。長持ちする鉢植えタイプなので、花が終わった後も来年また咲かせて楽しめます。',
+    mothersDay: true
+  },
+  herb: {
+    plantName: 'ハーブセット（バジル・ミント）',
+    category: 'ハーブ',
+    size: 'S（3号鉢以下）',
+    price: '1800',
+    shipping: '送料込み（出品者負担）',
+    condition: '新品、未使用',
+    potDiameter: '各9cm',
+    height: '約15〜20cm',
+    watering: '2〜3日に1回',
+    sunlight: '直射日光好き',
+    difficulty: '初心者向け ★',
+    tone: 'friendly',
+    appeal: '料理に使えるハーブ2種セットです。バジルとミントはキッチンに置いておくと便利。育てながら収穫が楽しめます。',
+    mothersDay: false
+  }
+};
+
+/* ===== プリセット適用 ===== */
+function applyPreset(key) {
+  const p = PRESETS[key];
+  if (!p) return;
+
+  setValue('plantName', p.plantName);
+  setValue('category', p.category);
+  setValue('size', p.size);
+  setValue('price', p.price);
+  setValue('shipping', p.shipping);
+  setValue('condition', p.condition);
+  setValue('potDiameter', p.potDiameter);
+  setValue('height', p.height);
+  setValue('watering', p.watering);
+  setValue('sunlight', p.sunlight);
+  setValue('difficulty', p.difficulty);
+  setValue('tone', p.tone);
+  setValue('appeal', p.appeal);
+  document.getElementById('mothersDay').checked = p.mothersDay;
+}
+
+function setValue(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
+}
+
+/* ===== 説明文生成 ===== */
+function generate() {
+  const plantName   = document.getElementById('plantName').value.trim();
+  const category    = document.getElementById('category').value;
+  const size        = document.getElementById('size').value;
+  const price       = document.getElementById('price').value;
+  const shipping    = document.getElementById('shipping').value;
+  const condition   = document.getElementById('condition').value;
+  const potDiameter = document.getElementById('potDiameter').value.trim();
+  const height      = document.getElementById('height').value.trim();
+  const watering    = document.getElementById('watering').value;
+  const sunlight    = document.getElementById('sunlight').value;
+  const difficulty  = document.getElementById('difficulty').value;
+  const appeal      = document.getElementById('appeal').value.trim();
+  const tone        = document.getElementById('tone').value;
+  const isMotherDay = document.getElementById('mothersDay').checked;
+
+  /* バリデーション */
+  if (!plantName) { alert('植物名を入力してください。'); document.getElementById('plantName').focus(); return; }
+  if (!price || Number(price) < 1) { alert('販売価格を入力してください。'); document.getElementById('price').focus(); return; }
+
+  const text = buildText({ plantName, category, size, price, shipping, condition, potDiameter, height, watering, sunlight, difficulty, appeal, tone, isMotherDay });
+
+  document.getElementById('outputText').value = text;
+  const section = document.getElementById('outputSection');
+  section.classList.add('visible');
+  updateCounter();
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ===== テキスト組み立て ===== */
+function buildText(d) {
+  const isPolite   = d.tone === 'polite';
+  const priceFormatted = Number(d.price).toLocaleString();
+
+  /* キャッチコピー */
+  const catchCopy = buildCatchCopy(d, isPolite);
+
+  /* 商品情報ブロック */
+  let info = '【商品情報】\n';
+  info += `🌿 植物名：${d.plantName}\n`;
+  info += `📦 カテゴリ：${d.category}\n`;
+  info += `📏 サイズ：${d.size}\n`;
+  if (d.potDiameter) info += `⭕ ポット径：${d.potDiameter}\n`;
+  if (d.height)      info += `📐 草丈・高さ：${d.height}\n`;
+  info += `💴 価格：¥${priceFormatted}\n`;
+  info += `🚚 送料：${d.shipping}\n`;
+  info += `🏷️ 状態：${d.condition}\n`;
+
+  /* ケア情報ブロック */
+  let care = '【育て方・ケア情報】\n';
+  care += `💧 水やり：${d.watering}\n`;
+  care += `☀️ 日光：${d.sunlight}\n`;
+  care += `🌱 難易度：${d.difficulty}\n`;
+
+  /* アピールポイント */
+  let appealBlock = '';
+  if (d.appeal) {
+    appealBlock = isPolite
+      ? `【商品の特徴】\n${d.appeal}\n`
+      : `【ここがおすすめ！】\n${d.appeal}\n`;
+  }
+
+  /* 母の日ギフト文 */
+  let mothersDayBlock = '';
+  if (d.isMotherDay) {
+    mothersDayBlock = isPolite
+      ? `【母の日ギフトに最適】\n大切なお母さんへのプレゼントにいかがでしょうか。丁寧に梱包してお届けしますので、そのままギフトとして渡していただけます。ラッピングをご希望の方はお気軽にコメントください。\n`
+      : `【母の日ギフトにぴったり！】\nお母さんへのサプライズプレゼントにぜひ！しっかり梱包してお届けするので、そのままプレゼントできます。ラッピング希望の方はコメントで教えてください！\n`;
+  }
+
+  /* 固定フッター文 */
+  const footer = buildFooter(isPolite);
+
+  /* 結合 */
+  const parts = [catchCopy, info, care];
+  if (appealBlock)    parts.push(appealBlock);
+  if (mothersDayBlock) parts.push(mothersDayBlock);
+  parts.push(footer);
+
+  return parts.join('\n');
+}
+
+/* ===== キャッチコピー生成 ===== */
+function buildCatchCopy(d, isPolite) {
+  const { plantName, category, difficulty, sunlight, isMotherDay } = d;
+  const copies = [];
+
+  if (isMotherDay) {
+    copies.push(isPolite
+      ? `母の日ギフトに ✿ ${plantName} ✿ 心を込めてお届けします`
+      : `母の日に贈りたい ✿ ${plantName} ✿ 喜ばれること間違いなし！`
+    );
+  } else if (difficulty === '初心者向け ★') {
+    copies.push(isPolite
+      ? `はじめての方にも安心 ✦ ${plantName} ✦ 育てやすさNo.1`
+      : `初心者さんでも大丈夫！✦ ${plantName} ✦ 育てやすくておすすめ`
+    );
+  } else if (sunlight === '日陰でもOK') {
+    copies.push(isPolite
+      ? `日当たりを選ばない ✦ ${plantName} ✦ 室内インテリアに最適`
+      : `日陰でもすくすく育つ！✦ ${plantName} ✦ お部屋に飾ろう`
+    );
+  } else {
+    copies.push(isPolite
+      ? `${category}の逸品 ✦ ${plantName} ✦ 丁寧に育てた自信作です`
+      : `状態バッチリ！✦ ${plantName} ✦ お気に入りの一鉢をどうぞ`
+    );
+  }
+
+  return copies[0] + '\n';
+}
+
+/* ===== フッター（固定文） ===== */
+function buildFooter(isPolite) {
+  if (isPolite) {
+    return `【梱包・発送について】
+植物が傷まないよう、新聞紙やプチプチで丁寧に梱包してお届けします。発送は購入確認後2〜3日以内を目安としております。
+
+【ご注意事項】
+・生き物のため、個体差により写真と色・形・大きさが若干異なる場合がございます。
+・植物の特性上、基本的に返品・返金はお受けできかねますが、輸送事故による著しい損傷の場合はご相談ください。
+・発送中の多少の葉の揺れや傷は予めご了承ください。
+・受け取りましたら、できるだけ早めに開封し、日当たりの良い場所に置いてあげてください。
+
+何かご不明な点がございましたら、お気軽にコメントください。よろしくお願いいたします。`;
+  } else {
+    return `【梱包・発送について】
+植物が元気なうちにお届けできるよう、しっかり梱包して発送します！購入確認後2〜3日以内に発送予定です。
+
+【ご注意事項】
+・生き物なので個体差により写真と色・形・大きさが少し違う場合があります。ご了承ください。
+・植物の特性上、基本的に返品・返金はお断りしていますが、輸送事故による大きなダメージがあった場合はご相談ください。
+・発送中に葉が少し揺れることがありますが、届いたら日当たりのいい場所に置いてあげてください！
+
+気になることがあれば気軽にコメントしてくださいね！よろしくお願いします。`;
+  }
+}
+
+/* ===== 文字数カウンター ===== */
+function updateCounter() {
+  const text  = document.getElementById('outputText').value;
+  const count = text.length;
+  const el    = document.getElementById('charCounter');
+  el.textContent = `${count} / 1000文字`;
+  el.classList.remove('over', 'warning');
+  if (count > 1000)      el.classList.add('over');
+  else if (count > 850)  el.classList.add('warning');
+}
+
+/* ===== コピー ===== */
+function copyText() {
+  const text = document.getElementById('outputText').value;
+  if (!text) return;
+
+  const btn = document.getElementById('copyBtn');
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showCopied(btn);
+    }).catch(() => {
+      fallbackCopy(text, btn);
+    });
+  } else {
+    fallbackCopy(text, btn);
+  }
+}
+
+function fallbackCopy(text, btn) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopied(btn); } catch(e) { alert('コピーに失敗しました。手動でコピーしてください。'); }
+  document.body.removeChild(ta);
+}
+
+function showCopied(btn) {
+  const original = btn.textContent;
+  btn.textContent = 'コピーしました！';
+  btn.classList.add('copied');
+  setTimeout(() => {
+    btn.textContent = original;
+    btn.classList.remove('copied');
+  }, 2000);
+}
+
+/* ===== リセット ===== */
+function resetOutput() {
+  document.getElementById('outputText').value = '';
+  document.getElementById('outputSection').classList.remove('visible');
+  updateCounter();
+}
+</script>
+</body>
+</html>

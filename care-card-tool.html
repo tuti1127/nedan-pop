@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>植物ケアカード印刷ツール — Kitayama Nursery</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --background:#f6faf6;
+  --card:#ffffff;
+  --muted:#edf5ed;
+  --foreground:#0f1f0f;
+  --muted-fg:#5a7a5a;
+  --border:#c8dfc8;
+  --input:#c8dfc8;
+  --ring:#2d6a2d;
+  --primary:#2d6a2d;
+  --primary-fg:#ffffff;
+  --primary-hover:#1b5e20;
+  --accent:#4caf50;
+  --accent-light:#e8f5e9;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+  --shadow:0 1px 3px rgba(0,0,0,0.10),0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.06);
+  --radius:8px;--radius-sm:6px;
+}
+html{font-size:15px;-webkit-text-size-adjust:100%;}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--background);color:var(--foreground);min-height:100vh;}
+
+/* ヘッダー */
+header{
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  height:56px;padding:0 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:200;
+  box-shadow:var(--shadow-sm);
+}
+.hdr-left{display:flex;align-items:center;gap:10px;}
+.hdr-logo{
+  width:36px;height:36px;
+  background:var(--accent-light);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+  border:1px solid var(--border);
+}
+.hdr-title{font-size:16px;font-weight:700;color:var(--foreground);line-height:1.2;}
+.hdr-sub{font-size:11px;color:var(--muted-fg);}
+.hdr-btn{
+  height:36px;padding:0 14px;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--card);color:var(--foreground);
+  font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;
+  display:flex;align-items:center;gap:5px;
+  transition:background 0.15s,border-color 0.15s;
+  box-shadow:var(--shadow-sm);
+}
+.hdr-btn:hover{background:var(--muted);border-color:#a7c9a7;}
+.hdr-btn:active{transform:scale(0.98);}
+
+/* レイアウト */
+.app{
+  display:grid;
+  grid-template-columns:360px 1fr;
+  min-height:calc(100vh - 56px);
+}
+.left-panel{
+  background:var(--card);
+  border-right:1px solid var(--border);
+  overflow-y:auto;
+  height:calc(100vh - 56px);
+  position:sticky;top:56px;
+}
+.panel-section{border-bottom:1px solid var(--border);padding:16px;}
+.panel-section h2{font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.panel-section h2 span{font-size:16px;}
+
+/* フォーム */
+.form-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.form-row:last-child{margin-bottom:0;}
+.form-row label{font-size:13px;font-weight:500;color:var(--foreground);}
+.form-row label .hint{font-size:11px;font-weight:400;color:var(--muted-fg);margin-left:4px;}
+.form-row input,
+.form-row textarea,
+.form-row select{
+  border:1px solid var(--input);border-radius:var(--radius-sm);
+  padding:0 12px;font-size:14px;font-family:inherit;
+  color:var(--foreground);background:var(--card);
+  transition:border-color 0.15s,box-shadow 0.15s;outline:none;
+  height:40px;
+}
+.form-row input::placeholder,
+.form-row textarea::placeholder{color:#9ab89a;}
+.form-row input:focus,
+.form-row textarea:focus,
+.form-row select:focus{
+  border-color:var(--ring);
+  box-shadow:0 0 0 2px var(--background),0 0 0 4px rgba(45,106,45,0.25);
+}
+.form-row textarea{height:auto;min-height:72px;padding:10px 12px;resize:vertical;line-height:1.5;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+/* アイコン選択 */
+.icon-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:4px;}
+.icon-btn{
+  aspect-ratio:1;border:2px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--muted);font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color 0.15s,background 0.15s;
+}
+.icon-btn:hover{border-color:var(--ring);background:var(--accent-light);}
+.icon-btn.active{border-color:var(--ring);background:var(--accent-light);box-shadow:0 0 0 2px rgba(45,106,45,0.2);}
+
+/* カラーテーマ選択 */
+.theme-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.theme-btn{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid transparent;cursor:pointer;
+  transition:transform 0.15s,border-color 0.15s;
+  flex-shrink:0;
+}
+.theme-btn:hover{transform:scale(1.15);}
+.theme-btn.active{border-color:var(--foreground);}
+
+/* ボタン */
+.btn{
+  height:40px;padding:0 16px;border-radius:var(--radius-sm);
+  font-family:inherit;font-weight:500;font-size:14px;cursor:pointer;
+  transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:1px solid transparent;
+}
+.btn:active{transform:scale(0.97)!important;}
+.btn-secondary{background:var(--card);border-color:var(--border);color:var(--foreground);}
+.btn-secondary:hover{background:var(--muted);}
+.btn-primary{background:var(--primary);color:var(--primary-fg);width:100%;font-size:14px;border-color:var(--primary);}
+.btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);}
+.btn-row{display:flex;gap:8px;margin-top:4px;}
+.btn-row .btn{flex:1;}
+
+/* 右パネル（プレビュー） */
+.right-panel{padding:24px;overflow-y:auto;}
+.preview-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;flex-wrap:wrap;gap:10px;
+}
+.preview-header h2{font-size:18px;font-weight:700;}
+.preview-meta{font-size:12px;color:var(--muted-fg);}
+
+/* カードグリッド */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,91mm);
+  gap:12px;
+  justify-content:start;
+}
+.card-wrapper{position:relative;}
+.card-delete{
+  position:absolute;top:-8px;right:-8px;
+  width:22px;height:22px;border-radius:50%;
+  background:#ef4444;color:white;border:none;cursor:pointer;
+  font-size:14px;display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity 0.15s;z-index:10;
+}
+.card-wrapper:hover .card-delete{opacity:1;}
+
+/* 名刺サイズカード: 91mm × 55mm */
+.care-card{
+  width:91mm;height:55mm;
+  border-radius:3mm;
+  overflow:hidden;
+  position:relative;
+  box-shadow:var(--shadow-md);
+  display:flex;flex-direction:column;
+  font-family:system-ui,-apple-system,sans-serif;
+  cursor:pointer;
+  transition:box-shadow 0.2s,transform 0.2s;
+  border:1px solid rgba(0,0,0,0.08);
+}
+.care-card:hover{box-shadow:0 8px 20px rgba(0,0,0,0.15);transform:translateY(-2px);}
+
+/* カードヘッダー部分 */
+.card-header{
+  flex-shrink:0;
+  padding:4mm 5mm 3mm;
+  display:flex;align-items:center;gap:3mm;
+}
+.card-icon{font-size:10mm;line-height:1;flex-shrink:0;}
+.card-name-block{flex:1;min-width:0;}
+.card-plant-name{
+  font-size:5mm;font-weight:700;line-height:1.1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.card-scientific{
+  font-size:2.5mm;opacity:0.7;
+  font-style:italic;margin-top:0.5mm;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.card-badge{
+  flex-shrink:0;
+  font-size:2.2mm;font-weight:700;
+  padding:1mm 2.5mm;border-radius:10px;
+  background:rgba(255,255,255,0.3);
+  border:0.5px solid rgba(255,255,255,0.5);
+}
+
+/* カード本体 */
+.card-body{
+  flex:1;
+  background:white;
+  padding:2.5mm 5mm;
+  display:flex;flex-direction:column;gap:1.5mm;
+}
+.card-row{
+  display:flex;align-items:flex-start;gap:2mm;
+  font-size:2.6mm;line-height:1.3;
+}
+.card-row-icon{
+  width:4mm;height:4mm;
+  flex-shrink:0;margin-top:0.2mm;
+  display:flex;align-items:center;justify-content:center;
+  font-size:3mm;
+}
+.card-row-label{font-weight:600;color:#4a4a4a;width:14mm;flex-shrink:0;}
+.card-row-value{color:#2a2a2a;flex:1;}
+
+/* カードフッター */
+.card-footer{
+  flex-shrink:0;
+  background:rgba(0,0,0,0.06);
+  padding:1.5mm 5mm;
+  font-size:2.2mm;
+  display:flex;align-items:center;justify-content:space-between;
+  opacity:0.8;
+}
+
+/* カラーテーマ */
+.theme-forest .card-header{background:linear-gradient(135deg,#2d6a2d,#4caf50);}
+.theme-forest .card-plant-name,.theme-forest .card-scientific,.theme-forest .card-badge{color:white;}
+.theme-forest .card-footer{border-top:1px solid #c8e6c9;}
+
+.theme-sage .card-header{background:linear-gradient(135deg,#607d6b,#8faf9a);}
+.theme-sage .card-plant-name,.theme-sage .card-scientific,.theme-sage .card-badge{color:white;}
+.theme-sage .card-footer{border-top:1px solid #b2cbb8;}
+
+.theme-moss .card-header{background:linear-gradient(135deg,#33691e,#7cb342);}
+.theme-moss .card-plant-name,.theme-moss .card-scientific,.theme-moss .card-badge{color:white;}
+.theme-moss .card-footer{border-top:1px solid #c5e1a5;}
+
+.theme-terra .card-header{background:linear-gradient(135deg,#5d4037,#8d6e63);}
+.theme-terra .card-plant-name,.theme-terra .card-scientific,.theme-terra .card-badge{color:white;}
+.theme-terra .card-footer{border-top:1px solid #d7ccc8;}
+
+.theme-sky .card-header{background:linear-gradient(135deg,#0277bd,#29b6f6);}
+.theme-sky .card-plant-name,.theme-sky .card-scientific,.theme-sky .card-badge{color:white;}
+.theme-sky .card-footer{border-top:1px solid #b3e5fc;}
+
+.theme-lavender .card-header{background:linear-gradient(135deg,#6a1b9a,#ab47bc);}
+.theme-lavender .card-plant-name,.theme-lavender .card-scientific,.theme-lavender .card-badge{color:white;}
+.theme-lavender .card-footer{border-top:1px solid #e1bee7;}
+
+/* 空の状態 */
+.empty-state{
+  grid-column:1/-1;
+  display:flex;flex-direction:column;align-items:center;
+  padding:60px 20px;gap:12px;color:var(--muted-fg);text-align:center;
+}
+.empty-state .empty-icon{font-size:64px;opacity:0.4;}
+.empty-state h3{font-size:16px;font-weight:600;color:var(--foreground);}
+.empty-state p{font-size:13px;max-width:280px;line-height:1.6;}
+
+/* トースト */
+.toast{
+  position:fixed;bottom:20px;right:20px;
+  background:#1a2e1a;color:white;
+  padding:10px 18px;border-radius:8px;
+  font-size:13px;font-weight:500;
+  box-shadow:var(--shadow-md);
+  z-index:1000;
+  transform:translateY(80px);opacity:0;
+  transition:transform 0.3s,opacity 0.3s;
+  pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* 印刷スタイル */
+@media print{
+  header,.left-panel,.preview-header,.card-delete{display:none!important;}
+  .app{display:block;}
+  .right-panel{padding:0;}
+  body{background:white;}
+  .cards-grid{
+    display:grid;
+    grid-template-columns:repeat(2,91mm);
+    gap:4mm;
+    padding:10mm;
+  }
+  .care-card{
+    box-shadow:none;
+    border:0.5px solid #ccc;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  .care-card:hover{transform:none;box-shadow:none;}
+  .toast{display:none;}
+}
+
+/* モバイル対応 */
+@media(max-width:768px){
+  .app{grid-template-columns:1fr;}
+  .left-panel{height:auto;position:static;}
+  .cards-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));}
+  .care-card{width:100%;height:auto;min-height:160px;}
+  .card-plant-name{font-size:16px;}
+  .card-scientific{font-size:11px;}
+  .card-row{font-size:11px;}
+  .card-row-label{width:56px;}
+  .card-header{padding:10px 14px 8px;}
+  .card-body{padding:8px 14px;}
+  .card-footer{padding:5px 14px;font-size:10px;}
+  .card-icon{font-size:32px;}
+  .card-badge{font-size:10px;padding:2px 8px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-left">
+    <div class="hdr-logo">🌿</div>
+    <div>
+      <div class="hdr-title">植物ケアカード印刷ツール</div>
+      <div class="hdr-sub">Kitayama Nursery</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <label style="font-size:13px;color:var(--muted-fg);white-space:nowrap;">印刷部数:</label>
+    <select id="printCopies" style="height:36px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:var(--card);color:var(--foreground);">
+      <option value="1">1部</option>
+      <option value="2">2部</option>
+      <option value="3">3部</option>
+      <option value="4">4部</option>
+      <option value="5">5部</option>
+      <option value="6">6部</option>
+      <option value="7">7部</option>
+      <option value="8">8部</option>
+      <option value="9">9部</option>
+      <option value="10">10部</option>
+    </select>
+    <button class="hdr-btn" onclick="printCards()">
+      🖨️ 印刷
+    </button>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- 左パネル: 入力フォーム -->
+  <div class="left-panel">
+
+    <!-- 植物基本情報 -->
+    <div class="panel-section">
+      <h2><span>🌱</span> 植物情報</h2>
+      <div class="form-row">
+        <label>植物名 <span class="hint">（必須）</span></label>
+        <input type="text" id="plantName" placeholder="例: モンステラ" maxlength="20">
+      </div>
+      <div class="form-row">
+        <label>学名 <span class="hint">（任意）</span></label>
+        <input type="text" id="scientificName" placeholder="例: Monstera deliciosa" maxlength="30">
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>難易度</label>
+          <select id="difficulty">
+            <option value="">-</option>
+            <option value="初心者向け">初心者向け</option>
+            <option value="中級者向け">中級者向け</option>
+            <option value="上級者向け">上級者向け</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>カテゴリ</label>
+          <select id="category">
+            <option value="">-</option>
+            <option value="観葉植物">観葉植物</option>
+            <option value="多肉植物">多肉植物</option>
+            <option value="サボテン">サボテン</option>
+            <option value="エアプランツ">エアプランツ</option>
+            <option value="ハーブ">ハーブ</option>
+            <option value="花もの">花もの</option>
+            <option value="樹木">樹木</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ケア情報 -->
+    <div class="panel-section">
+      <h2><span>💧</span> ケア情報</h2>
+      <div class="form-row">
+        <label>水やり頻度</label>
+        <select id="watering">
+          <option value="">選択してください</option>
+          <option value="毎日">毎日</option>
+          <option value="2〜3日に1回">2〜3日に1回</option>
+          <option value="週1回">週1回</option>
+          <option value="2週間に1回">2週間に1回</option>
+          <option value="月1回">月1回</option>
+          <option value="土が乾いたら">土が乾いたら</option>
+          <option value="乾燥気味に管理">乾燥気味に管理</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>日光の好み</label>
+        <select id="sunlight">
+          <option value="">選択してください</option>
+          <option value="直射日光">直射日光</option>
+          <option value="明るい日陰">明るい日陰</option>
+          <option value="半日陰">半日陰</option>
+          <option value="日陰でもOK">日陰でもOK</option>
+          <option value="室内の明るい場所">室内の明るい場所</option>
+          <option value="屋外推奨">屋外推奨</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>推奨温度</label>
+        <select id="temperature">
+          <option value="">選択してください</option>
+          <option value="10℃以上">10℃以上</option>
+          <option value="15℃以上">15℃以上</option>
+          <option value="20℃以上">20℃以上</option>
+          <option value="5℃以上（耐寒性あり）">5℃以上（耐寒性あり）</option>
+          <option value="0℃以上（強健）">0℃以上（強健）</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>育て方のコツ <span class="hint">（最大60字）</span></label>
+        <textarea id="tips" placeholder="例: 葉水が大好きです。夏は直射日光を避けて..." maxlength="60"></textarea>
+      </div>
+    </div>
+
+    <!-- アイコン選択 -->
+    <div class="panel-section">
+      <h2><span>🎨</span> アイコン</h2>
+      <div class="icon-grid" id="iconGrid">
+        <button class="icon-btn active" data-icon="🌿" onclick="selectIcon(this)">🌿</button>
+        <button class="icon-btn" data-icon="🪴" onclick="selectIcon(this)">🪴</button>
+        <button class="icon-btn" data-icon="🌵" onclick="selectIcon(this)">🌵</button>
+        <button class="icon-btn" data-icon="🌸" onclick="selectIcon(this)">🌸</button>
+        <button class="icon-btn" data-icon="🌺" onclick="selectIcon(this)">🌺</button>
+        <button class="icon-btn" data-icon="🍃" onclick="selectIcon(this)">🍃</button>
+        <button class="icon-btn" data-icon="🌳" onclick="selectIcon(this)">🌳</button>
+        <button class="icon-btn" data-icon="🌻" onclick="selectIcon(this)">🌻</button>
+        <button class="icon-btn" data-icon="🌾" onclick="selectIcon(this)">🌾</button>
+        <button class="icon-btn" data-icon="🍀" onclick="selectIcon(this)">🍀</button>
+      </div>
+    </div>
+
+    <!-- カラーテーマ -->
+    <div class="panel-section">
+      <h2><span>🎨</span> カラーテーマ</h2>
+      <div class="theme-row">
+        <div class="theme-btn active" data-theme="forest" style="background:linear-gradient(135deg,#2d6a2d,#4caf50);" onclick="selectTheme(this)" title="フォレスト"></div>
+        <div class="theme-btn" data-theme="sage" style="background:linear-gradient(135deg,#607d6b,#8faf9a);" onclick="selectTheme(this)" title="セージ"></div>
+        <div class="theme-btn" data-theme="moss" style="background:linear-gradient(135deg,#33691e,#7cb342);" onclick="selectTheme(this)" title="モス"></div>
+        <div class="theme-btn" data-theme="terra" style="background:linear-gradient(135deg,#5d4037,#8d6e63);" onclick="selectTheme(this)" title="テラコッタ"></div>
+        <div class="theme-btn" data-theme="sky" style="background:linear-gradient(135deg,#0277bd,#29b6f6);" onclick="selectTheme(this)" title="スカイ"></div>
+        <div class="theme-btn" data-theme="lavender" style="background:linear-gradient(135deg,#6a1b9a,#ab47bc);" onclick="selectTheme(this)" title="ラベンダー"></div>
+      </div>
+    </div>
+
+    <!-- 操作ボタン -->
+    <div class="panel-section">
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="clearForm()">クリア</button>
+        <button class="btn btn-secondary" onclick="loadSample()">サンプル</button>
+      </div>
+      <button class="btn btn-primary" style="margin-top:8px;" onclick="addCard()">
+        カードを追加
+      </button>
+    </div>
+
+    <!-- 一括プリセット -->
+    <div class="panel-section">
+      <h2><span>⚡</span> よく使う植物</h2>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <button class="btn btn-secondary" style="font-size:12px;justify-content:flex-start;" onclick="loadPreset('monstera')">🌿 モンステラ</button>
+        <button class="btn btn-secondary" style="font-size:12px;justify-content:flex-start;" onclick="loadPreset('cactus')">🌵 サボテン</button>
+        <button class="btn btn-secondary" style="font-size:12px;justify-content:flex-start;" onclick="loadPreset('pothos')">🍃 ポトス</button>
+        <button class="btn btn-secondary" style="font-size:12px;justify-content:flex-start;" onclick="loadPreset('succulent')">🪴 多肉植物</button>
+        <button class="btn btn-secondary" style="font-size:12px;justify-content:flex-start;" onclick="loadPreset('ficus')">🌳 フィカス</button>
+      </div>
+    </div>
+
+  </div><!-- /left-panel -->
+
+  <!-- 右パネル: プレビュー -->
+  <div class="right-panel">
+    <div class="preview-header">
+      <div>
+        <h2>プレビュー</h2>
+        <div class="preview-meta" id="cardCount">カード 0 枚</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" onclick="clearAll()" style="font-size:13px;">全削除</button>
+        <button class="btn btn-secondary" onclick="printCards()" style="font-size:13px;">🖨️ 印刷（部数設定は上部で）</button>
+      </div>
+    </div>
+    <div class="cards-grid" id="cardsGrid">
+      <div class="empty-state">
+        <div class="empty-icon">🌱</div>
+        <h3>カードがまだありません</h3>
+        <p>左のフォームに植物の情報を入力して「カードを追加」を押してください。</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// アプリ状態
+const state = {
+  cards: [],
+  selectedIcon: '🌿',
+  selectedTheme: 'forest',
+  nextId: 1,
+};
+
+// アイコン選択
+function selectIcon(btn) {
+  document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.selectedIcon = btn.dataset.icon;
+}
+
+// テーマ選択
+function selectTheme(btn) {
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.selectedTheme = btn.dataset.theme;
+}
+
+// フォームデータ取得
+function getFormData() {
+  return {
+    id: state.nextId++,
+    plantName: document.getElementById('plantName').value.trim(),
+    scientificName: document.getElementById('scientificName').value.trim(),
+    difficulty: document.getElementById('difficulty').value,
+    category: document.getElementById('category').value,
+    watering: document.getElementById('watering').value,
+    sunlight: document.getElementById('sunlight').value,
+    temperature: document.getElementById('temperature').value,
+    tips: document.getElementById('tips').value.trim(),
+    icon: state.selectedIcon,
+    theme: state.selectedTheme,
+  };
+}
+
+// カード追加
+function addCard() {
+  const data = getFormData();
+  if (!data.plantName) {
+    showToast('植物名を入力してください');
+    document.getElementById('plantName').focus();
+    return;
+  }
+  state.cards.push(data);
+  renderCards();
+  showToast(`「${data.plantName}」のカードを追加しました`);
+}
+
+// カード削除
+function deleteCard(id) {
+  state.cards = state.cards.filter(c => c.id !== id);
+  renderCards();
+}
+
+// カードHTMLを生成
+function buildCardHTML(data) {
+  const rows = [];
+  if (data.watering) {
+    rows.push(`<div class="card-row"><div class="card-row-icon">💧</div><div class="card-row-label">水やり</div><div class="card-row-value">${escHtml(data.watering)}</div></div>`);
+  }
+  if (data.sunlight) {
+    rows.push(`<div class="card-row"><div class="card-row-icon">☀️</div><div class="card-row-label">日光</div><div class="card-row-value">${escHtml(data.sunlight)}</div></div>`);
+  }
+  if (data.temperature) {
+    rows.push(`<div class="card-row"><div class="card-row-icon">🌡️</div><div class="card-row-label">温度</div><div class="card-row-value">${escHtml(data.temperature)}</div></div>`);
+  }
+  if (data.tips) {
+    rows.push(`<div class="card-row"><div class="card-row-icon">💡</div><div class="card-row-label">コツ</div><div class="card-row-value">${escHtml(data.tips)}</div></div>`);
+  }
+
+  const badgeHtml = data.difficulty
+    ? `<div class="card-badge">${escHtml(data.difficulty)}</div>`
+    : '';
+  const scientificHtml = data.scientificName
+    ? `<div class="card-scientific">${escHtml(data.scientificName)}</div>`
+    : '';
+  const footerLeft = data.category || 'Kitayama Nursery';
+  const footerRight = 'Kitayama Nursery';
+
+  return `
+    <div class="care-card theme-${data.theme}">
+      <div class="card-header">
+        <div class="card-icon">${data.icon}</div>
+        <div class="card-name-block">
+          <div class="card-plant-name">${escHtml(data.plantName)}</div>
+          ${scientificHtml}
+        </div>
+        ${badgeHtml}
+      </div>
+      <div class="card-body">
+        ${rows.join('')}
+      </div>
+      <div class="card-footer">
+        <span>${escHtml(footerLeft)}</span>
+        <span>${footerRight}</span>
+      </div>
+    </div>
+  `;
+}
+
+// カード一覧をレンダリング
+function renderCards() {
+  const grid = document.getElementById('cardsGrid');
+  const countEl = document.getElementById('cardCount');
+  countEl.textContent = `カード ${state.cards.length} 枚`;
+
+  if (state.cards.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🌱</div>
+        <h3>カードがまだありません</h3>
+        <p>左のフォームに植物の情報を入力して「カードを追加」を押してください。</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = state.cards.map(data => `
+    <div class="card-wrapper">
+      <button class="card-delete" onclick="deleteCard(${data.id})" title="削除">×</button>
+      ${buildCardHTML(data)}
+    </div>
+  `).join('');
+}
+
+// フォームクリア
+function clearForm() {
+  ['plantName','scientificName','tips'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  ['difficulty','category','watering','sunlight','temperature'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+// 全削除
+function clearAll() {
+  if (state.cards.length === 0) return;
+  if (confirm(`${state.cards.length}枚のカードを全て削除しますか？`)) {
+    state.cards = [];
+    renderCards();
+  }
+}
+
+// 印刷（指定部数分カードを複製してから印刷）
+function printCards() {
+  if (state.cards.length === 0) {
+    showToast('印刷するカードがありません');
+    return;
+  }
+
+  const copies = parseInt(document.getElementById('printCopies').value, 10) || 1;
+
+  if (copies === 1) {
+    window.print();
+    return;
+  }
+
+  // 部数分だけカードHTMLを複製して一時的に差し替える
+  const grid = document.getElementById('cardsGrid');
+  const originalHTML = grid.innerHTML;
+
+  // 1部分のカードHTMLを生成（削除ボタンなし）
+  const oneSetHTML = state.cards.map(data => `
+    <div class="card-wrapper">
+      ${buildCardHTML(data)}
+    </div>
+  `).join('');
+
+  // copies部分を並べる
+  let allHTML = '';
+  for (let i = 0; i < copies; i++) {
+    allHTML += oneSetHTML;
+  }
+  grid.innerHTML = allHTML;
+
+  // 印刷後に元に戻す
+  window.print();
+  grid.innerHTML = originalHTML;
+}
+
+// サンプルデータ読み込み
+function loadSample() {
+  document.getElementById('plantName').value = 'モンステラ';
+  document.getElementById('scientificName').value = 'Monstera deliciosa';
+  document.getElementById('difficulty').value = '初心者向け';
+  document.getElementById('category').value = '観葉植物';
+  document.getElementById('watering').value = '週1回';
+  document.getElementById('sunlight').value = '明るい日陰';
+  document.getElementById('temperature').value = '10℃以上';
+  document.getElementById('tips').value = '葉水が大好きです。夏は直射日光を避けてください。';
+}
+
+// プリセット
+const PRESETS = {
+  monstera: {
+    plantName: 'モンステラ', scientificName: 'Monstera deliciosa',
+    difficulty: '初心者向け', category: '観葉植物',
+    watering: '週1回', sunlight: '明るい日陰', temperature: '10℃以上',
+    tips: '葉水が大好きです。夏の直射日光は避けてください。',
+    icon: '🌿', theme: 'forest',
+  },
+  cactus: {
+    plantName: 'サボテン', scientificName: 'Cactaceae',
+    difficulty: '初心者向け', category: 'サボテン',
+    watering: '月1回', sunlight: '直射日光', temperature: '5℃以上（耐寒性あり）',
+    tips: '水のやりすぎに注意。冬は断水気味に管理してください。',
+    icon: '🌵', theme: 'moss',
+  },
+  pothos: {
+    plantName: 'ポトス', scientificName: 'Epipremnum aureum',
+    difficulty: '初心者向け', category: '観葉植物',
+    watering: '土が乾いたら', sunlight: '室内の明るい場所', temperature: '10℃以上',
+    tips: '丈夫で育てやすい入門植物。日陰にも強いです。',
+    icon: '🍃', theme: 'sage',
+  },
+  succulent: {
+    plantName: '多肉植物', scientificName: 'Succulent',
+    difficulty: '初心者向け', category: '多肉植物',
+    watering: '2週間に1回', sunlight: '直射日光', temperature: '5℃以上（耐寒性あり）',
+    tips: '蒸れに注意。通気の良い場所で管理してください。',
+    icon: '🪴', theme: 'terra',
+  },
+  ficus: {
+    plantName: 'フィカス', scientificName: 'Ficus benjamina',
+    difficulty: '中級者向け', category: '観葉植物',
+    watering: '週1回', sunlight: '明るい日陰', temperature: '15℃以上',
+    tips: '置き場所を変えると葉を落とすことがあります。安定した場所で管理を。',
+    icon: '🌳', theme: 'forest',
+  },
+};
+
+function loadPreset(key) {
+  const p = PRESETS[key];
+  if (!p) return;
+  document.getElementById('plantName').value = p.plantName;
+  document.getElementById('scientificName').value = p.scientificName;
+  document.getElementById('difficulty').value = p.difficulty;
+  document.getElementById('category').value = p.category;
+  document.getElementById('watering').value = p.watering;
+  document.getElementById('sunlight').value = p.sunlight;
+  document.getElementById('temperature').value = p.temperature;
+  document.getElementById('tips').value = p.tips;
+
+  // アイコン設定
+  document.querySelectorAll('.icon-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.icon === p.icon);
+  });
+  state.selectedIcon = p.icon;
+
+  // テーマ設定
+  document.querySelectorAll('.theme-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === p.theme);
+  });
+  state.selectedTheme = p.theme;
+
+  showToast(`「${p.plantName}」のプリセットを読み込みました`);
+}
+
+// HTML エスケープ
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// トースト通知
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// 初期化
+renderCards();
+</script>
+</body>
+</html>
