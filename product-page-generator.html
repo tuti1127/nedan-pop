@@ -359,7 +359,7 @@
         </div>
         <div class="field">
           <label>カテゴリ <span class="required">必須</span></label>
-          <select id="category">
+          <select id="category" onchange="onCategoryChange()">
             <option value="観葉植物">観葉植物</option>
             <option value="多肉植物・サボテン">多肉植物・サボテン</option>
             <option value="ハーブ">ハーブ</option>
@@ -462,6 +462,16 @@
       <label class="checkbox-field">
         <input type="checkbox" id="mothersDay">
         <span>母の日ギフト訴求を追加する（5月の販売に）</span>
+      </label>
+      <!-- 多肉おまかせ免責（カテゴリ=多肉植物・サボテン選択時のみ表示） -->
+      <label class="checkbox-field" id="succulentAssortedRow" style="display:none;">
+        <input type="checkbox" id="succulentAssorted">
+        <span>品種おまかせセットである（免責文を自動挿入）</span>
+      </label>
+      <!-- 北海道・沖縄追加送料注意 -->
+      <label class="checkbox-field">
+        <input type="checkbox" id="hokkaidoOkinawa">
+        <span>北海道・沖縄への配送注意書きを追加する</span>
       </label>
     </div>
   </div>
@@ -575,6 +585,18 @@ const PRESETS = {
   }
 };
 
+/* ===== カテゴリ変更：多肉おまかせ行の表示切り替え ===== */
+function onCategoryChange() {
+  const category = document.getElementById('category').value;
+  const row = document.getElementById('succulentAssortedRow');
+  if (category === '多肉植物・サボテン') {
+    row.style.display = '';
+  } else {
+    row.style.display = 'none';
+    document.getElementById('succulentAssorted').checked = false;
+  }
+}
+
 /* ===== プリセット適用 ===== */
 function applyPreset(key) {
   const p = PRESETS[key];
@@ -594,6 +616,8 @@ function applyPreset(key) {
   setValue('tone', p.tone);
   setValue('appeal', p.appeal);
   document.getElementById('mothersDay').checked = p.mothersDay;
+  /* カテゴリ変更に合わせて多肉おまかせ行の表示を更新 */
+  onCategoryChange();
 }
 
 function setValue(id, val) {
@@ -615,14 +639,16 @@ function generate() {
   const sunlight    = document.getElementById('sunlight').value;
   const difficulty  = document.getElementById('difficulty').value;
   const appeal      = document.getElementById('appeal').value.trim();
-  const tone        = document.getElementById('tone').value;
-  const isMotherDay = document.getElementById('mothersDay').checked;
+  const tone               = document.getElementById('tone').value;
+  const isMotherDay        = document.getElementById('mothersDay').checked;
+  const isSucAssorted      = document.getElementById('succulentAssorted').checked;
+  const isHokkaidoOkinawa  = document.getElementById('hokkaidoOkinawa').checked;
 
   /* バリデーション */
   if (!plantName) { alert('植物名を入力してください。'); document.getElementById('plantName').focus(); return; }
   if (!price || Number(price) < 1) { alert('販売価格を入力してください。'); document.getElementById('price').focus(); return; }
 
-  const text = buildText({ plantName, category, size, price, shipping, condition, potDiameter, height, watering, sunlight, difficulty, appeal, tone, isMotherDay });
+  const text = buildText({ plantName, category, size, price, shipping, condition, potDiameter, height, watering, sunlight, difficulty, appeal, tone, isMotherDay, isSucAssorted, isHokkaidoOkinawa });
 
   document.getElementById('outputText').value = text;
   const section = document.getElementById('outputSection');
@@ -672,13 +698,20 @@ function buildText(d) {
       : `【母の日ギフトにぴったり！】\nお母さんへのサプライズプレゼントにぜひ！しっかり梱包してお届けするので、そのままプレゼントできます。ラッピング希望の方はコメントで教えてください！\n`;
   }
 
-  /* 固定フッター文 */
-  const footer = buildFooter(isPolite);
+  /* 品種おまかせ免責文（多肉植物カテゴリ、おまかせセット選択時） */
+  let sucAssortedBlock = '';
+  if (d.isSucAssorted) {
+    sucAssortedBlock = '【品種について】\n写真はイメージです。品種は入荷状況により異なります。到着した植物の品種でご不満の場合は事前にお問い合わせください。\n';
+  }
+
+  /* 固定フッター文（北海道・沖縄注意書きを含む） */
+  const footer = buildFooter(isPolite, d.isHokkaidoOkinawa);
 
   /* 結合 */
   const parts = [catchCopy, info, care];
-  if (appealBlock)    parts.push(appealBlock);
-  if (mothersDayBlock) parts.push(mothersDayBlock);
+  if (appealBlock)      parts.push(appealBlock);
+  if (mothersDayBlock)  parts.push(mothersDayBlock);
+  if (sucAssortedBlock) parts.push(sucAssortedBlock);
   parts.push(footer);
 
   return parts.join('\n');
@@ -715,10 +748,15 @@ function buildCatchCopy(d, isPolite) {
 }
 
 /* ===== フッター（固定文） ===== */
-function buildFooter(isPolite) {
+function buildFooter(isPolite, isHokkaidoOkinawa) {
+  /* 北海道・沖縄注意書き */
+  const hokkaidoNote = isHokkaidoOkinawa
+    ? '\n※北海道・沖縄へのお届けは追加送料が発生します。購入前にコメントにてご確認ください。'
+    : '';
+
   if (isPolite) {
     return `【梱包・発送について】
-植物が傷まないよう、新聞紙やプチプチで丁寧に梱包してお届けします。発送は購入確認後2〜3日以内を目安としております。
+植物が傷まないよう、新聞紙やプチプチで丁寧に梱包してお届けします。発送は購入確認後2〜3日以内を目安としております。${hokkaidoNote}
 
 【ご注意事項】
 ・生き物のため、個体差により写真と色・形・大きさが若干異なる場合がございます。
@@ -729,7 +767,7 @@ function buildFooter(isPolite) {
 何かご不明な点がございましたら、お気軽にコメントください。よろしくお願いいたします。`;
   } else {
     return `【梱包・発送について】
-植物が元気なうちにお届けできるよう、しっかり梱包して発送します！購入確認後2〜3日以内に発送予定です。
+植物が元気なうちにお届けできるよう、しっかり梱包して発送します！購入確認後2〜3日以内に発送予定です。${hokkaidoNote}
 
 【ご注意事項】
 ・生き物なので個体差により写真と色・形・大きさが少し違う場合があります。ご了承ください。
