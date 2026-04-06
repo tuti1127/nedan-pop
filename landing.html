@@ -285,113 +285,7 @@ footer {
   letter-spacing: 0.03em;
 }
 
-/* ===== 管理者設定パネル ===== */
-.admin-panel {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #1a1a1a;
-  color: #ffffff;
-  padding: 20px 24px 28px;
-  box-shadow: 0 -4px 24px rgba(0,0,0,0.35);
-  z-index: 1000;
-  border-top: 3px solid var(--primary-light);
-}
-
-.admin-panel.visible {
-  display: block;
-}
-
-.admin-panel-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-  text-transform: uppercase;
-  margin-bottom: 14px;
-}
-
-.admin-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-width: 540px;
-  margin: 0 auto;
-}
-
-.admin-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.admin-label {
-  font-size: 0.78rem;
-  color: #aaaaaa;
-  font-weight: 600;
-}
-
-.admin-input {
-  background: #2d2d2d;
-  border: 1px solid #444444;
-  border-radius: 8px;
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 0.9rem;
-  padding: 9px 12px;
-  width: 100%;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.admin-input:focus {
-  border-color: var(--primary-light);
-}
-
-.admin-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-  max-width: 540px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.admin-save-btn {
-  background: var(--primary-light);
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 700;
-  padding: 11px 28px;
-  cursor: pointer;
-  transition: filter 0.15s;
-}
-
-.admin-save-btn:hover {
-  filter: brightness(1.1);
-}
-
-.admin-toast {
-  display: none;
-  font-size: 0.83rem;
-  color: var(--accent);
-  font-weight: 600;
-  align-self: center;
-}
-
-.admin-toast.show {
-  display: block;
-}
-
-/* ===== 管理者モード時の余白（パネル分） ===== */
-body.admin-mode {
-  padding-bottom: 200px;
-}
+/* ===== レスポンシブ調整（管理者パネル削除済み） ===== */
 
 /* ===== レスポンシブ調整 ===== */
 @media (max-width: 400px) {
@@ -463,16 +357,16 @@ body.admin-mode {
   <!-- SNSボタン -->
   <div class="sns-buttons">
 
-    <!-- Instagramボタン -->
-    <a id="btn-instagram" href="#instagram" class="btn btn-instagram">
+    <!-- Instagramボタン（URLをここに直接記入してください: href="https://www.instagram.com/あなたのアカウント名"） -->
+    <a id="btn-instagram" href="https://www.instagram.com/" class="btn btn-instagram">
       <svg class="sns-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.31.975.975 1.248 2.242 1.31 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.335 2.633-1.31 3.608-.975.975-2.242 1.248-3.608 1.31-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.335-3.608-1.31-.975-.975-1.248-2.242-1.31-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.335-2.633 1.31-3.608.975-.975 2.242-1.248 3.608-1.31C8.416 2.175 8.796 2.163 12 2.163zm0-2.163C8.741 0 8.333.013 7.053.072 5.197.157 3.355.673 2.014 2.014.673 3.355.157 5.197.072 7.053.013 8.333 0 8.741 0 12c0 3.259.013 3.667.072 4.947.085 1.856.601 3.698 1.942 5.039 1.341 1.341 3.183 1.857 5.039 1.942C8.333 23.987 8.741 24 12 24c3.259 0 3.667-.013 4.947-.072 1.856-.085 3.698-.601 5.039-1.942 1.341-1.341 1.857-3.183 1.942-5.039.059-1.28.072-1.688.072-4.947s-.013-3.667-.072-4.947c-.085-1.856-.601-3.698-1.942-5.039C20.645.673 18.803.157 16.947.072 15.667.013 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
       </svg>
       Instagramをフォローする
     </a>
 
-    <!-- Xボタン -->
-    <a id="btn-twitter" href="#twitter" class="btn btn-twitter">
+    <!-- Xボタン（URLをここに直接記入してください: href="https://x.com/あなたのアカウント名"） -->
+    <a id="btn-twitter" href="https://twitter.com/" class="btn btn-twitter">
       <svg class="sns-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/>
       </svg>
@@ -488,26 +382,7 @@ body.admin-mode {
   <p>© 2026 植物のある暮らし</p>
 </footer>
 
-<!-- 管理者設定パネル（?edit=1 のときのみ表示） -->
-<div class="admin-panel" id="adminPanel">
-  <div style="max-width:540px;margin:0 auto;">
-    <div class="admin-panel-title">管理者設定 — SNSリンク</div>
-    <div class="admin-fields">
-      <div class="admin-field">
-        <label class="admin-label" for="inputInstagram">Instagram URL</label>
-        <input class="admin-input" type="url" id="inputInstagram" placeholder="https://www.instagram.com/yourhandle">
-      </div>
-      <div class="admin-field">
-        <label class="admin-label" for="inputTwitter">X (Twitter) URL</label>
-        <input class="admin-input" type="url" id="inputTwitter" placeholder="https://x.com/yourhandle">
-      </div>
-    </div>
-    <div class="admin-actions">
-      <button class="admin-save-btn" id="adminSaveBtn">保存</button>
-      <span class="admin-toast" id="adminToast">保存しました</span>
-    </div>
-  </div>
-</div>
+<!-- 管理者設定パネルは削除済み（セキュリティ対応）。SNS URLはHTMLのhref属性に直接記入してください。 -->
 
 <script>
 // ===== 母の日カウントダウン =====
@@ -543,49 +418,8 @@ body.admin-mode {
   inner.innerHTML = html;
 })();
 
-// ===== SNSリンクをlocalStorageから反映 =====
-(function() {
-  var igUrl = localStorage.getItem('sns_instagram');
-  var twUrl = localStorage.getItem('sns_twitter');
-  if (igUrl) document.getElementById('btn-instagram').href = igUrl;
-  if (twUrl) document.getElementById('btn-twitter').href = twUrl;
-})();
-
-// ===== 管理者モード =====
-(function() {
-  var params = new URLSearchParams(window.location.search);
-  if (params.get('edit') !== '1') return;
-
-  // パネル表示
-  var panel = document.getElementById('adminPanel');
-  panel.classList.add('visible');
-  document.body.classList.add('admin-mode');
-
-  // 既存値をフィールドに反映
-  var igStored = localStorage.getItem('sns_instagram') || '';
-  var twStored = localStorage.getItem('sns_twitter') || '';
-  document.getElementById('inputInstagram').value = igStored;
-  document.getElementById('inputTwitter').value = twStored;
-
-  // 保存ボタン
-  document.getElementById('adminSaveBtn').addEventListener('click', function() {
-    var igVal = document.getElementById('inputInstagram').value.trim();
-    var twVal = document.getElementById('inputTwitter').value.trim();
-
-    if (igVal) {
-      localStorage.setItem('sns_instagram', igVal);
-      document.getElementById('btn-instagram').href = igVal;
-    }
-    if (twVal) {
-      localStorage.setItem('sns_twitter', twVal);
-      document.getElementById('btn-twitter').href = twVal;
-    }
-
-    var toast = document.getElementById('adminToast');
-    toast.classList.add('show');
-    setTimeout(function() { toast.classList.remove('show'); }, 2500);
-  });
-})();
+// SNS URLはHTMLのhref属性に直接ハードコードされています。
+// localStorage・管理者パネルは削除済み（セキュリティ対応）。
 </script>
 
 </body>
